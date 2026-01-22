@@ -24,7 +24,7 @@
         "Decision made on which version is canonical",
         "README reflects that actual files are the source of truth"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "003",

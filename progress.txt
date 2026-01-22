@@ -18,3 +18,23 @@ What I did:
 
 Commit: 13ceb74
 Notes: All template files now exist as standalone files. Content matches README.md descriptions.
+
+---
+2026-01-22T21:05:00Z
+Task: 002
+Status: done
+
+What I did:
+- Compared all 5 Ralph scripts (ralph-start.sh, ralph-clone.sh, ralph-once.sh, ralph-loop.sh, ralph-reset.sh) between README.md heredoc versions and actual files
+- Documented key differences found:
+  - ralph-start.sh: Actual uses named volumes (better), README used anonymous volumes
+  - ralph-once.sh: Actual is simplified (no logging), README had full logging - simplified is appropriate for quick testing
+  - ralph-clone.sh: Minor differences in volume mounts
+  - ralph-loop.sh and ralph-reset.sh: Nearly identical
+- Determined actual files are canonical (improved/updated versions)
+- Updated README.md Step 1.7 to remove embedded heredocs, now links to actual files with a table
+- Updated README.md Step 3.9 to reference actual files
+- Removed ~340 lines of duplicated script content from README
+
+Commit: 165a9a3
+Notes: README is now significantly shorter and references the actual scripts as source of truth.
