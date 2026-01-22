@@ -11,6 +11,45 @@
 
 ---
 
+## Repository Structure
+
+This repo contains everything you need to run the Ralph workflow. Here's what each file and directory is for:
+
+```
+├── README.md                    # This guide - setup and workflow documentation
+├── RALPH_PROMPT.md              # Instructions Claude reads each iteration
+├── UI_TESTING.md                # UI testing standards (reference for UI projects)
+├── Dockerfile                   # Docker image definition for Ralph containers
+├── progress.txt                 # Work log (example/placeholder)
+│
+├── ralph-start.sh               # Launch container with local project mounted
+├── ralph-clone.sh               # Clone a repo into Docker-managed storage
+├── ralph-once.sh                # Run single Claude iteration (for testing)
+├── ralph-loop.sh                # Run Claude in a loop until done
+├── ralph-reset.sh               # Remove a container to start fresh
+│
+├── templates/                   # Files users copy to their projects
+│   ├── CLAUDE.md.template       # Project context template (rename to CLAUDE.md)
+│   ├── progress.txt.template    # Initial progress log
+│   ├── .claudeignore            # File exclusion patterns for Claude
+│   └── .git-hooks/
+│       └── pre-push             # Git safety hook (blocks pushes to main)
+│
+├── prds/                        # PRD templates and tools
+│   ├── PRD_TEMPLATE.json        # Template for creating new PRDs
+│   ├── PRD_REFINE.md            # Prompt for refining PRDs
+│   └── new-prd.sh               # Helper script to create numbered PRDs
+│
+└── ralph-logs/                  # Iteration logs (gitignored, local only)
+```
+
+**Key distinction:**
+- **Root scripts** (`ralph-*.sh`, `Dockerfile`) are installed once on your machine and used across all projects
+- **Templates** (`templates/`) are copied into each project you want to use Ralph with
+- **PRD tools** (`prds/`) can be copied to projects or used from this repo directly
+
+---
+
 ## Part 1: One-Time Machine Setup (~60 minutes)
 
 ### Step 1.1: Install Docker Desktop (10 min)
