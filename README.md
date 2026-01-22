@@ -147,372 +147,29 @@ docker build -t ralph-claude:latest .
 
 ### Step 1.7: Create Ralph Helper Scripts (10 min)
 
-**ralph-start.sh** — Launches a persistent container for a local project folder. Your Mac's `node_modules` is shadowed by the container's own copy (required because Mac and Linux have different architectures). Run `npm install` inside the container on first use.
+The Ralph helper scripts are provided in this repository. Copy them to your ralph-docker directory:
 
 ```bash
-cat > ~/ralph-docker/ralph-start.sh << 'EOF'
-#!/bin/bash
-# ralph-start.sh - Start Ralph container with local project mounted
-# Usage: ralph-start.sh [--fresh] /path/to/project [container-name]
-#   --fresh    Remove existing container and create new one
-#
-# Note: Run `npm install` inside the container - Mac's node_modules won't work.
-
-set -e  # Exit on any error
-
-# Check for --fresh flag
-FRESH=false
-if [ "$1" = "--fresh" ] || [ "$1" = "-f" ]; then
-    FRESH=true
-    shift
-fi
-
-# Arguments with defaults
-PROJECT_PATH="${1:-.}"                                    # Default: current directory
-
-# Convert to absolute path (fails if path doesn't exist)
-PROJECT_PATH=$(cd "$PROJECT_PATH" && pwd) || {
-    echo "❌ Error: Project path '$1' does not exist"
-    exit 1
-}
-
-# Get folder name for container (handles trailing slashes and edge cases)
-FOLDER_NAME=$(basename "$PROJECT_PATH")
-if [ -z "$FOLDER_NAME" ] || [ "$FOLDER_NAME" = "/" ]; then
-    FOLDER_NAME="project"
-fi
-CONTAINER_NAME="${2:-ralph-$FOLDER_NAME}"
-
-echo "🚀 Ralph Container: $CONTAINER_NAME"
-echo "📁 Project: $PROJECT_PATH"
-
-# Handle --fresh: remove existing container
-if [ "$FRESH" = true ] && docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "🗑️  Removing existing container (--fresh)..."
-    docker rm -f "$CONTAINER_NAME"
-fi
-
-# Check if container already exists
-if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "📦 Resuming existing container..."
-    docker start -ai "$CONTAINER_NAME"
-else
-    echo "📦 Creating new container..."
-    docker run -it \
-        --name "$CONTAINER_NAME" \
-        --memory="8g" \
-        --cpus="4" \
-        -v "$PROJECT_PATH:/workspace" \
-        -v /workspace/node_modules \
-        ralph-claude:latest \
-        bash
-    # -v /workspace/node_modules creates an anonymous volume that shadows
-    # Mac's node_modules (different architectures). Run `npm install` inside.
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-start.sh
+# Copy the scripts from this repo (after cloning)
+cp ralph-start.sh ralph-clone.sh ralph-once.sh ralph-loop.sh ralph-reset.sh ~/ralph-docker/
+chmod +x ~/ralph-docker/*.sh
 ```
 
-**ralph-clone.sh** — Alternative workflow: clones a repo into Docker-managed storage. You never manage local files—just push/pull via git.
+**What each script does:**
 
-```bash
-cat > ~/ralph-docker/ralph-clone.sh << 'EOF'
-#!/bin/bash
-# ralph-clone.sh - Start Ralph with repo cloned into Docker volume
-# Usage: ralph-clone.sh https://github.com/user/repo.git
+| Script | Purpose |
+|--------|---------|
+| [ralph-start.sh](ralph-start.sh) | Launch a container with a local project folder mounted |
+| [ralph-clone.sh](ralph-clone.sh) | Clone a repo into Docker-managed storage |
+| [ralph-once.sh](ralph-once.sh) | Run a single Claude iteration (for testing) |
+| [ralph-loop.sh](ralph-loop.sh) | Run Claude in a loop until done or max iterations |
+| [ralph-reset.sh](ralph-reset.sh) | Remove a container to start fresh |
 
-set -e  # Exit on any error
-
-REPO_URL="$1"
-if [ -z "$REPO_URL" ]; then
-    echo "Usage: ralph-clone.sh <github-repo-url>"
-    echo "Example: ralph-clone.sh https://github.com/user/repo.git"
-    exit 1
-fi
-
-# Extract repo name from URL (handles .git suffix)
-REPO_NAME=$(basename "$REPO_URL" .git)
-CONTAINER_NAME="ralph-${REPO_NAME}"
-VOLUME_NAME="ralph-vol-${REPO_NAME}"
-
-echo "🚀 Ralph Container: $CONTAINER_NAME"
-echo "📦 Volume: $VOLUME_NAME"
-
-# Create Docker volume if it doesn't exist (persists data between container recreations)
-if ! docker volume ls -q | grep -q "^${VOLUME_NAME}$"; then
-    echo "📦 Creating volume: $VOLUME_NAME"
-    docker volume create "$VOLUME_NAME"
-fi
-
-# Resume existing container or create new one
-if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "📦 Resuming existing container..."
-    docker start -ai "$CONTAINER_NAME"
-else
-    echo "📦 Creating container and cloning repo..."
-    docker run -it \
-        --name "$CONTAINER_NAME" \
-        --memory="8g" \
-        --cpus="4" \
-        -v "${VOLUME_NAME}:/workspace" \
-        -v /workspace/node_modules \
-        -e "REPO_URL=$REPO_URL" \
-        ralph-claude:latest \
-        bash -c '
-            if [ ! -d ".git" ]; then
-                echo "📥 Cloning repository..."
-                git clone "$REPO_URL" .
-            else
-                echo "📂 Repository already cloned"
-            fi
-            exec bash
-        '
-    # -v /workspace/node_modules creates an anonymous volume for Linux node_modules
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-clone.sh
-```
-
-**ralph-once.sh** — Runs a single Claude iteration. Use this to test your setup before running the full loop.
-
-```bash
-cat > ~/ralph-docker/ralph-once.sh << 'EOF'
-#!/bin/bash
-# ralph-once.sh - Run a single Ralph iteration (for testing)
-# Usage: ./ralph-once.sh <prd-file> [prompt-file]
-# Run this INSIDE the container, in /workspace
-#
-# Note: Output is buffered (appears when iteration completes).
-# To watch live, open another terminal and run: tail -f ralph-logs/*.log
-
-PRD_FILE="${1:-}"
-PROMPT_FILE="${2:-RALPH_PROMPT.md}"
-
-# PRD file is required
-if [ -z "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file required"
-    echo "Usage: ./ralph-once.sh <prd-file> [prompt-file]"
-    echo "Example: ./ralph-once.sh prds/001_test_infrastructure.json"
-    exit 1
-fi
-
-if [ ! -f "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file '$PRD_FILE' not found"
-    echo "Available PRDs:"
-    ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE || echo "  (none)"
-    exit 1
-fi
-
-if [ ! -f "$PROMPT_FILE" ]; then
-    echo "❌ Error: $PROMPT_FILE not found"
-    exit 1
-fi
-
-# Create logs directory
-mkdir -p ralph-logs
-
-# Get PRD name for log prefix
-PRD_NAME=$(basename "$PRD_FILE" .json)
-TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
-LOG_FILE="ralph-logs/${PRD_NAME}_${TIMESTAMP}_once.log"
-
-echo "🔂 Running single Ralph iteration"
-echo "📋 Prompt: $PROMPT_FILE"
-echo "📝 PRD: $PRD_FILE"
-echo "📄 Log: $LOG_FILE"
-echo ""
-echo "💡 To watch live output, open another terminal and run:"
-echo "   tail -f $LOG_FILE"
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-# Log header
-{
-    echo "=== Ralph Single Iteration ==="
-    echo "PRD: $PRD_FILE"
-    echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "=================================="
-    echo ""
-} > "$LOG_FILE"
-
-# Run claude in print mode
-OUTPUT=$(claude -p "Read $PROMPT_FILE for instructions. The PRD file is: $PRD_FILE" --dangerously-skip-permissions 2>&1)
-
-# Display and log
-echo "$OUTPUT"
-echo "$OUTPUT" >> "$LOG_FILE"
-
-# Log footer
-{
-    echo ""
-    echo "=================================="
-    echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
-} >> "$LOG_FILE"
-
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ Single iteration complete"
-echo "📄 Log saved to: $LOG_FILE"
-echo "Check git log and progress.txt to see what happened"
-EOF
-chmod +x ~/ralph-docker/ralph-once.sh
-```
-
-**ralph-loop.sh** — Runs Claude repeatedly until it outputs `<promise>COMPLETE</promise>` or hits max iterations.
-
-```bash
-cat > ~/ralph-docker/ralph-loop.sh << 'EOF'
-#!/bin/bash
-# ralph-loop.sh - Run Ralph in a loop until done
-# Usage: ./ralph-loop.sh <prd-file> [max-iterations] [prompt-file]
-# Run this INSIDE the container, in /workspace
-#
-# Note: Output is buffered (appears after each iteration completes).
-# To watch live, open another terminal and run: tail -f ralph-logs/*.log
-
-PRD_FILE="${1:-}"
-MAX_ITERATIONS="${2:-20}"
-PROMPT_FILE="${3:-RALPH_PROMPT.md}"
-
-# PRD file is required
-if [ -z "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file required"
-    echo "Usage: ./ralph-loop.sh <prd-file> [max-iterations] [prompt-file]"
-    echo "Example: ./ralph-loop.sh prds/001_test_infrastructure.json 20"
-    exit 1
-fi
-
-if [ ! -f "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file '$PRD_FILE' not found"
-    echo "Available PRDs:"
-    ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE || echo "  (none)"
-    exit 1
-fi
-
-if [ ! -f "$PROMPT_FILE" ]; then
-    echo "❌ Error: $PROMPT_FILE not found"
-    exit 1
-fi
-
-# Create logs directory
-mkdir -p ralph-logs
-
-# Get PRD name for log prefix (e.g., "001_test_infrastructure" from path)
-PRD_NAME=$(basename "$PRD_FILE" .json)
-TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
-
-echo "🔄 Ralph Loop Starting"
-echo "📋 Prompt: $PROMPT_FILE"
-echo "📝 PRD: $PRD_FILE"
-echo "🔢 Max iterations: $MAX_ITERATIONS"
-echo "📂 Logs: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-echo ""
-echo "💡 To watch live output, open another terminal and run:"
-echo "   tail -f ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-echo ""
-echo "⏹️  Ctrl+C to stop, or wait for COMPLETE signal"
-echo ""
-
-ITERATION=0
-while [ $ITERATION -lt $MAX_ITERATIONS ]; do
-    ITERATION=$((ITERATION + 1))
-    LOG_FILE="ralph-logs/${PRD_NAME}_${TIMESTAMP}_$(printf '%03d' $ITERATION).log"
-    
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔁 Iteration $ITERATION of $MAX_ITERATIONS"
-    echo "📄 Log: $LOG_FILE"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Log header
-    {
-        echo "=== Ralph Iteration $ITERATION ==="
-        echo "PRD: $PRD_FILE"
-        echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
-        echo "=================================="
-        echo ""
-    } > "$LOG_FILE"
-    
-    # Run claude in print mode (buffered output)
-    OUTPUT=$(claude -p "Read $PROMPT_FILE for instructions. The PRD file is: $PRD_FILE" --dangerously-skip-permissions 2>&1)
-    
-    # Display and log
-    echo "$OUTPUT"
-    echo "$OUTPUT" >> "$LOG_FILE"
-    
-    # Log footer
-    {
-        echo ""
-        echo "=================================="
-        echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
-    } >> "$LOG_FILE"
-    
-    # Check for completion signal
-    if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then
-        echo ""
-        echo "🎉 Ralph signaled COMPLETE after $ITERATION iterations"
-        echo "📂 Logs saved to: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-        exit 0
-    fi
-    
-    # Brief pause between iterations
-    sleep 2
-done
-
-echo ""
-echo "⚠️  Hit max iterations ($MAX_ITERATIONS) without COMPLETE signal"
-echo "Check progress.txt and $PRD_FILE to see what's left"
-echo "📂 Logs saved to: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-EOF
-chmod +x ~/ralph-docker/ralph-loop.sh
-```
-
-**ralph-reset.sh** — Deletes a container so you can start fresh. Project files are safe (they're on your Mac or in a Docker volume). This does NOT delete volumes.
-
-```bash
-cat > ~/ralph-docker/ralph-reset.sh << 'EOF'
-#!/bin/bash
-# ralph-reset.sh - Remove a Ralph container to start fresh
-# Usage: ralph-reset.sh <container-name>
-# 
-# SAFE: This only removes the container, NOT your project files:
-#   - ralph-start.sh projects: Files are on your Mac (mounted)
-#   - ralph-clone.sh projects: Files are in Docker volume (preserved)
-#
-# To also delete the volume (rare): docker volume rm ralph-vol-<repo-name>
-
-if [ -z "$1" ]; then
-    echo "Usage: ralph-reset.sh <container-name>"
-    echo ""
-    echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
-    exit 1
-fi
-
-CONTAINER_NAME="$1"
-
-# Check if container exists
-if ! docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "❌ Container '$CONTAINER_NAME' not found"
-    echo ""
-    echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
-    exit 1
-fi
-
-echo "⚠️  This will delete container: $CONTAINER_NAME"
-echo "   Project files are SAFE (on Mac or in Docker volume)"
-read -p "Continue? (y/n) " -n 1 -r
-echo
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker rm -f "$CONTAINER_NAME"
-    echo "✅ Container removed"
-    echo "   Run ralph-start.sh or ralph-clone.sh to recreate"
-else
-    echo "Cancelled"
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-reset.sh
-```
+**Key notes:**
+- `ralph-start.sh` and `ralph-clone.sh` run on your Mac to manage containers
+- `ralph-once.sh` and `ralph-loop.sh` run INSIDE the container
+- `node_modules` uses a named Docker volume (Mac/Linux architecture differences)
+- Run `npm install` inside the container on first use
 
 ### Step 1.8: Add Scripts to PATH (1 min)
 
@@ -963,11 +620,15 @@ EOF
 
 ### Step 3.9: Copy Ralph Scripts
 
+If you cloned this Ralph repo, you already have the scripts. Otherwise, copy them from your ralph-docker directory:
+
 ```bash
 cp ~/ralph-docker/ralph-loop.sh ./ralph-loop.sh
 cp ~/ralph-docker/ralph-once.sh ./ralph-once.sh
 chmod +x ralph-loop.sh ralph-once.sh
 ```
+
+See [ralph-loop.sh](ralph-loop.sh) and [ralph-once.sh](ralph-once.sh) for the current versions.
 
 ### Step 3.10: Update .gitignore
 
