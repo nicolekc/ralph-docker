@@ -36,7 +36,7 @@
         "README still readable as a guide",
         "File references use relative paths that work on GitHub"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "004",

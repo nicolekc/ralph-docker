@@ -38,3 +38,23 @@ What I did:
 
 Commit: 165a9a3
 Notes: README is now significantly shorter and references the actual scripts as source of truth.
+
+---
+2026-01-22T21:30:00Z
+Task: 003
+Status: done
+
+What I did:
+- Replaced 8 heredoc blocks in README with copy commands referencing actual files
+- Added markdown links to all template and script files for easy navigation
+- Reduced README from ~1254 lines to ~965 lines (~290 lines removed)
+- Renumbered steps 3.5-3.12 to 3.5-3.13 for proper sequencing
+- Preserved only necessary heredocs: Dockerfile (users create in ralph-docker) and .gitignore append (small addition)
+- Verified all 14 linked files exist and paths work as relative links
+
+Files modified:
+- README.md: Restructured to reference files instead of embedding
+- prds/001_normalize_repo_structure.json: Marked task 003 complete
+
+Commit: 337615c
+Notes: README is now a proper documentation hub. All file contents are in actual files, README links to them.
