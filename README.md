@@ -230,37 +230,20 @@ cd /path/to/your/project
 
 Or if using the clone workflow, you'll run `ralph-clone.sh` later instead.
 
-### Step 3.2: Create the Git Safety Hook
+### Step 3.2: Install the Git Safety Hook
 
 This blocks dangerous git commands inside the container as a safety net (branch protection is the real safeguard, this is defense in depth).
 
-Create `.git-hooks/pre-push`:
+Copy from this repo and configure git to use it:
+
 ```bash
 mkdir -p .git-hooks
-cat > .git-hooks/pre-push << 'EOF'
-#!/bin/bash
-# Block pushes to main/master from Claude
-
-protected_branches=("main" "master")
-current_branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
-
-for branch in "${protected_branches[@]}"; do
-    if [ "$current_branch" = "$branch" ]; then
-        echo "❌ BLOCKED: Cannot push directly to $branch"
-        echo "Create a feature branch and PR instead."
-        exit 1
-    fi
-done
-
-exit 0
-EOF
+cp /path/to/ralph-repo/templates/.git-hooks/pre-push .git-hooks/pre-push
 chmod +x .git-hooks/pre-push
-```
-
-Configure git to use this hooks directory:
-```bash
 git config core.hooksPath .git-hooks
 ```
+
+See [templates/.git-hooks/pre-push](templates/.git-hooks/pre-push) for the hook source.
 
 Commit the hook:
 ```bash
@@ -272,29 +255,12 @@ git commit -m "Add git safety hook to block direct pushes to main"
 
 Start with a minimal template. Claude will expand this by exploring your project.
 
+Copy from this repo:
 ```bash
-cat > CLAUDE.md << 'EOF'
-# Project Context
-
-## Commands
-- `npm install` - Install dependencies
-- `npm run dev` - Start dev server  
-- `npm test` - Run tests
-- `npm run build` - Production build
-
-## Git Rules
-- NEVER push to main directly
-- Always work on feature branches
-- Make small, logical commits with clear messages
-
-## Testing Rules
-- ALL changes MUST have tests
-- Tests MUST pass before committing
-
-## Project Details
-[To be filled by project discovery - see Step 3.4]
-EOF
+cp /path/to/ralph-repo/templates/CLAUDE.md.template ./CLAUDE.md
 ```
+
+See [templates/CLAUDE.md.template](templates/CLAUDE.md.template) for the starting point.
 
 ### Step 3.4: Run Project Discovery
 
@@ -345,139 +311,30 @@ Save the updated CLAUDE.md when done.
 
 Review the output and adjust anything that seems wrong.
 
-### Step 3.5: Create RALPH_PROMPT.md
+### Step 3.5: Copy RALPH_PROMPT.md
 
 This is what Claude reads each iteration. The PRD filename is passed when invoking the script.
 
+Copy from this repo (assuming you cloned it):
 ```bash
-cat > RALPH_PROMPT.md << 'EOF'
-# Ralph Instructions
-
-Read these files first:
-1. CLAUDE.md - Project context and rules
-2. The PRD file (you were told which one)
-3. progress.txt - What's been done
-
-## Your Job (ONE TASK PER ITERATION)
-
-You will complete exactly ONE task per iteration. Not zero, not two. One.
-
-1. If not already on a feature branch, create one based on the PRD filename:
-   `git checkout -b ralph/[prd-number]-[brief-description]`
-   Example: `git checkout -b ralph/001-test-infrastructure`
-2. Read the PRD file and find all tasks where `testsPassing: false`
-3. Choose the BEST NEXT TASK to work on (not necessarily the first one—pick the most logical next step based on dependencies, complexity, and what's already done)
-4. Implement ONLY that task with appropriate tests
-5. Run the test command from CLAUDE.md - fix until ALL tests pass
-6. Commit with a clear message describing what you did
-7. Update the PRD file: set `testsPassing: true` for ONLY the completed task
-8. APPEND summary to progress.txt (add to end of file, do not modify existing content)
-9. STOP this iteration (the loop will start a new one)
-
-## Rules
-
-- **One task per iteration.** Do not continue to the next task.
-- **No drive-by refactoring.** Only touch code directly related to your current task. If you see something else that needs fixing, add it as a new task to the PRD instead of fixing it now.
-- **Never push to main.** Only push your feature branch.
-- **Never commit failing tests.**
-- **Small commits.** One logical change per commit.
-- **If stuck on same task 3+ times**, mark it with a `blocked` field explaining why, then pick a different task.
-
-## Modifying the PRD
-
-You may modify the PRD file in these specific ways:
-
-**Adding tasks:** If you discover something that needs to be done that isn't in the PRD, add it as a new task with a new ID and `testsPassing: false`. APPEND a note to progress.txt.
-
-**Splitting tasks:** If a task is too large to complete in one iteration, split it into smaller subtasks:
-- Keep the original task ID as a prefix (e.g., "003" becomes "003a", "003b", "003c")
-- Mark the original as split by adding `"split": true`
-- Create the subtasks with `testsPassing: false`
-- APPEND a note to progress.txt
-
-Do NOT delete tasks. Do NOT rename task IDs (except for splitting). Do NOT modify completed tasks.
-
-## After Each Task
-
-APPEND to progress.txt (add to end of file):
-```
----
-[TIMESTAMP]
-Task: [task id]
-Status: done|blocked|split
-
-What I did:
-- [Detailed list of changes made]
-- [Include specific files modified]
-- [Include any key decisions or approaches taken]
-
-Commit: [hash]
-Notes: [any PRD modifications, blockers encountered, or issues to flag]
+cp /path/to/ralph-repo/RALPH_PROMPT.md ./RALPH_PROMPT.md
 ```
 
-## When All Tasks Complete
+See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows during each iteration.
 
-When there are no more tasks with `testsPassing: false` in the PRD file:
-
-1. `git push -u origin [branch-name]`
-2. Output exactly this completion signal (the loop script detects this):
-
-<promise>COMPLETE</promise>
-
-3. Then output: "✅ All tasks complete. Branch [branch-name] pushed. Please review PR on GitHub."
-EOF
-```
-
-### Step 3.5: Create PRD Directory and Template
+### Step 3.6: Create PRD Directory and Template
 
 PRDs are numbered for history (e.g., `001_initial_setup.json`, `002_user_auth.json`). **Task IDs are for reference only—they do NOT imply execution order.** Ralph picks the best next task dynamically.
 
+Copy from this repo:
 ```bash
-# Create PRD directory
 mkdir -p prds
-
-# Create the template
-cat > prds/PRD_TEMPLATE.json << 'EOF'
-{
-  "sprint": "[Name]",
-  "created": "[YYYY-MM-DD]",
-  "overview": "[Brief description of what this sprint accomplishes]",
-  "note": "Task IDs are for reference only. Order is determined dynamically.",
-  "tasks": [
-    {
-      "id": "001",
-      "name": "[Task Name]",
-      "description": "[What needs to be done]",
-      "acceptanceCriteria": [
-        "Criterion 1",
-        "Criterion 2"
-      ],
-      "testsPassing": false
-    }
-  ]
-}
-EOF
-
-# Create a helper script to start a new PRD
-cat > prds/new-prd.sh << 'EOF'
-#!/bin/bash
-# Usage: ./new-prd.sh "sprint name"
-
-NAME="${1:-unnamed}"
-# Find the next number
-LAST=$(ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE | sort -r | head -1 | grep -oE '[0-9]{3}' | head -1)
-NEXT=$(printf "%03d" $((10#${LAST:-0} + 1)))
-FILENAME="prds/${NEXT}_$(echo "$NAME" | tr ' ' '_' | tr '[:upper:]' '[:lower:]').json"
-
-cp prds/PRD_TEMPLATE.json "$FILENAME"
-sed -i '' "s/\[Name\]/$NAME/" "$FILENAME" 2>/dev/null || sed -i "s/\[Name\]/$NAME/" "$FILENAME"
-sed -i '' "s/\[YYYY-MM-DD\]/$(date +%Y-%m-%d)/" "$FILENAME" 2>/dev/null || sed -i "s/\[YYYY-MM-DD\]/$(date +%Y-%m-%d)/" "$FILENAME"
-
-echo "Created: $FILENAME"
-echo "Run Ralph with: ./ralph-loop.sh $FILENAME"
-EOF
+cp /path/to/ralph-repo/prds/PRD_TEMPLATE.json ./prds/
+cp /path/to/ralph-repo/prds/new-prd.sh ./prds/
 chmod +x prds/new-prd.sh
 ```
+
+See [prds/PRD_TEMPLATE.json](prds/PRD_TEMPLATE.json) for the template structure and [prds/new-prd.sh](prds/new-prd.sh) for the helper script.
 
 **Workflow:**
 1. `./prds/new-prd.sh "user authentication"` → creates `prds/001_user_authentication.json`
@@ -485,140 +342,38 @@ chmod +x prds/new-prd.sh
 3. Run Ralph: `./ralph-loop.sh prds/001_user_authentication.json`
 4. When done, the numbered file serves as history
 
-### Step 3.6: Create progress.txt
+### Step 3.7: Create progress.txt
 
+Copy from this repo:
 ```bash
-cat > progress.txt << 'EOF'
-# Ralph Progress Log
-
----
-[Setup]
-Project configured for Ralph workflow.
-EOF
+cp /path/to/ralph-repo/templates/progress.txt.template ./progress.txt
 ```
 
-### Step 3.7: Create UI_TESTING.md (Reference for UI Projects)
+See [templates/progress.txt.template](templates/progress.txt.template) for the initial structure.
+
+### Step 3.8: Copy UI_TESTING.md (Reference for UI Projects)
 
 This file contains UI testing standards. Claude reads it when working on UI tasks.
 
+Copy from this repo:
 ```bash
-cat > UI_TESTING.md << 'EOF'
-# UI Testing Standards
-
-This document defines our standards for UI testing. Claude should reference 
-this when implementing or testing UI components.
-
-## Core Principle: Accessibility-First Testing
-
-UI correctness is verified through **accessibility semantics**, not visual 
-appearance. If a component has correct ARIA attributes and semantic HTML, 
-it will be accessible AND testable.
-
-## Required Standards
-
-### Semantic HTML First
-- Use `<button>` not `<div onClick>`
-- Use `<nav>`, `<main>`, `<header>`, `<footer>` for landmarks
-- Use proper heading hierarchy (`<h1>` → `<h2>` → `<h3>`)
-- Use `<label>` elements properly associated with inputs
-
-### ARIA Attributes for Interactive Elements
-- Buttons without visible text: `aria-label`
-- Toggle buttons: `aria-pressed`
-- Expandable sections: `aria-expanded`
-- Form inputs: `aria-required`, `aria-invalid` for validation states
-- Modals: `role="dialog"`, `aria-labelledby`, `aria-modal`
-- Loading states: `aria-busy`
-- Dynamic content: `aria-live` regions where appropriate
-
-### Verification Approach
-
-When verifying UI changes:
-1. The accessibility tree should reflect the intended UI structure
-2. Interactive elements should be reachable and have meaningful names
-3. State changes should be reflected in ARIA attributes
-4. No console errors related to accessibility
-
-## Tools Available
-
-- **Playwright** is available in the container for browser-based testing
-- Playwright can capture **accessibility snapshots** showing the semantic 
-  structure of a page
-- Use accessibility snapshots to verify UI correctness without relying on 
-  visual comparison
-
-## When to Apply
-
-These standards apply when:
-- Creating new UI components
-- Modifying existing UI
-- Writing tests for UI functionality
-- Verifying acceptance criteria that involve user interface
-
-Claude should determine the specific testing approach based on the project's 
-existing test setup (discovered in CLAUDE.md).
-EOF
+cp /path/to/ralph-repo/UI_TESTING.md ./UI_TESTING.md
 ```
 
-### Step 3.8: Create PRD_REFINE.md (PRD Quality Check)
+See [UI_TESTING.md](UI_TESTING.md) for the full UI testing standards document.
+
+### Step 3.9: Copy PRD_REFINE.md (PRD Quality Check)
 
 This prompt helps refine PRDs to ensure tasks are right-sized.
 
+Copy from this repo:
 ```bash
-cat > prds/PRD_REFINE.md << 'EOF'
-# PRD Refinement
-
-Review the PRD for task sizing and acceptance criteria quality.
-
-## Right-Sized Task
-- Completable in one focused session
-- Has clear "done" state (testable)
-- Dependencies are explicit
-
-## Too Big (split it)
-- Has multiple distinct deliverables
-- Naturally breaks into "first X, then Y"
-
-## Too Small (merge it)
-- Just a sub-step of another task
-- Can't be tested independently
-
-## Task Order
-
-Task IDs are for REFERENCE ONLY—not execution order.
-Ralph picks the best next task dynamically based on:
-- What's already done
-- What makes logical sense
-- Dependencies between tasks
-
-If tasks have hard dependencies, note them in the description:
-- "Requires: 003" or "After auth is complete"
-- Do NOT assume numeric order = execution order
-
-## Acceptance Criteria Quality
-
-Good criteria test PURPOSE, not implementation:
-- "User can log in with email/password" (purpose)
-- "Login form calls /api/auth endpoint" (implementation - too rigid)
-
-Avoid:
-- Specifying exact function names or file structures
-- Requiring specific libraries or patterns
-- Testing internal state rather than observable behavior
-
-## Output Format
-
-For each task:
-- KEEP: [task id] - [reason]
-- SPLIT: [task id] into [subtasks]
-- MERGE: [task ids] into [single task]
-- FIX: [task id] - [criteria issue]
-
-Or if all tasks are ready: "PRD is ready"
-EOF
+cp /path/to/ralph-repo/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 ```
 
-### Step 3.9: Copy Ralph Scripts
+See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
+
+### Step 3.10: Copy Ralph Scripts
 
 If you cloned this Ralph repo, you already have the scripts. Otherwise, copy them from your ralph-docker directory:
 
@@ -630,7 +385,7 @@ chmod +x ralph-loop.sh ralph-once.sh
 
 See [ralph-loop.sh](ralph-loop.sh) and [ralph-once.sh](ralph-once.sh) for the current versions.
 
-### Step 3.10: Update .gitignore
+### Step 3.11: Update .gitignore
 
 ```bash
 cat >> .gitignore << 'EOF'
@@ -640,59 +395,16 @@ ralph-logs/
 EOF
 ```
 
-### Step 3.11: Create .claudeignore
+### Step 3.12: Create .claudeignore
 
 Prevent Claude from reading sensitive or wasteful files. Claude Code doesn't do RAG on large files—it reads them into context, which wastes tokens and can hit limits.
 
+Copy from this repo:
 ```bash
-cat > .claudeignore << 'EOF'
-# === SECRETS (never let Claude read these) ===
-.env
-.env.*
-*.pem
-*.key
-secrets/
-
-# === LARGE GENERATED FILES (waste of context) ===
-# Lock files - huge, not useful
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Build outputs
-/build/
-/dist/
-/.next/
-/.nuxt/
-/.output/
-/.react-router/
-
-# Dependencies
-/node_modules/
-
-# Generated code (Claude can read the source schemas instead)
-# Uncomment if applicable:
-# /app/generated/        # Prisma
-# /src/gql/              # GraphQL codegen
-# /__generated__/        # Relay
-
-# === TEST ARTIFACTS (usually not helpful) ===
-/playwright-report/
-/test-results/
-/coverage/
-/.nyc_output/
-
-# === RALPH LOGS ===
-# These COULD help Claude debug issues from previous iterations,
-# but they're large and not always present (gitignored).
-# Uncomment to exclude:
-# /ralph-logs/
-
-# === OS FILES ===
-.DS_Store
-Thumbs.db
-EOF
+cp /path/to/ralph-repo/templates/.claudeignore ./.claudeignore
 ```
+
+See [templates/.claudeignore](templates/.claudeignore) for the default exclusions.
 
 **Customize for your project:** Review what's in your `.gitignore`—most of those should also be in `.claudeignore`. The key categories:
 - **Secrets** — Always ignore
@@ -701,7 +413,7 @@ EOF
 - **Test artifacts** — Usually ignore (reports, screenshots)
 - **Ralph logs** — Optional (might help debugging, but large)
 
-### Step 3.12: Commit Setup
+### Step 3.13: Commit Setup
 
 ```bash
 git add CLAUDE.md RALPH_PROMPT.md UI_TESTING.md prds/ progress.txt ralph-loop.sh ralph-once.sh .git-hooks .gitignore .claudeignore
