@@ -47,7 +47,7 @@
         "All files and directories are explained",
         "Purpose of templates/ vs root scripts is clear"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "005",

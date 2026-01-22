@@ -58,3 +58,25 @@ Files modified:
 
 Commit: 337615c
 Notes: README is now a proper documentation hub. All file contents are in actual files, README links to them.
+
+---
+2026-01-22T21:45:00Z
+Task: 004
+Status: done
+
+What I did:
+- Added "Repository Structure" section to README.md after the intro
+- Created visual directory tree showing all files and directories
+- Explained purpose of each file and directory:
+  - Root scripts (ralph-*.sh, Dockerfile) for machine-level setup
+  - templates/ for files users copy to their projects
+  - prds/ for PRD templates and tools
+  - ralph-logs/ for iteration logs (gitignored)
+- Added "Key distinction" section explaining which files go where
+
+Files modified:
+- README.md: Added Repository Structure section (~39 lines)
+- prds/001_normalize_repo_structure.json: Marked task 004 complete
+
+Commit: 55f948d
+Notes: Users can now see the repo structure at a glance. Task 005 (update setup instructions) remains.
