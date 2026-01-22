@@ -44,7 +44,8 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 ```
 
 **Key distinction:**
-- **Root scripts** (`ralph-*.sh`, `Dockerfile`) are installed once on your machine and used across all projects
+- **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`, `Dockerfile`) are installed once in `~/ralph-docker/` and manage containers
+- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) are copied into each project and run inside containers
 - **Templates** (`templates/`) are copied into each project you want to use Ralph with
 - **PRD tools** (`prds/`) can be copied to projects or used from this repo directly
 
@@ -184,29 +185,34 @@ Build (takes ~10 min due to Playwright):
 docker build -t ralph-claude:latest .
 ```
 
-### Step 1.7: Create Ralph Helper Scripts (10 min)
+### Step 1.7: Install Ralph Helper Scripts (10 min)
 
-The Ralph helper scripts are provided in this repository. Copy them to your ralph-docker directory:
+Clone this Ralph repository and copy the machine-level scripts to your ralph-docker directory:
 
 ```bash
-# Copy the scripts from this repo (after cloning)
-cp ralph-start.sh ralph-clone.sh ralph-once.sh ralph-loop.sh ralph-reset.sh ~/ralph-docker/
+# Clone the Ralph repo if you haven't already
+git clone https://github.com/your-org/ralph.git ~/ralph
+
+# Copy machine-level scripts to ralph-docker
+cp ~/ralph/ralph-start.sh ~/ralph/ralph-clone.sh ~/ralph/ralph-reset.sh ~/ralph-docker/
 chmod +x ~/ralph-docker/*.sh
 ```
 
+**Note:** `ralph-once.sh` and `ralph-loop.sh` run inside containers, so they get copied to each project in Part 3, not to `~/ralph-docker/`.
+
 **What each script does:**
 
-| Script | Purpose |
-|--------|---------|
-| [ralph-start.sh](ralph-start.sh) | Launch a container with a local project folder mounted |
-| [ralph-clone.sh](ralph-clone.sh) | Clone a repo into Docker-managed storage |
-| [ralph-once.sh](ralph-once.sh) | Run a single Claude iteration (for testing) |
-| [ralph-loop.sh](ralph-loop.sh) | Run Claude in a loop until done or max iterations |
-| [ralph-reset.sh](ralph-reset.sh) | Remove a container to start fresh |
+| Script | Location | Purpose |
+|--------|----------|---------|
+| [ralph-start.sh](ralph-start.sh) | `~/ralph-docker/` | Launch a container with a local project folder mounted |
+| [ralph-clone.sh](ralph-clone.sh) | `~/ralph-docker/` | Clone a repo into Docker-managed storage |
+| [ralph-reset.sh](ralph-reset.sh) | `~/ralph-docker/` | Remove a container to start fresh |
+| [ralph-once.sh](ralph-once.sh) | Your project | Run a single Claude iteration (for testing) |
+| [ralph-loop.sh](ralph-loop.sh) | Your project | Run Claude in a loop until done or max iterations |
 
 **Key notes:**
-- `ralph-start.sh` and `ralph-clone.sh` run on your Mac to manage containers
-- `ralph-once.sh` and `ralph-loop.sh` run INSIDE the container
+- **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`) go in `~/ralph-docker/` and run on your Mac
+- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) get copied to each project and run inside containers
 - `node_modules` uses a named Docker volume (Mac/Linux architecture differences)
 - Run `npm install` inside the container on first use
 
@@ -261,6 +267,16 @@ You then: Review on GitHub → Approve → Merge → Delete branch
 
 ## Part 3: Project Setup (~15 minutes per project)
 
+### Step 3.0: Clone This Repository
+
+If you haven't already, clone this Ralph repository to your machine:
+
+```bash
+git clone https://github.com/your-org/ralph.git ~/ralph
+```
+
+This gives you access to all templates and scripts. The setup steps below copy files from `~/ralph/` to your project.
+
 ### Step 3.1: Navigate to Your Project
 
 ```bash
@@ -273,11 +289,11 @@ Or if using the clone workflow, you'll run `ralph-clone.sh` later instead.
 
 This blocks dangerous git commands inside the container as a safety net (branch protection is the real safeguard, this is defense in depth).
 
-Copy from this repo and configure git to use it:
+Copy from the Ralph repo and configure git to use it:
 
 ```bash
 mkdir -p .git-hooks
-cp /path/to/ralph-repo/templates/.git-hooks/pre-push .git-hooks/pre-push
+cp ~/ralph/templates/.git-hooks/pre-push .git-hooks/pre-push
 chmod +x .git-hooks/pre-push
 git config core.hooksPath .git-hooks
 ```
@@ -294,9 +310,9 @@ git commit -m "Add git safety hook to block direct pushes to main"
 
 Start with a minimal template. Claude will expand this by exploring your project.
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/templates/CLAUDE.md.template ./CLAUDE.md
+cp ~/ralph/templates/CLAUDE.md.template ./CLAUDE.md
 ```
 
 See [templates/CLAUDE.md.template](templates/CLAUDE.md.template) for the starting point.
@@ -354,9 +370,9 @@ Review the output and adjust anything that seems wrong.
 
 This is what Claude reads each iteration. The PRD filename is passed when invoking the script.
 
-Copy from this repo (assuming you cloned it):
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/RALPH_PROMPT.md ./RALPH_PROMPT.md
+cp ~/ralph/RALPH_PROMPT.md ./RALPH_PROMPT.md
 ```
 
 See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows during each iteration.
@@ -365,11 +381,11 @@ See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows 
 
 PRDs are numbered for history (e.g., `001_initial_setup.json`, `002_user_auth.json`). **Task IDs are for reference only—they do NOT imply execution order.** Ralph picks the best next task dynamically.
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
 mkdir -p prds
-cp /path/to/ralph-repo/prds/PRD_TEMPLATE.json ./prds/
-cp /path/to/ralph-repo/prds/new-prd.sh ./prds/
+cp ~/ralph/prds/PRD_TEMPLATE.json ./prds/
+cp ~/ralph/prds/new-prd.sh ./prds/
 chmod +x prds/new-prd.sh
 ```
 
@@ -383,9 +399,9 @@ See [prds/PRD_TEMPLATE.json](prds/PRD_TEMPLATE.json) for the template structure 
 
 ### Step 3.7: Create progress.txt
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/templates/progress.txt.template ./progress.txt
+cp ~/ralph/templates/progress.txt.template ./progress.txt
 ```
 
 See [templates/progress.txt.template](templates/progress.txt.template) for the initial structure.
@@ -394,9 +410,9 @@ See [templates/progress.txt.template](templates/progress.txt.template) for the i
 
 This file contains UI testing standards. Claude reads it when working on UI tasks.
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/UI_TESTING.md ./UI_TESTING.md
+cp ~/ralph/UI_TESTING.md ./UI_TESTING.md
 ```
 
 See [UI_TESTING.md](UI_TESTING.md) for the full UI testing standards document.
@@ -405,20 +421,20 @@ See [UI_TESTING.md](UI_TESTING.md) for the full UI testing standards document.
 
 This prompt helps refine PRDs to ensure tasks are right-sized.
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
+cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 ```
 
 See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
 
 ### Step 3.10: Copy Ralph Scripts
 
-If you cloned this Ralph repo, you already have the scripts. Otherwise, copy them from your ralph-docker directory:
+Copy the in-container scripts from the Ralph repo:
 
 ```bash
-cp ~/ralph-docker/ralph-loop.sh ./ralph-loop.sh
-cp ~/ralph-docker/ralph-once.sh ./ralph-once.sh
+cp ~/ralph/ralph-loop.sh ./ralph-loop.sh
+cp ~/ralph/ralph-once.sh ./ralph-once.sh
 chmod +x ralph-loop.sh ralph-once.sh
 ```
 
@@ -438,9 +454,9 @@ EOF
 
 Prevent Claude from reading sensitive or wasteful files. Claude Code doesn't do RAG on large files—it reads them into context, which wastes tokens and can hit limits.
 
-Copy from this repo:
+Copy from the Ralph repo:
 ```bash
-cp /path/to/ralph-repo/templates/.claudeignore ./.claudeignore
+cp ~/ralph/templates/.claudeignore ./.claudeignore
 ```
 
 See [templates/.claudeignore](templates/.claudeignore) for the default exclusions.
