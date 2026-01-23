@@ -376,3 +376,23 @@ What I did:
 
 Commit: cf24db7
 Notes: Example uses realistic content without being actual data. Users can now see exactly what progress entries should look like.
+
+---
+2026-01-23T10:00:00Z
+PRD: 003_readme_modernization.json
+Task: 011
+Status: done
+
+What I did:
+- Removed Step 8.2 (Review Commits separately) - merged into GitHub review step
+- Removed Step 8.3 (Run Tests) - tests already passed in container, redundant
+- Removed Step 8.4 (Manual Testing) - optional, doesn't need explicit instruction
+- Renumbered remaining steps: 8.5→8.2 (Review on GitHub), 8.6→8.3 (Pull Merged Changes)
+- Part 8 now focuses on: review progress.txt, review PR on GitHub, merge and pull
+- Verified Part 5 is consistent with new workflow:
+  - No references to new-prd.sh ✓
+  - Uses natural language PRD creation ✓
+  - References /refine skill in Step 5.2 ✓
+
+Commit: 5a446bb
+Notes: Part 8 reduced from 6 steps to 3 steps. Focused and non-redundant.
