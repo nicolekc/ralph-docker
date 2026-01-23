@@ -91,7 +91,7 @@
         "Time estimates reflect the ACTUAL time after all improvements",
         "Replaces the current bullet-list time budget"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "008",

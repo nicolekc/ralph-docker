@@ -396,3 +396,25 @@ What I did:
 
 Commit: 5a446bb
 Notes: Part 8 reduced from 6 steps to 3 steps. Focused and non-redundant.
+
+---
+2026-01-23T11:00:00Z
+PRD: 003_readme_modernization.json
+Task: 007
+Status: done
+
+What I did:
+- Added Table of Contents section after "Why Ralph?" section
+- Created markdown table with 9 Parts, descriptions, and time estimates
+- Each Part number links to its section via GitHub markdown anchors
+- Time estimates updated based on post-improvement workflow:
+  - Part 1: ~45 min (reduced from ~60 min due to removing host Claude installation)
+  - Part 3: ~5 min (dramatically reduced due to install.sh)
+  - Part 4: ~20 min (added estimate for test infrastructure PRD)
+  - Part 7: "varies" (depends on PRD complexity)
+  - Part 9: "reference" (troubleshooting guide, not a timed activity)
+- Added summary grouping below table: one-time setup, per-project setup, per-feature cycle
+- Removed old bullet-list Time Budget format
+
+Commit: 431f3d0
+Notes: All dependencies (004, 005, 006, 010, 011) were complete. Only Task 012 (final coherency review) remains.
