@@ -32,8 +32,6 @@ Ralph is a workflow technique that lets Claude Code work autonomously on your co
 **Per-project setup:** Part 3 (~5 min) + first container auth (~10 min)
 **Per-feature cycle:** Parts 4-8 (time varies by feature complexity)
 
-**Your Stack:** macOS, Claude Max, React Router, TypeScript, npm, Jest, Figma screenshots
-
 ---
 
 ## Repository Structure
