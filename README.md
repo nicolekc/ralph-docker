@@ -2,7 +2,7 @@
 
 **Time Budget:**
 - Machine setup (one-time): ~60 minutes
-- Project setup: ~15 minutes  
+- Project setup: ~5 minutes
 - Sprint planning: ~15 minutes
 - Feature planning: ~5 minutes each
 - Human verification: ~15 minutes
@@ -19,6 +19,7 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 ├── README.md                    # This guide - setup and workflow documentation
 ├── RALPH_PROMPT.md              # Instructions Claude reads each iteration
 ├── Dockerfile                   # Docker image definition for Ralph containers
+├── install.sh                   # Project setup script (copies files to your project)
 ├── progress.txt                 # Work log (example/placeholder)
 │
 ├── ralph-start.sh               # Launch container with local project mounted
@@ -27,7 +28,7 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 ├── ralph-loop.sh                # Run Claude in a loop until done
 ├── ralph-reset.sh               # Remove a container to start fresh
 │
-├── templates/                   # Files users copy to their projects
+├── templates/                   # Files copied to your project by install.sh
 │   ├── CLAUDE.md.template       # Project context template (rename to CLAUDE.md)
 │   ├── progress.txt.template    # Initial progress log
 │   ├── UI_TESTING.md            # UI testing standards (reference for UI projects)
@@ -37,17 +38,16 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 │
 ├── prds/                        # PRD templates and tools
 │   ├── PRD_TEMPLATE.json        # Template for creating new PRDs
-│   ├── PRD_REFINE.md            # Prompt for refining PRDs
-│   └── new-prd.sh               # Helper script to create numbered PRDs
+│   └── PRD_REFINE.md            # Prompt for refining PRDs
 │
 └── ralph-logs/                  # Iteration logs (gitignored, local only)
 ```
 
 **Key distinction:**
 - **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`, `Dockerfile`) are installed once in `~/ralph-docker/` and manage containers
-- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) are copied into each project and run inside containers
-- **Templates** (`templates/`) are copied into each project you want to use Ralph with
-- **PRD tools** (`prds/`) can be copied to projects or used from this repo directly
+- **Project setup** (`install.sh`) copies all project files in one command
+- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) are copied to each project and run inside containers
+- **Templates** (`templates/`) and **PRD tools** (`prds/`) are copied by the install script
 
 ---
 
@@ -217,203 +217,82 @@ You then: Review on GitHub → Approve → Merge → Delete branch
 
 ---
 
-## Part 3: Project Setup (~15 minutes per project)
+## Part 3: Project Setup (~5 minutes per project)
 
-These files go in your project root (or subdirectories as specified). Repeat this setup for each project you want to use with Ralph.
+The install script copies all necessary Ralph files to your project. Repeat for each project you want to use with Ralph.
 
-### Step 3.0: Clone This Repository
+### Step 3.1: Clone the Ralph Repository
 
-If you haven't already, clone this Ralph repository to your machine:
+If you haven't already:
 
 ```bash
 git clone https://github.com/your-org/ralph.git ~/ralph
 ```
 
-This gives you access to all templates and scripts. The setup steps below copy files from `~/ralph/` to your project.
-
-### Step 3.1: Navigate to Your Project
+### Step 3.2: Run the Install Script
 
 ```bash
 cd /path/to/your/project
+~/ralph/install.sh .
 ```
 
-Or if using the clone workflow, you'll run `ralph-clone.sh` later instead.
+This copies all Ralph files to your project:
+- `CLAUDE.md` — Project context (from template)
+- `RALPH_PROMPT.md` — Instructions Claude reads each iteration
+- `ralph-loop.sh`, `ralph-once.sh` — Scripts to run Ralph
+- `prds/` — PRD template and refinement docs
+- `.claude/skills/` — `/discover` and `/refine` skills
+- `.git-hooks/pre-push` — Safety hook blocking pushes to main
+- `.claudeignore` — File exclusions for Claude
+- `UI_TESTING.md` — UI testing standards reference
+- `progress.txt` — Work log
 
-### Step 3.2: Install the Git Safety Hook
+The script is idempotent—safe to run multiple times.
 
-This blocks dangerous git commands inside the container as a safety net (branch protection is the real safeguard, this is defense in depth).
+### Step 3.3: Run Project Discovery
 
-Copy from the Ralph repo and configure git to use it:
-
-```bash
-mkdir -p .git-hooks
-cp ~/ralph/templates/.git-hooks/pre-push .git-hooks/pre-push
-chmod +x .git-hooks/pre-push
-git config core.hooksPath .git-hooks
-```
-
-See [templates/.git-hooks/pre-push](templates/.git-hooks/pre-push) for the hook source.
-
-Commit the hook:
-```bash
-git add .git-hooks
-git commit -m "Add git safety hook to block direct pushes to main"
-```
-
-### Step 3.3: Create Minimal CLAUDE.md Base
-
-Start with a minimal template. Claude will expand this by exploring your project.
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/templates/CLAUDE.md.template ./CLAUDE.md
-```
-
-See [templates/CLAUDE.md.template](templates/CLAUDE.md.template) for the starting point.
-
-### Step 3.4: Copy Claude Code Skills
-
-Copy the skills directory from the Ralph repo:
+Have Claude explore your project and populate CLAUDE.md:
 
 ```bash
-mkdir -p .claude/skills
-cp -r ~/ralph/.claude/skills/* .claude/skills/
-```
-
-This installs two skills:
-- `/discover` — explores your project and populates CLAUDE.md (used in the next step)
-- `/refine` — reviews a PRD for task sizing and acceptance criteria quality
-
-See [.claude/skills/discover/SKILL.md](.claude/skills/discover/SKILL.md) and [.claude/skills/refine/SKILL.md](.claude/skills/refine/SKILL.md) for the skill definitions.
-
-### Step 3.5: Run Project Discovery
-
-Have Claude explore your project and complete CLAUDE.md with actual details.
-
-```bash
-cd /path/to/your/project
 claude
 ```
-
-Run the discover skill:
 
 ```
 /discover
 ```
 
-This explores your project and populates CLAUDE.md with tech stack, project structure, coding patterns, testing setup, and dev server details.
+This fills in your tech stack, project structure, coding patterns, and testing setup. Review the output and adjust anything that seems wrong.
 
-Review the output and adjust anything that seems wrong.
+### Step 3.4: Customize .claudeignore (Optional)
 
-### Step 3.6: Copy RALPH_PROMPT.md
-
-This is what Claude reads each iteration. The PRD filename is passed when invoking the script.
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/RALPH_PROMPT.md ./RALPH_PROMPT.md
-```
-
-See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows during each iteration.
-
-### Step 3.7: Create PRD Directory and Template
-
-PRDs are numbered for history (e.g., `001_initial_setup.json`, `002_user_auth.json`). **Task IDs are for reference only—they do NOT imply execution order.** Ralph picks the best next task dynamically.
-
-Copy from the Ralph repo:
-```bash
-mkdir -p prds
-cp ~/ralph/prds/PRD_TEMPLATE.json ./prds/
-cp ~/ralph/prds/new-prd.sh ./prds/
-chmod +x prds/new-prd.sh
-```
-
-See [prds/PRD_TEMPLATE.json](prds/PRD_TEMPLATE.json) for the template structure and [prds/new-prd.sh](prds/new-prd.sh) for the helper script.
-
-**Workflow:**
-1. `./prds/new-prd.sh "user authentication"` → creates `prds/001_user_authentication.json`
-2. Edit the PRD file with your tasks
-3. Run Ralph: `./ralph-loop.sh prds/001_user_authentication.json`
-4. When done, the numbered file serves as history
-
-### Step 3.8: Create progress.txt
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/templates/progress.txt.template ./progress.txt
-```
-
-See [templates/progress.txt.template](templates/progress.txt.template) for the initial structure.
-
-### Step 3.9: Copy UI_TESTING.md (Reference for UI Projects)
-
-This file contains UI testing standards. Claude reads it when working on UI tasks.
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/templates/UI_TESTING.md .
-```
-
-The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness. See [templates/UI_TESTING.md](templates/UI_TESTING.md) for the full document.
-
-### Step 3.10: Copy PRD_REFINE.md (Reference)
-
-This file documents the PRD refinement criteria. The `/refine` skill (copied in Step 3.4) uses these criteria to review PRDs.
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
-```
-
-See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full checklist.
-
-### Step 3.11: Copy Ralph Scripts to Project Root
-
-Copy the in-container scripts from the Ralph repo to your project root:
-
-```bash
-cp ~/ralph/ralph-loop.sh ./ralph-loop.sh
-cp ~/ralph/ralph-once.sh ./ralph-once.sh
-chmod +x ralph-loop.sh ralph-once.sh
-```
-
-See [ralph-loop.sh](ralph-loop.sh) and [ralph-once.sh](ralph-once.sh) for the current versions.
-
-### Step 3.12: Update .gitignore
-
-```bash
-cat >> .gitignore << 'EOF'
-
-# Ralph logs (iteration transcripts for debugging)
-ralph-logs/
-EOF
-```
-
-### Step 3.13: Create .claudeignore
-
-Prevent Claude from reading sensitive or wasteful files. Claude Code doesn't do RAG on large files—it reads them into context, which wastes tokens and can hit limits.
-
-Copy from the Ralph repo:
-```bash
-cp ~/ralph/templates/.claudeignore ./.claudeignore
-```
-
-See [templates/.claudeignore](templates/.claudeignore) for the default exclusions.
-
-**Customize for your project:** Review what's in your `.gitignore`—most of those should also be in `.claudeignore`. The key categories:
+Review what's in your `.gitignore`—most of those should also be in `.claudeignore`. Key categories:
 - **Secrets** — Always ignore
-- **Generated/compiled** — Ignore (Claude can read source files)
-- **Dependencies** — Always ignore (`node_modules` is massive)
-- **Test artifacts** — Usually ignore (reports, screenshots)
-- **Ralph logs** — Optional (might help debugging, but large)
+- **Dependencies** — Always ignore (`node_modules`)
+- **Generated/compiled** — Ignore (Claude can read source)
 
-### Step 3.14: Commit Setup
+### Step 3.5: Commit Setup
 
 ```bash
 git add CLAUDE.md RALPH_PROMPT.md UI_TESTING.md prds/ progress.txt ralph-loop.sh ralph-once.sh .git-hooks .gitignore .claudeignore .claude/
 git commit -m "Add Ralph workflow configuration"
 git push
 ```
+
+### What the Script Installs
+
+| File/Directory | Purpose |
+|----------------|---------|
+| `CLAUDE.md` | Project context (populate with `/discover`) |
+| `RALPH_PROMPT.md` | Instructions Claude follows each iteration |
+| `ralph-loop.sh` | Run Claude in a loop until done |
+| `ralph-once.sh` | Run single Claude iteration (testing) |
+| `prds/PRD_TEMPLATE.json` | Template for creating PRDs |
+| `prds/PRD_REFINE.md` | PRD quality criteria reference |
+| `.claude/skills/` | `/discover` and `/refine` skills |
+| `.git-hooks/pre-push` | Blocks pushes to main |
+| `.claudeignore` | Files Claude should ignore |
+| `UI_TESTING.md` | UI testing standards |
+| `progress.txt` | Ralph's work log |
 
 ---
 
@@ -801,14 +680,13 @@ Wait for reset, reduce iterations, or switch model:
 
 ```bash
 cd ~/projects/my-app
-./prds/new-prd.sh "feature name"
 claude
 ```
 
 ```
 I want to build [describe your features].
 
-Create a PRD matching prds/PRD_TEMPLATE.json:
+Create a PRD in prds/002_feature_name.json matching prds/PRD_TEMPLATE.json:
 - Break into logical tasks
 - Each task completable in one focused session
 - Clear acceptance criteria (testable)
@@ -845,31 +723,31 @@ git checkout main && git pull
 | File | Purpose | Source |
 |------|---------|--------|
 | `Dockerfile` | Builds Ralph Docker image | Copy from Ralph repo |
-| `ralph-start.sh` | Start container with local folder | Created via README heredoc |
-| `ralph-clone.sh` | Start container with cloned repo | Created via README heredoc |
-| `ralph-reset.sh` | Remove container to start fresh | Created via README heredoc |
+| `ralph-start.sh` | Start container with local folder | Copy from Ralph repo |
+| `ralph-clone.sh` | Start container with cloned repo | Copy from Ralph repo |
+| `ralph-reset.sh` | Remove container to start fresh | Copy from Ralph repo |
 
 **Project-level (per-project in project root):**
 
 | File | Purpose | Source |
 |------|---------|--------|
-| `CLAUDE.md` | Project context | Create via README heredoc, then run discovery |
-| `RALPH_PROMPT.md` | Loop instructions for Claude | Create via README heredoc |
-| `UI_TESTING.md` | UI testing standards (optional) | Copy from Ralph repo `templates/` |
-| `prds/PRD_TEMPLATE.json` | Template for new PRDs | Create via README heredoc |
-| `prds/PRD_REFINE.md` | PRD quality check prompt | Create via README heredoc |
-| `prds/new-prd.sh` | Helper to create numbered PRDs | Create via README heredoc |
-| `ralph-loop.sh` | Run Ralph iterations | Copy from `~/ralph-docker/` |
-| `ralph-once.sh` | Run single iteration (testing) | Copy from `~/ralph-docker/` |
-| `progress.txt` | Work log | Create via README heredoc |
-| `.git-hooks/pre-push` | Block pushes to main | Create via README heredoc |
-| `.claudeignore` | Hide files from Claude | Create via README heredoc |
+| `CLAUDE.md` | Project context | `install.sh`, then run `/discover` |
+| `RALPH_PROMPT.md` | Loop instructions for Claude | `install.sh` |
+| `UI_TESTING.md` | UI testing standards (optional) | `install.sh` |
+| `prds/PRD_TEMPLATE.json` | Template for new PRDs | `install.sh` |
+| `prds/PRD_REFINE.md` | PRD quality check prompt | `install.sh` |
+| `.claude/skills/` | `/discover` and `/refine` skills | `install.sh` |
+| `ralph-loop.sh` | Run Ralph iterations | `install.sh` |
+| `ralph-once.sh` | Run single iteration (testing) | `install.sh` |
+| `progress.txt` | Work log | `install.sh` |
+| `.git-hooks/pre-push` | Block pushes to main | `install.sh` |
+| `.claudeignore` | Hide files from Claude | `install.sh` |
 
 ### Commands
 
 | Command | What it does |
 |---------|--------------|
-| `./prds/new-prd.sh "name"` | Create a new numbered PRD |
+| `~/ralph/install.sh .` | Install Ralph files to current project |
 | `ralph-start.sh /path` | Start container with local folder mounted |
 | `ralph-start.sh --fresh /path` | Recreate container (after image rebuild) |
 | `ralph-clone.sh URL` | Start container with repo cloned into Docker storage |
