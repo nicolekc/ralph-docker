@@ -280,7 +280,11 @@ mkdir -p .claude/skills
 cp -r ~/ralph/.claude/skills/* .claude/skills/
 ```
 
-This installs the `/discover` skill used in the next step. See [.claude/skills/discover/SKILL.md](.claude/skills/discover/SKILL.md) for the skill definition.
+This installs two skills:
+- `/discover` — explores your project and populates CLAUDE.md (used in the next step)
+- `/refine` — reviews a PRD for task sizing and acceptance criteria quality
+
+See [.claude/skills/discover/SKILL.md](.claude/skills/discover/SKILL.md) and [.claude/skills/refine/SKILL.md](.claude/skills/refine/SKILL.md) for the skill definitions.
 
 ### Step 3.5: Run Project Discovery
 
@@ -352,16 +356,16 @@ cp ~/ralph/templates/UI_TESTING.md .
 
 The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness. See [templates/UI_TESTING.md](templates/UI_TESTING.md) for the full document.
 
-### Step 3.10: Copy PRD_REFINE.md (PRD Quality Check)
+### Step 3.10: Copy PRD_REFINE.md (Reference)
 
-This prompt helps refine PRDs to ensure tasks are right-sized.
+This file documents the PRD refinement criteria. The `/refine` skill (copied in Step 3.4) uses these criteria to review PRDs.
 
 Copy from the Ralph repo:
 ```bash
 cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 ```
 
-See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
+See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full checklist.
 
 ### Step 3.11: Copy Ralph Scripts to Project Root
 
@@ -456,11 +460,13 @@ Output valid JSON matching prds/PRD_TEMPLATE.json
 
 ### Step 4.3: Refine the PRD
 
+Run the refine skill to check task sizing and acceptance criteria:
+
 ```
-Read prds/PRD_REFINE.md and use it to review the PRD above
+/refine prds/001_test_infrastructure.json
 ```
 
-Apply any changes, run again if needed. Usually 1-2 passes.
+Apply any suggested changes, run again if needed. Usually 1-2 passes.
 
 ### Step 4.4: Save and Run
 
@@ -542,11 +548,13 @@ Output valid JSON.
 
 ### Step 5.3: Refine the PRD
 
+Run the refine skill to check task sizing and acceptance criteria:
+
 ```
-Read prds/PRD_REFINE.md and use it to review this PRD
+/refine prds/002_feature_name.json
 ```
 
-Apply any changes, run again if needed. Usually 1-2 passes.
+Apply any suggested changes, run again if needed. Usually 1-2 passes.
 
 ### Step 5.4: Save and Run
 
@@ -809,7 +817,7 @@ Create a PRD matching prds/PRD_TEMPLATE.json:
 Output valid JSON.
 ```
 
-Refine if needed (see Part 5), save to PRD file.
+Refine with `/refine prds/002_feature_name.json`, save to PRD file.
 
 **Step 2: Run Ralph**
 
