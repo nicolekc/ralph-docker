@@ -551,27 +551,7 @@ cat progress.txt
 
 Check for blocked tasks needing attention.
 
-### Step 8.2: Review Commits
-
-```bash
-git log --oneline -20
-# Or on GitHub, view the branch's commit history
-```
-
-### Step 8.3: Run Tests
-
-```bash
-npm test
-```
-
-### Step 8.4: Manual Testing
-
-```bash
-npm run dev
-# Test in browser
-```
-
-### Step 8.5: Review and Merge PR
+### Step 8.2: Review on GitHub
 
 1. Go to GitHub → Pull Requests
 2. Review Claude's PR
@@ -579,7 +559,7 @@ npm run dev
 4. Approve and merge
 5. Delete the branch
 
-### Step 8.6: Pull Merged Changes
+### Step 8.3: Pull Merged Changes
 
 ```bash
 git checkout main
