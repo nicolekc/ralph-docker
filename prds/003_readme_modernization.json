@@ -154,7 +154,7 @@
         "A new user could follow the guide from start to finish",
         "Quick Reference and Commands sections are accurate"
       ],
-      "testsPassing": false
+      "testsPassing": true
     }
   ]
 }
