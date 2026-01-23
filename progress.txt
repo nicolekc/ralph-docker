@@ -361,3 +361,18 @@ Files modified:
 
 Commit: fdcd34d
 Notes: Part 7 now follows the recommended flow: setup → verify → dry run → real run. Users won't discover setup issues on their first real PRD.
+
+---
+2026-01-23T09:00:00Z
+PRD: 003_readme_modernization.json
+Task: 009
+Status: done
+
+What I did:
+- Added commented example entry format to templates/progress.txt.template
+- Example shows all required fields: timestamp, PRD reference, task ID, status, "What I did" bullets, commit hash, notes
+- Used HTML comment to mark it as an example (delete after first real entry)
+- Format matches RALPH_PROMPT.md specification (lines 50-63)
+
+Commit: cf24db7
+Notes: Example uses realistic content without being actual data. Users can now see exactly what progress entries should look like.

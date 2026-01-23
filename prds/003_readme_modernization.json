@@ -116,7 +116,7 @@
         "Example is clearly marked as example/template (not real data)",
         "Format matches what RALPH_PROMPT.md expects Claude to write"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "010",
