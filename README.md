@@ -1,8 +1,9 @@
 # Ralph Technique: Complete Step-by-Step Setup Guide
 
 **Time Budget:**
-- Machine setup (one-time): ~60 minutes
+- Machine setup (one-time): ~45 minutes
 - Project setup: ~5 minutes
+- First container setup: ~10 minutes (authentication)
 - Sprint planning: ~15 minutes
 - Feature planning: ~5 minutes each
 - Human verification: ~15 minutes
@@ -51,7 +52,7 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 
 ---
 
-## Part 1: One-Time Machine Setup (~60 minutes)
+## Part 1: One-Time Machine Setup (~45 minutes)
 
 ### Step 1.1: Install Docker Desktop (10 min)
 
@@ -65,26 +66,7 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
    docker --version
    ```
 
-### Step 1.2: Install Claude Code (5 min)
-
-```bash
-curl -fsSL https://claude.ai/install.sh | bash
-# Restart terminal, then:
-claude --version
-```
-
-### Step 1.3: Authenticate Claude Code with Claude Max (5 min)
-
-```bash
-claude
-# Choose "Claude.ai account (Pro/Max subscription)"
-# Browser opens - log in with your Claude Max account
-# Return to terminal after authentication completes
-```
-
-**Do this BEFORE setting up Docker.** Your auth will be shared with containers automatically.
-
-### Step 1.4: Configure Git Authentication
+### Step 1.2: Configure Git Authentication
 
 **If using Git Credential Manager (GCM) via HTTPS** (check with `git config --get credential.helper`):
 
@@ -109,16 +91,18 @@ pbcopy < ~/.ssh/id_ed25519.pub
 ssh -T git@github.com
 ```
 
-### Step 1.5: Configure Git Identity (2 min)
+### Step 1.3: Configure Git Identity (2 min)
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your-email@example.com"
 ```
 
-### Step 1.6: Create the Ralph Docker Image (15 min)
+### Step 1.4: Create the Ralph Docker Image (15 min)
 
-This custom image provides: persistent containers that survive restarts (critical for resuming Ralph), Playwright pre-installed for UI testing, and full control over the environment.
+This custom image provides: persistent containers that survive restarts (critical for resuming Ralph), Playwright pre-installed for UI testing, Claude Code pre-installed, and full control over the environment.
+
+**Note:** Claude Code is installed inside the Docker image—you don't need it on your Mac for this workflow. If you have Claude Code on your Mac for other purposes, that's separate. Never use `--dangerously-skip-permissions` with your local Claude Code.
 
 ```bash
 mkdir -p ~/ralph-docker
@@ -137,7 +121,7 @@ Build (takes ~10 min due to Playwright):
 docker build -t ralph-claude:latest .
 ```
 
-### Step 1.7: Install Ralph Helper Scripts (10 min)
+### Step 1.5: Install Ralph Helper Scripts (10 min)
 
 Clone this Ralph repository and copy the machine-level scripts to your ralph-docker directory:
 
@@ -168,7 +152,7 @@ chmod +x ~/ralph-docker/*.sh
 - `node_modules` uses a named Docker volume (Mac/Linux architecture differences)
 - Run `npm install` inside the container on first use
 
-### Step 1.8: Add Scripts to PATH (1 min)
+### Step 1.6: Add Scripts to PATH (1 min)
 
 ```bash
 echo 'export PATH="$HOME/ralph-docker:$PATH"' >> ~/.zshrc
@@ -300,44 +284,74 @@ git push
 
 Your first PRD gets your test infrastructure ready. Task 001 is always "fix existing tests"—everything else builds on that.
 
-### Step 4.1: Quick Assessment
+### Step 4.1: Enter the Container
 
-On your Mac:
 ```bash
-cd /path/to/your/project
+ralph-start.sh /path/to/your/project
+```
+
+### Step 4.2: Authenticate (First Run Only)
+
+Each new container needs its own authentication. These credentials persist between container restarts—you only need to do this once per container (or after `ralph-reset.sh` or `--fresh`).
+
+**Authenticate Claude Code:**
+```bash
+claude
+# Choose "Claude.ai account (Pro/Max subscription)"
+# Browser opens - log in with your Claude Max account
+# Return to terminal after authentication completes
+# Type 'exit' or Ctrl+C to exit Claude
+```
+
+**Authenticate GitHub CLI:**
+```bash
+gh auth login
+# Choose: GitHub.com → HTTPS → Yes (authenticate git) → Login with browser
+# Copy the code, open the URL in your browser manually, paste code
+
+gh auth setup-git
+
+# Verify both work
+git fetch
+claude --version
+```
+
+**Note:** Git user is pre-configured as `claude-bot`.
+
+### Step 4.3: Quick Assessment
+
+Inside the container, assess your current test state:
+
+```bash
+npm test
+```
+
+Note: Do tests pass, fail, or error out? What framework? How many tests?
+
+### Step 4.4: Generate Initial PRD
+
+Start Claude and describe what you need:
+
+```bash
 claude
 ```
 
 ```
-Run `npm test` and tell me:
-1. Do tests pass, fail, or error out entirely?
-2. What test framework is configured?
-3. Roughly how many tests exist?
-```
-
-### Step 4.2: Generate Initial PRD
-
-```bash
-./prds/new-prd.sh "test infrastructure"
-```
-
-Then in Claude:
-
-```
 Create a PRD for test infrastructure setup.
 
-Current state: [Paste assessment from Step 4.1]
+Current state: [describe test results from Step 4.3]
 
 Requirements:
-- Task 001 MUST be "Fix existing tests" 
+- Task 001 MUST be "Fix existing tests"
   Acceptance: "npm test runs and all existing tests pass"
 - Add tasks for any test infrastructure improvements needed
 - Reference UI_TESTING.md for UI testing standards if relevant
 
 Output valid JSON matching prds/PRD_TEMPLATE.json
+Save it to prds/001_test_infrastructure.json
 ```
 
-### Step 4.3: Refine the PRD
+### Step 4.5: Refine the PRD
 
 Run the refine skill to check task sizing and acceptance criteria:
 
@@ -345,73 +359,39 @@ Run the refine skill to check task sizing and acceptance criteria:
 /refine prds/001_test_infrastructure.json
 ```
 
-Apply any suggested changes, run again if needed. Usually 1-2 passes.
+Apply any suggested changes, run again if needed. Usually 1-2 passes. Exit Claude when done.
 
-### Step 4.4: Save and Run
+### Step 4.6: Commit and Run
 
 ```bash
-# Save final PRD to prds/001_test_infrastructure.json
 git add prds/
 git commit -m "Add test infrastructure PRD"
 git push
 
-# Start the container
-ralph-start.sh /path/to/your/project
+# Test single iteration first
+./ralph-once.sh prds/001_test_infrastructure.json
+
+# Run the full loop
+./ralph-loop.sh prds/001_test_infrastructure.json 20
 ```
 
-**First run only:** Set up GitHub access:
+### Step 4.7: External Dependencies (If Needed)
 
-```bash
-# Login to GitHub
-gh auth login
-# Choose: GitHub.com → HTTPS → Yes (authenticate git) → Login with browser
-# Copy the code, open the URL in your browser manually, paste code
-
-# Configure git to use gh for credentials
-gh auth setup-git
-
-# Verify
-git fetch
-```
-
-**Note:** Git user is pre-configured as `claude-bot`. Credentials persist in the container between restarts — you only need to do this once per container (or after `--fresh`).
-
-Now run Ralph:
-```bash
-./ralph-once.sh prds/001_test_infrastructure.json        # Test single iteration
-./ralph-loop.sh prds/001_test_infrastructure.json 20     # Run the full loop
-```
-
-### Step 4.5: External Dependencies (If Needed)
-
-If tests need external services (database, etc.), add to your initial prompt:
-
-```
-Also note any external dependencies:
-- What services do tests need to run?
-- What commands should I run before starting Ralph?
-```
+If tests need external services (database, etc.), set those up before running Ralph.
 
 ---
 
 ## Part 5: Feature Planning (For Each Sprint)
 
-After your test infrastructure PRD is complete, use this process for feature work.
+After your test infrastructure PRD is complete, use this process for feature work. Run these steps inside the container.
 
-### Step 5.1: Create a New PRD
+### Step 5.1: Generate PRD
 
-```bash
-cd /path/to/your/project
-./prds/new-prd.sh "feature name"
-```
-
-### Step 5.2: Generate Initial PRD
+Start Claude and describe what you want:
 
 ```bash
 claude
 ```
-
-Describe what you want to build:
 
 ```
 I want to build [describe your features in plain language].
@@ -422,10 +402,10 @@ Create a PRD matching prds/PRD_TEMPLATE.json:
 - Clear acceptance criteria (testable)
 - All tasks start with "testsPassing": false
 
-Output valid JSON.
+Save it to prds/002_feature_name.json
 ```
 
-### Step 5.3: Refine the PRD
+### Step 5.2: Refine the PRD
 
 Run the refine skill to check task sizing and acceptance criteria:
 
@@ -433,20 +413,19 @@ Run the refine skill to check task sizing and acceptance criteria:
 /refine prds/002_feature_name.json
 ```
 
-Apply any suggested changes, run again if needed. Usually 1-2 passes.
+Apply any suggested changes, run again if needed. Usually 1-2 passes. Exit Claude when done.
 
-### Step 5.4: Save and Run
+### Step 5.3: Commit and Run
 
 ```bash
-# Save PRD (e.g., prds/002_feature_name.json)
 git add prds/
 git commit -m "Add feature PRD"
+git push
 
-# Run Ralph
 ./ralph-loop.sh prds/002_feature_name.json 20
 ```
 
-### Step 5.5: Don't Over-Plan
+### Step 5.4: Don't Over-Plan
 
 Ralph picks tasks dynamically and can split tasks or add new ones as needed. You don't need perfect upfront planning—just a reasonable starting point.
 
@@ -676,10 +655,15 @@ Wait for reset, reduce iterations, or switch model:
 
 ### Daily Workflow
 
-**Step 1: Create PRD (~10 min)**
+**Step 1: Enter Container**
 
 ```bash
-cd ~/projects/my-app
+ralph-start.sh ~/projects/my-app
+```
+
+**Step 2: Create PRD (~10 min, inside container)**
+
+```bash
 claude
 ```
 
@@ -692,23 +676,21 @@ Create a PRD in prds/002_feature_name.json matching prds/PRD_TEMPLATE.json:
 - Clear acceptance criteria (testable)
 - All tasks start with "testsPassing": false
 
-Output valid JSON.
+Save it to prds/002_feature_name.json
 ```
 
-Refine with `/refine prds/002_feature_name.json`, save to PRD file.
+Refine with `/refine prds/002_feature_name.json`. Exit Claude when done.
 
-**Step 2: Run Ralph**
+**Step 3: Run Ralph (inside container)**
 
 ```bash
-ralph-start.sh ~/projects/my-app
-
-# Inside container:
+git add prds/ && git commit -m "Add feature PRD" && git push
 ./ralph-once.sh prds/002_feature_name.json           # Test single iteration
 ./ralph-loop.sh prds/002_feature_name.json 30        # Run full loop
 exit
 ```
 
-**Step 3: Review and Merge**
+**Step 4: Review and Merge**
 
 On GitHub: Review PR → Check commits → Approve → Merge
 

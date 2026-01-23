@@ -13,7 +13,7 @@
         "Running /discover triggers project exploration workflow",
         "README Step 3.4 references the skill with brief usage instructions"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "002",
@@ -25,7 +25,7 @@
         "Skill applies task sizing and acceptance criteria checks from PRD_REFINE.md",
         "README updated to show /refine usage in PRD workflow sections"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "003",
@@ -38,7 +38,7 @@
         "README Part 3 is dramatically simplified to: clone Ralph repo, run install script, run /discover",
         "Script handles both 'fresh project' and 'existing project' scenarios"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "004",
@@ -52,7 +52,7 @@
         "The sequence of instructions reflects actual workflow without backtracking",
         "Part 4.1 no longer references running Claude outside Docker"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "005",

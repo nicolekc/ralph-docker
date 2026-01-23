@@ -175,3 +175,110 @@ Files modified:
 
 Commit: 06331ae (included with other changes)
 Notes: Users can now test their Ralph setup safely before running real tasks.
+
+---
+2026-01-23T01:30:00Z
+PRD: 003_readme_modernization.json
+Task: 001
+Status: done
+
+What I did:
+- Created .claude/skills/ directory structure
+- Created .claude/skills/discover/SKILL.md with YAML frontmatter (name, description)
+- Skill contains project exploration instructions (tech stack, project structure, coding patterns, testing setup, dev server)
+- Moved long prompt from README Step 3.4 into the skill
+- Added new Step 3.4: Copy Claude Code Skills (copies .claude/skills/ directory)
+- Changed Step 3.5 to: Run Project Discovery (runs /discover skill)
+- Renumbered Steps 3.6-3.14 (previously 3.5-3.13)
+- Updated Step 3.14 commit command to include .claude/ directory
+
+Files modified:
+- .claude/skills/discover/SKILL.md (new)
+- README.md (restructured Step 3.4-3.14)
+
+Commit: a454549
+Notes: The discover skill replaces the embedded prompt, making project discovery simpler (/discover vs copy-paste). This establishes the skills infrastructure that Task 002 (refine skill) will build upon.
+
+---
+2026-01-23T02:00:00Z
+PRD: 003_readme_modernization.json
+Task: 002
+Status: done
+
+What I did:
+- Created .claude/skills/refine/ directory
+- Created .claude/skills/refine/SKILL.md with YAML frontmatter (name, description)
+- Skill instructions cover: right-sized tasks, too big (split), too small (merge), dependencies, acceptance criteria quality
+- Output format: KEEP/SPLIT/MERGE/FIX for each task, or "PRD is ready"
+- Kept PRD_REFINE.md as reference doc (skill uses same criteria)
+- Updated README Step 3.4 to document both discover and refine skills
+- Updated README Step 3.10 to note PRD_REFINE.md is reference for the skill
+- Updated README Steps 4.3 and 5.3 to use /refine command instead of manual prompt
+- Updated Quick Reference to mention /refine
+
+Files modified:
+- .claude/skills/refine/SKILL.md (new)
+- README.md (updated skill docs and PRD refinement workflow)
+
+Commit: b3d1a08
+Notes: The refine skill simplifies PRD quality checking. Users now run /refine <prd-path> instead of manually referencing PRD_REFINE.md. This unblocks Task 003 (install script) and Task 008 (remove new-prd.sh).
+
+---
+2026-01-23T03:00:00Z
+PRD: 003_readme_modernization.json
+Task: 003
+Status: done
+
+What I did:
+- Created install.sh script in repo root
+- Script copies all necessary files to target project:
+  - CLAUDE.md.template → CLAUDE.md (only if doesn't exist)
+  - progress.txt.template → progress.txt (only if doesn't exist)
+  - .claudeignore, RALPH_PROMPT.md, UI_TESTING.md
+  - ralph-loop.sh, ralph-once.sh (made executable)
+  - prds/PRD_TEMPLATE.json, prds/PRD_REFINE.md
+  - .claude/skills/discover/SKILL.md, .claude/skills/refine/SKILL.md
+  - .git-hooks/pre-push (made executable, configured git hooks path)
+  - Updates .gitignore to exclude ralph-logs/
+- Script is idempotent: detects unchanged files, backs up changed files, creates only missing files
+- Script verifies target is a git repository
+- Dramatically simplified README Part 3 from 14 steps to 5 steps
+- Updated time estimate from ~15 min to ~5 min
+- Updated Repository Structure to include install.sh
+- Updated Key Files tables in Quick Reference to show install.sh as source
+- Removed new-prd.sh from repository structure diagram (anticipating Task 008)
+- Updated Commands table to include install.sh
+
+Files modified:
+- install.sh (new)
+- README.md (simplified Part 3, updated Quick Reference)
+
+Commit: d1a533f
+Notes: Part 3 is now: clone Ralph → run install.sh → run /discover → commit. This unblocks other documentation tasks and makes onboarding much faster.
+
+---
+2026-01-23T04:00:00Z
+PRD: 003_readme_modernization.json
+Task: 004
+Status: done
+
+What I did:
+- Removed Step 1.2 (Install Claude Code) and Step 1.3 (Authenticate Claude Code) from Part 1
+- Added note in Step 1.4 that Claude Code is pre-installed in Docker image and users don't need it on their Mac
+- Added warning about never using --dangerously-skip-permissions with local Claude Code
+- Renumbered Part 1 steps (1.4→1.2, 1.5→1.3, 1.6→1.4, 1.7→1.5, 1.8→1.6)
+- Updated Part 1 time estimate from ~60 min to ~45 min
+- Added "First container setup: ~10 minutes (authentication)" to Time Budget
+- Completely restructured Part 4 to start with entering container first:
+  - Step 4.1: Enter the Container
+  - Step 4.2: Authenticate (First Run Only) - Claude auth AND gh auth together
+  - Step 4.3: Quick Assessment (inside container)
+  - Step 4.4-4.7: Generate PRD, refine, commit, run
+- Simplified Part 5 to remove implication of running Claude on Mac
+- Updated Quick Reference Daily Workflow to show container-first approach
+
+Files modified:
+- README.md (restructured Parts 1, 4, 5, and Quick Reference)
+
+Commit: af8a74e
+Notes: Auth flow now correctly reflects per-container authentication happening inside the container after ralph-start.sh. No more false claims about auth being shared across containers.
