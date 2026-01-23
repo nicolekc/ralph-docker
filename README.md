@@ -1,5 +1,19 @@
 # Ralph Technique: Complete Step-by-Step Setup Guide
 
+## Why Ralph?
+
+Ralph is a workflow technique that lets Claude Code work autonomously on your codebase while you do other things. Here's what makes it work:
+
+- **Docker isolation** — Claude runs in a container, unable to touch your host system or accidentally break things outside the project
+- **Automated feedback loop** — Tests verify code, git preserves progress, PRD checklist tracks completion. Claude iterates until tests pass
+- **Incremental commits** — One task at a time, each committed. You can resume anytime, nothing is lost
+- **Human oversight** — Claude works on feature branches. You review PRs, approve, and merge. No blind automation
+- **GitHub protection** — Branch rules block direct pushes to main. Even if something goes wrong, your main branch is safe
+
+**The key insight:** You define the end state (PRD with tasks and acceptance criteria). Ralph gets there through the feedback loop—you don't need to micromanage.
+
+---
+
 **Time Budget:**
 - Machine setup (one-time): ~45 minutes
 - Project setup: ~5 minutes
@@ -824,8 +838,6 @@ source ~/.zshrc
 2. Ralph works on feature branch, commits as it goes
 3. Ralph pushes branch when done
 4. You review PR, approve, merge
-
-**Key insight:** Ralph's power is the feedback loop—tests verify code, git preserves progress, PRD checklist knows when to stop. You define the end state. Ralph gets there.
 
 ---
 
