@@ -11,6 +11,46 @@
 
 ---
 
+## Repository Structure
+
+This repo contains everything you need to run the Ralph workflow. Here's what each file and directory is for:
+
+```
+├── README.md                    # This guide - setup and workflow documentation
+├── RALPH_PROMPT.md              # Instructions Claude reads each iteration
+├── Dockerfile                   # Docker image definition for Ralph containers
+├── progress.txt                 # Work log (example/placeholder)
+│
+├── ralph-start.sh               # Launch container with local project mounted
+├── ralph-clone.sh               # Clone a repo into Docker-managed storage
+├── ralph-once.sh                # Run single Claude iteration (for testing)
+├── ralph-loop.sh                # Run Claude in a loop until done
+├── ralph-reset.sh               # Remove a container to start fresh
+│
+├── templates/                   # Files users copy to their projects
+│   ├── CLAUDE.md.template       # Project context template (rename to CLAUDE.md)
+│   ├── progress.txt.template    # Initial progress log
+│   ├── UI_TESTING.md            # UI testing standards (reference for UI projects)
+│   ├── .claudeignore            # File exclusion patterns for Claude
+│   └── .git-hooks/
+│       └── pre-push             # Git safety hook (blocks pushes to main)
+│
+├── prds/                        # PRD templates and tools
+│   ├── PRD_TEMPLATE.json        # Template for creating new PRDs
+│   ├── PRD_REFINE.md            # Prompt for refining PRDs
+│   └── new-prd.sh               # Helper script to create numbered PRDs
+│
+└── ralph-logs/                  # Iteration logs (gitignored, local only)
+```
+
+**Key distinction:**
+- **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`, `Dockerfile`) are installed once in `~/ralph-docker/` and manage containers
+- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) are copied into each project and run inside containers
+- **Templates** (`templates/`) are copied into each project you want to use Ralph with
+- **PRD tools** (`prds/`) can be copied to projects or used from this repo directly
+
+---
+
 ## Part 1: One-Time Machine Setup (~60 minutes)
 
 ### Step 1.1: Install Docker Desktop (10 min)
@@ -97,374 +137,36 @@ Build (takes ~10 min due to Playwright):
 docker build -t ralph-claude:latest .
 ```
 
-### Step 1.7: Create Ralph Helper Scripts (10 min)
+### Step 1.7: Install Ralph Helper Scripts (10 min)
 
-**ralph-start.sh** — Launches a persistent container for a local project folder. Your Mac's `node_modules` is shadowed by the container's own copy (required because Mac and Linux have different architectures). Run `npm install` inside the container on first use.
-
-```bash
-cat > ~/ralph-docker/ralph-start.sh << 'EOF'
-#!/bin/bash
-# ralph-start.sh - Start Ralph container with local project mounted
-# Usage: ralph-start.sh [--fresh] /path/to/project [container-name]
-#   --fresh    Remove existing container and create new one
-#
-# Note: Run `npm install` inside the container - Mac's node_modules won't work.
-
-set -e  # Exit on any error
-
-# Check for --fresh flag
-FRESH=false
-if [ "$1" = "--fresh" ] || [ "$1" = "-f" ]; then
-    FRESH=true
-    shift
-fi
-
-# Arguments with defaults
-PROJECT_PATH="${1:-.}"                                    # Default: current directory
-
-# Convert to absolute path (fails if path doesn't exist)
-PROJECT_PATH=$(cd "$PROJECT_PATH" && pwd) || {
-    echo "❌ Error: Project path '$1' does not exist"
-    exit 1
-}
-
-# Get folder name for container (handles trailing slashes and edge cases)
-FOLDER_NAME=$(basename "$PROJECT_PATH")
-if [ -z "$FOLDER_NAME" ] || [ "$FOLDER_NAME" = "/" ]; then
-    FOLDER_NAME="project"
-fi
-CONTAINER_NAME="${2:-ralph-$FOLDER_NAME}"
-
-echo "🚀 Ralph Container: $CONTAINER_NAME"
-echo "📁 Project: $PROJECT_PATH"
-
-# Handle --fresh: remove existing container
-if [ "$FRESH" = true ] && docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "🗑️  Removing existing container (--fresh)..."
-    docker rm -f "$CONTAINER_NAME"
-fi
-
-# Check if container already exists
-if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "📦 Resuming existing container..."
-    docker start -ai "$CONTAINER_NAME"
-else
-    echo "📦 Creating new container..."
-    docker run -it \
-        --name "$CONTAINER_NAME" \
-        --memory="8g" \
-        --cpus="4" \
-        -v "$PROJECT_PATH:/workspace" \
-        -v /workspace/node_modules \
-        ralph-claude:latest \
-        bash
-    # -v /workspace/node_modules creates an anonymous volume that shadows
-    # Mac's node_modules (different architectures). Run `npm install` inside.
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-start.sh
-```
-
-**ralph-clone.sh** — Alternative workflow: clones a repo into Docker-managed storage. You never manage local files—just push/pull via git.
+Clone this Ralph repository and copy the machine-level scripts to your ralph-docker directory:
 
 ```bash
-cat > ~/ralph-docker/ralph-clone.sh << 'EOF'
-#!/bin/bash
-# ralph-clone.sh - Start Ralph with repo cloned into Docker volume
-# Usage: ralph-clone.sh https://github.com/user/repo.git
+# Clone the Ralph repo if you haven't already
+git clone https://github.com/your-org/ralph.git ~/ralph
 
-set -e  # Exit on any error
-
-REPO_URL="$1"
-if [ -z "$REPO_URL" ]; then
-    echo "Usage: ralph-clone.sh <github-repo-url>"
-    echo "Example: ralph-clone.sh https://github.com/user/repo.git"
-    exit 1
-fi
-
-# Extract repo name from URL (handles .git suffix)
-REPO_NAME=$(basename "$REPO_URL" .git)
-CONTAINER_NAME="ralph-${REPO_NAME}"
-VOLUME_NAME="ralph-vol-${REPO_NAME}"
-
-echo "🚀 Ralph Container: $CONTAINER_NAME"
-echo "📦 Volume: $VOLUME_NAME"
-
-# Create Docker volume if it doesn't exist (persists data between container recreations)
-if ! docker volume ls -q | grep -q "^${VOLUME_NAME}$"; then
-    echo "📦 Creating volume: $VOLUME_NAME"
-    docker volume create "$VOLUME_NAME"
-fi
-
-# Resume existing container or create new one
-if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "📦 Resuming existing container..."
-    docker start -ai "$CONTAINER_NAME"
-else
-    echo "📦 Creating container and cloning repo..."
-    docker run -it \
-        --name "$CONTAINER_NAME" \
-        --memory="8g" \
-        --cpus="4" \
-        -v "${VOLUME_NAME}:/workspace" \
-        -v /workspace/node_modules \
-        -e "REPO_URL=$REPO_URL" \
-        ralph-claude:latest \
-        bash -c '
-            if [ ! -d ".git" ]; then
-                echo "📥 Cloning repository..."
-                git clone "$REPO_URL" .
-            else
-                echo "📂 Repository already cloned"
-            fi
-            exec bash
-        '
-    # -v /workspace/node_modules creates an anonymous volume for Linux node_modules
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-clone.sh
+# Copy machine-level scripts to ralph-docker
+cp ~/ralph/ralph-start.sh ~/ralph/ralph-clone.sh ~/ralph/ralph-reset.sh ~/ralph-docker/
+chmod +x ~/ralph-docker/*.sh
 ```
 
-**ralph-once.sh** — Runs a single Claude iteration. Use this to test your setup before running the full loop.
+**Note:** `ralph-once.sh` and `ralph-loop.sh` run inside containers, so they get copied to each project in Part 3, not to `~/ralph-docker/`.
 
-```bash
-cat > ~/ralph-docker/ralph-once.sh << 'EOF'
-#!/bin/bash
-# ralph-once.sh - Run a single Ralph iteration (for testing)
-# Usage: ./ralph-once.sh <prd-file> [prompt-file]
-# Run this INSIDE the container, in /workspace
-#
-# Note: Output is buffered (appears when iteration completes).
-# To watch live, open another terminal and run: tail -f ralph-logs/*.log
+**What each script does:**
 
-PRD_FILE="${1:-}"
-PROMPT_FILE="${2:-RALPH_PROMPT.md}"
+| Script | Location | Purpose |
+|--------|----------|---------|
+| [ralph-start.sh](ralph-start.sh) | `~/ralph-docker/` | Launch a container with a local project folder mounted |
+| [ralph-clone.sh](ralph-clone.sh) | `~/ralph-docker/` | Clone a repo into Docker-managed storage |
+| [ralph-reset.sh](ralph-reset.sh) | `~/ralph-docker/` | Remove a container to start fresh |
+| [ralph-once.sh](ralph-once.sh) | Your project | Run a single Claude iteration (for testing) |
+| [ralph-loop.sh](ralph-loop.sh) | Your project | Run Claude in a loop until done or max iterations |
 
-# PRD file is required
-if [ -z "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file required"
-    echo "Usage: ./ralph-once.sh <prd-file> [prompt-file]"
-    echo "Example: ./ralph-once.sh prds/001_test_infrastructure.json"
-    exit 1
-fi
-
-if [ ! -f "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file '$PRD_FILE' not found"
-    echo "Available PRDs:"
-    ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE || echo "  (none)"
-    exit 1
-fi
-
-if [ ! -f "$PROMPT_FILE" ]; then
-    echo "❌ Error: $PROMPT_FILE not found"
-    exit 1
-fi
-
-# Create logs directory
-mkdir -p ralph-logs
-
-# Get PRD name for log prefix
-PRD_NAME=$(basename "$PRD_FILE" .json)
-TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
-LOG_FILE="ralph-logs/${PRD_NAME}_${TIMESTAMP}_once.log"
-
-echo "🔂 Running single Ralph iteration"
-echo "📋 Prompt: $PROMPT_FILE"
-echo "📝 PRD: $PRD_FILE"
-echo "📄 Log: $LOG_FILE"
-echo ""
-echo "💡 To watch live output, open another terminal and run:"
-echo "   tail -f $LOG_FILE"
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-# Log header
-{
-    echo "=== Ralph Single Iteration ==="
-    echo "PRD: $PRD_FILE"
-    echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "=================================="
-    echo ""
-} > "$LOG_FILE"
-
-# Run claude in print mode
-OUTPUT=$(claude -p "Read $PROMPT_FILE for instructions. The PRD file is: $PRD_FILE" --dangerously-skip-permissions 2>&1)
-
-# Display and log
-echo "$OUTPUT"
-echo "$OUTPUT" >> "$LOG_FILE"
-
-# Log footer
-{
-    echo ""
-    echo "=================================="
-    echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
-} >> "$LOG_FILE"
-
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ Single iteration complete"
-echo "📄 Log saved to: $LOG_FILE"
-echo "Check git log and progress.txt to see what happened"
-EOF
-chmod +x ~/ralph-docker/ralph-once.sh
-```
-
-**ralph-loop.sh** — Runs Claude repeatedly until it outputs `<promise>COMPLETE</promise>` or hits max iterations.
-
-```bash
-cat > ~/ralph-docker/ralph-loop.sh << 'EOF'
-#!/bin/bash
-# ralph-loop.sh - Run Ralph in a loop until done
-# Usage: ./ralph-loop.sh <prd-file> [max-iterations] [prompt-file]
-# Run this INSIDE the container, in /workspace
-#
-# Note: Output is buffered (appears after each iteration completes).
-# To watch live, open another terminal and run: tail -f ralph-logs/*.log
-
-PRD_FILE="${1:-}"
-MAX_ITERATIONS="${2:-20}"
-PROMPT_FILE="${3:-RALPH_PROMPT.md}"
-
-# PRD file is required
-if [ -z "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file required"
-    echo "Usage: ./ralph-loop.sh <prd-file> [max-iterations] [prompt-file]"
-    echo "Example: ./ralph-loop.sh prds/001_test_infrastructure.json 20"
-    exit 1
-fi
-
-if [ ! -f "$PRD_FILE" ]; then
-    echo "❌ Error: PRD file '$PRD_FILE' not found"
-    echo "Available PRDs:"
-    ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE || echo "  (none)"
-    exit 1
-fi
-
-if [ ! -f "$PROMPT_FILE" ]; then
-    echo "❌ Error: $PROMPT_FILE not found"
-    exit 1
-fi
-
-# Create logs directory
-mkdir -p ralph-logs
-
-# Get PRD name for log prefix (e.g., "001_test_infrastructure" from path)
-PRD_NAME=$(basename "$PRD_FILE" .json)
-TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
-
-echo "🔄 Ralph Loop Starting"
-echo "📋 Prompt: $PROMPT_FILE"
-echo "📝 PRD: $PRD_FILE"
-echo "🔢 Max iterations: $MAX_ITERATIONS"
-echo "📂 Logs: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-echo ""
-echo "💡 To watch live output, open another terminal and run:"
-echo "   tail -f ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-echo ""
-echo "⏹️  Ctrl+C to stop, or wait for COMPLETE signal"
-echo ""
-
-ITERATION=0
-while [ $ITERATION -lt $MAX_ITERATIONS ]; do
-    ITERATION=$((ITERATION + 1))
-    LOG_FILE="ralph-logs/${PRD_NAME}_${TIMESTAMP}_$(printf '%03d' $ITERATION).log"
-    
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔁 Iteration $ITERATION of $MAX_ITERATIONS"
-    echo "📄 Log: $LOG_FILE"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Log header
-    {
-        echo "=== Ralph Iteration $ITERATION ==="
-        echo "PRD: $PRD_FILE"
-        echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
-        echo "=================================="
-        echo ""
-    } > "$LOG_FILE"
-    
-    # Run claude in print mode (buffered output)
-    OUTPUT=$(claude -p "Read $PROMPT_FILE for instructions. The PRD file is: $PRD_FILE" --dangerously-skip-permissions 2>&1)
-    
-    # Display and log
-    echo "$OUTPUT"
-    echo "$OUTPUT" >> "$LOG_FILE"
-    
-    # Log footer
-    {
-        echo ""
-        echo "=================================="
-        echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
-    } >> "$LOG_FILE"
-    
-    # Check for completion signal
-    if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then
-        echo ""
-        echo "🎉 Ralph signaled COMPLETE after $ITERATION iterations"
-        echo "📂 Logs saved to: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-        exit 0
-    fi
-    
-    # Brief pause between iterations
-    sleep 2
-done
-
-echo ""
-echo "⚠️  Hit max iterations ($MAX_ITERATIONS) without COMPLETE signal"
-echo "Check progress.txt and $PRD_FILE to see what's left"
-echo "📂 Logs saved to: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
-EOF
-chmod +x ~/ralph-docker/ralph-loop.sh
-```
-
-**ralph-reset.sh** — Deletes a container so you can start fresh. Project files are safe (they're on your Mac or in a Docker volume). This does NOT delete volumes.
-
-```bash
-cat > ~/ralph-docker/ralph-reset.sh << 'EOF'
-#!/bin/bash
-# ralph-reset.sh - Remove a Ralph container to start fresh
-# Usage: ralph-reset.sh <container-name>
-# 
-# SAFE: This only removes the container, NOT your project files:
-#   - ralph-start.sh projects: Files are on your Mac (mounted)
-#   - ralph-clone.sh projects: Files are in Docker volume (preserved)
-#
-# To also delete the volume (rare): docker volume rm ralph-vol-<repo-name>
-
-if [ -z "$1" ]; then
-    echo "Usage: ralph-reset.sh <container-name>"
-    echo ""
-    echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
-    exit 1
-fi
-
-CONTAINER_NAME="$1"
-
-# Check if container exists
-if ! docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
-    echo "❌ Container '$CONTAINER_NAME' not found"
-    echo ""
-    echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
-    exit 1
-fi
-
-echo "⚠️  This will delete container: $CONTAINER_NAME"
-echo "   Project files are SAFE (on Mac or in Docker volume)"
-read -p "Continue? (y/n) " -n 1 -r
-echo
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker rm -f "$CONTAINER_NAME"
-    echo "✅ Container removed"
-    echo "   Run ralph-start.sh or ralph-clone.sh to recreate"
-else
-    echo "Cancelled"
-fi
-EOF
-chmod +x ~/ralph-docker/ralph-reset.sh
-```
+**Key notes:**
+- **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`) go in `~/ralph-docker/` and run on your Mac
+- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) get copied to each project and run inside containers
+- `node_modules` uses a named Docker volume (Mac/Linux architecture differences)
+- Run `npm install` inside the container on first use
 
 ### Step 1.8: Add Scripts to PATH (1 min)
 
@@ -519,6 +221,16 @@ You then: Review on GitHub → Approve → Merge → Delete branch
 
 These files go in your project root (or subdirectories as specified). Repeat this setup for each project you want to use with Ralph.
 
+### Step 3.0: Clone This Repository
+
+If you haven't already, clone this Ralph repository to your machine:
+
+```bash
+git clone https://github.com/your-org/ralph.git ~/ralph
+```
+
+This gives you access to all templates and scripts. The setup steps below copy files from `~/ralph/` to your project.
+
 ### Step 3.1: Navigate to Your Project
 
 ```bash
@@ -527,37 +239,20 @@ cd /path/to/your/project
 
 Or if using the clone workflow, you'll run `ralph-clone.sh` later instead.
 
-### Step 3.2: Create the Git Safety Hook
+### Step 3.2: Install the Git Safety Hook
 
 This blocks dangerous git commands inside the container as a safety net (branch protection is the real safeguard, this is defense in depth).
 
-Create `.git-hooks/pre-push`:
+Copy from the Ralph repo and configure git to use it:
+
 ```bash
 mkdir -p .git-hooks
-cat > .git-hooks/pre-push << 'EOF'
-#!/bin/bash
-# Block pushes to main/master from Claude
-
-protected_branches=("main" "master")
-current_branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
-
-for branch in "${protected_branches[@]}"; do
-    if [ "$current_branch" = "$branch" ]; then
-        echo "❌ BLOCKED: Cannot push directly to $branch"
-        echo "Create a feature branch and PR instead."
-        exit 1
-    fi
-done
-
-exit 0
-EOF
+cp ~/ralph/templates/.git-hooks/pre-push .git-hooks/pre-push
 chmod +x .git-hooks/pre-push
-```
-
-Configure git to use this hooks directory:
-```bash
 git config core.hooksPath .git-hooks
 ```
+
+See [templates/.git-hooks/pre-push](templates/.git-hooks/pre-push) for the hook source.
 
 Commit the hook:
 ```bash
@@ -569,29 +264,12 @@ git commit -m "Add git safety hook to block direct pushes to main"
 
 Start with a minimal template. Claude will expand this by exploring your project.
 
+Copy from the Ralph repo:
 ```bash
-cat > CLAUDE.md << 'EOF'
-# Project Context
-
-## Commands
-- `npm install` - Install dependencies
-- `npm run dev` - Start dev server  
-- `npm test` - Run tests
-- `npm run build` - Production build
-
-## Git Rules
-- NEVER push to main directly
-- Always work on feature branches
-- Make small, logical commits with clear messages
-
-## Testing Rules
-- ALL changes MUST have tests
-- Tests MUST pass before committing
-
-## Project Details
-[To be filled by project discovery - see Step 3.4]
-EOF
+cp ~/ralph/templates/CLAUDE.md.template ./CLAUDE.md
 ```
+
+See [templates/CLAUDE.md.template](templates/CLAUDE.md.template) for the starting point.
 
 ### Step 3.4: Run Project Discovery
 
@@ -642,139 +320,30 @@ Save the updated CLAUDE.md when done.
 
 Review the output and adjust anything that seems wrong.
 
-### Step 3.5: Create RALPH_PROMPT.md
+### Step 3.5: Copy RALPH_PROMPT.md
 
 This is what Claude reads each iteration. The PRD filename is passed when invoking the script.
 
+Copy from the Ralph repo:
 ```bash
-cat > RALPH_PROMPT.md << 'EOF'
-# Ralph Instructions
-
-Read these files first:
-1. CLAUDE.md - Project context and rules
-2. The PRD file (you were told which one)
-3. progress.txt - What's been done
-
-## Your Job (ONE TASK PER ITERATION)
-
-You will complete exactly ONE task per iteration. Not zero, not two. One.
-
-1. If not already on a feature branch, create one based on the PRD filename:
-   `git checkout -b ralph/[prd-number]-[brief-description]`
-   Example: `git checkout -b ralph/001-test-infrastructure`
-2. Read the PRD file and find all tasks where `testsPassing: false`
-3. Choose the BEST NEXT TASK to work on (not necessarily the first one—pick the most logical next step based on dependencies, complexity, and what's already done)
-4. Implement ONLY that task with appropriate tests
-5. Run the test command from CLAUDE.md - fix until ALL tests pass
-6. Commit with a clear message describing what you did
-7. Update the PRD file: set `testsPassing: true` for ONLY the completed task
-8. APPEND summary to progress.txt (add to end of file, do not modify existing content)
-9. STOP this iteration (the loop will start a new one)
-
-## Rules
-
-- **One task per iteration.** Do not continue to the next task.
-- **No drive-by refactoring.** Only touch code directly related to your current task. If you see something else that needs fixing, add it as a new task to the PRD instead of fixing it now.
-- **Never push to main.** Only push your feature branch.
-- **Never commit failing tests.**
-- **Small commits.** One logical change per commit.
-- **If stuck on same task 3+ times**, mark it with a `blocked` field explaining why, then pick a different task.
-
-## Modifying the PRD
-
-You may modify the PRD file in these specific ways:
-
-**Adding tasks:** If you discover something that needs to be done that isn't in the PRD, add it as a new task with a new ID and `testsPassing: false`. APPEND a note to progress.txt.
-
-**Splitting tasks:** If a task is too large to complete in one iteration, split it into smaller subtasks:
-- Keep the original task ID as a prefix (e.g., "003" becomes "003a", "003b", "003c")
-- Mark the original as split by adding `"split": true`
-- Create the subtasks with `testsPassing: false`
-- APPEND a note to progress.txt
-
-Do NOT delete tasks. Do NOT rename task IDs (except for splitting). Do NOT modify completed tasks.
-
-## After Each Task
-
-APPEND to progress.txt (add to end of file):
-```
----
-[TIMESTAMP]
-Task: [task id]
-Status: done|blocked|split
-
-What I did:
-- [Detailed list of changes made]
-- [Include specific files modified]
-- [Include any key decisions or approaches taken]
-
-Commit: [hash]
-Notes: [any PRD modifications, blockers encountered, or issues to flag]
+cp ~/ralph/RALPH_PROMPT.md ./RALPH_PROMPT.md
 ```
 
-## When All Tasks Complete
+See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows during each iteration.
 
-When there are no more tasks with `testsPassing: false` in the PRD file:
-
-1. `git push -u origin [branch-name]`
-2. Output exactly this completion signal (the loop script detects this):
-
-<promise>COMPLETE</promise>
-
-3. Then output: "✅ All tasks complete. Branch [branch-name] pushed. Please review PR on GitHub."
-EOF
-```
-
-### Step 3.5: Create PRD Directory and Template
+### Step 3.6: Create PRD Directory and Template
 
 PRDs are numbered for history (e.g., `001_initial_setup.json`, `002_user_auth.json`). **Task IDs are for reference only—they do NOT imply execution order.** Ralph picks the best next task dynamically.
 
+Copy from the Ralph repo:
 ```bash
-# Create PRD directory
 mkdir -p prds
-
-# Create the template
-cat > prds/PRD_TEMPLATE.json << 'EOF'
-{
-  "sprint": "[Name]",
-  "created": "[YYYY-MM-DD]",
-  "overview": "[Brief description of what this sprint accomplishes]",
-  "note": "Task IDs are for reference only. Order is determined dynamically.",
-  "tasks": [
-    {
-      "id": "001",
-      "name": "[Task Name]",
-      "description": "[What needs to be done]",
-      "acceptanceCriteria": [
-        "Criterion 1",
-        "Criterion 2"
-      ],
-      "testsPassing": false
-    }
-  ]
-}
-EOF
-
-# Create a helper script to start a new PRD
-cat > prds/new-prd.sh << 'EOF'
-#!/bin/bash
-# Usage: ./new-prd.sh "sprint name"
-
-NAME="${1:-unnamed}"
-# Find the next number
-LAST=$(ls -1 prds/*.json 2>/dev/null | grep -v TEMPLATE | sort -r | head -1 | grep -oE '[0-9]{3}' | head -1)
-NEXT=$(printf "%03d" $((10#${LAST:-0} + 1)))
-FILENAME="prds/${NEXT}_$(echo "$NAME" | tr ' ' '_' | tr '[:upper:]' '[:lower:]').json"
-
-cp prds/PRD_TEMPLATE.json "$FILENAME"
-sed -i '' "s/\[Name\]/$NAME/" "$FILENAME" 2>/dev/null || sed -i "s/\[Name\]/$NAME/" "$FILENAME"
-sed -i '' "s/\[YYYY-MM-DD\]/$(date +%Y-%m-%d)/" "$FILENAME" 2>/dev/null || sed -i "s/\[YYYY-MM-DD\]/$(date +%Y-%m-%d)/" "$FILENAME"
-
-echo "Created: $FILENAME"
-echo "Run Ralph with: ./ralph-loop.sh $FILENAME"
-EOF
+cp ~/ralph/prds/PRD_TEMPLATE.json ./prds/
+cp ~/ralph/prds/new-prd.sh ./prds/
 chmod +x prds/new-prd.sh
 ```
+
+See [prds/PRD_TEMPLATE.json](prds/PRD_TEMPLATE.json) for the template structure and [prds/new-prd.sh](prds/new-prd.sh) for the helper script.
 
 **Workflow:**
 1. `./prds/new-prd.sh "user authentication"` → creates `prds/001_user_authentication.json`
@@ -782,97 +351,50 @@ chmod +x prds/new-prd.sh
 3. Run Ralph: `./ralph-loop.sh prds/001_user_authentication.json`
 4. When done, the numbered file serves as history
 
-### Step 3.6: Create progress.txt
+### Step 3.7: Create progress.txt
 
+Copy from the Ralph repo:
 ```bash
-cat > progress.txt << 'EOF'
-# Ralph Progress Log
-
----
-[Setup]
-Project configured for Ralph workflow.
-EOF
+cp ~/ralph/templates/progress.txt.template ./progress.txt
 ```
 
-### Step 3.7: Copy UI_TESTING.md (Reference for UI Projects)
+See [templates/progress.txt.template](templates/progress.txt.template) for the initial structure.
+
+### Step 3.8: Copy UI_TESTING.md (Reference for UI Projects)
 
 This file contains UI testing standards. Claude reads it when working on UI tasks.
 
+Copy from the Ralph repo:
 ```bash
 cp ~/ralph/templates/UI_TESTING.md .
 ```
 
-The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness.
+The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness. See [templates/UI_TESTING.md](templates/UI_TESTING.md) for the full document.
 
-### Step 3.8: Create PRD_REFINE.md (PRD Quality Check)
+### Step 3.9: Copy PRD_REFINE.md (PRD Quality Check)
 
 This prompt helps refine PRDs to ensure tasks are right-sized.
 
+Copy from the Ralph repo:
 ```bash
-cat > prds/PRD_REFINE.md << 'EOF'
-# PRD Refinement
-
-Review the PRD for task sizing and acceptance criteria quality.
-
-## Right-Sized Task
-- Completable in one focused session
-- Has clear "done" state (testable)
-- Dependencies are explicit
-
-## Too Big (split it)
-- Has multiple distinct deliverables
-- Naturally breaks into "first X, then Y"
-
-## Too Small (merge it)
-- Just a sub-step of another task
-- Can't be tested independently
-
-## Task Order
-
-Task IDs are for REFERENCE ONLY—not execution order.
-Ralph picks the best next task dynamically based on:
-- What's already done
-- What makes logical sense
-- Dependencies between tasks
-
-If tasks have hard dependencies, note them in the description:
-- "Requires: 003" or "After auth is complete"
-- Do NOT assume numeric order = execution order
-
-## Acceptance Criteria Quality
-
-Good criteria test PURPOSE, not implementation:
-- "User can log in with email/password" (purpose)
-- "Login form calls /api/auth endpoint" (implementation - too rigid)
-
-Avoid:
-- Specifying exact function names or file structures
-- Requiring specific libraries or patterns
-- Testing internal state rather than observable behavior
-
-## Output Format
-
-For each task:
-- KEEP: [task id] - [reason]
-- SPLIT: [task id] into [subtasks]
-- MERGE: [task ids] into [single task]
-- FIX: [task id] - [criteria issue]
-
-Or if all tasks are ready: "PRD is ready"
-EOF
+cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 ```
 
-### Step 3.9: Copy Ralph Scripts to Project Root
+See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
 
-Copy from your machine-level `~/ralph-docker/` to your project root:
+### Step 3.10: Copy Ralph Scripts to Project Root
+
+Copy the in-container scripts from the Ralph repo to your project root:
 
 ```bash
-cp ~/ralph-docker/ralph-loop.sh ./ralph-loop.sh
-cp ~/ralph-docker/ralph-once.sh ./ralph-once.sh
+cp ~/ralph/ralph-loop.sh ./ralph-loop.sh
+cp ~/ralph/ralph-once.sh ./ralph-once.sh
 chmod +x ralph-loop.sh ralph-once.sh
 ```
 
-### Step 3.10: Update .gitignore
+See [ralph-loop.sh](ralph-loop.sh) and [ralph-once.sh](ralph-once.sh) for the current versions.
+
+### Step 3.11: Update .gitignore
 
 ```bash
 cat >> .gitignore << 'EOF'
@@ -882,59 +404,16 @@ ralph-logs/
 EOF
 ```
 
-### Step 3.11: Create .claudeignore
+### Step 3.12: Create .claudeignore
 
 Prevent Claude from reading sensitive or wasteful files. Claude Code doesn't do RAG on large files—it reads them into context, which wastes tokens and can hit limits.
 
+Copy from the Ralph repo:
 ```bash
-cat > .claudeignore << 'EOF'
-# === SECRETS (never let Claude read these) ===
-.env
-.env.*
-*.pem
-*.key
-secrets/
-
-# === LARGE GENERATED FILES (waste of context) ===
-# Lock files - huge, not useful
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Build outputs
-/build/
-/dist/
-/.next/
-/.nuxt/
-/.output/
-/.react-router/
-
-# Dependencies
-/node_modules/
-
-# Generated code (Claude can read the source schemas instead)
-# Uncomment if applicable:
-# /app/generated/        # Prisma
-# /src/gql/              # GraphQL codegen
-# /__generated__/        # Relay
-
-# === TEST ARTIFACTS (usually not helpful) ===
-/playwright-report/
-/test-results/
-/coverage/
-/.nyc_output/
-
-# === RALPH LOGS ===
-# These COULD help Claude debug issues from previous iterations,
-# but they're large and not always present (gitignored).
-# Uncomment to exclude:
-# /ralph-logs/
-
-# === OS FILES ===
-.DS_Store
-Thumbs.db
-EOF
+cp ~/ralph/templates/.claudeignore ./.claudeignore
 ```
+
+See [templates/.claudeignore](templates/.claudeignore) for the default exclusions.
 
 **Customize for your project:** Review what's in your `.gitignore`—most of those should also be in `.claudeignore`. The key categories:
 - **Secrets** — Always ignore
@@ -943,7 +422,7 @@ EOF
 - **Test artifacts** — Usually ignore (reports, screenshots)
 - **Ralph logs** — Optional (might help debugging, but large)
 
-### Step 3.12: Commit Setup
+### Step 3.13: Commit Setup
 
 ```bash
 git add CLAUDE.md RALPH_PROMPT.md UI_TESTING.md prds/ progress.txt ralph-loop.sh ralph-once.sh .git-hooks .gitignore .claudeignore

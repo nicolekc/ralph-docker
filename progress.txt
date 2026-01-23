@@ -1,7 +1,93 @@
 # Ralph Progress Log
 
 ---
+2026-01-22T20:50:00Z
+PRD: 001_normalize_repo_structure
+Task: 001
+Status: done
+
+What I did:
+- Created templates/ directory structure
+- Created templates/CLAUDE.md.template with project context template
+- Created templates/progress.txt.template with initial progress log
+- Created templates/.claudeignore with file exclusion patterns
+- Created templates/.git-hooks/pre-push with branch protection hook
+- Created UI_TESTING.md with UI testing standards
+- Created prds/PRD_REFINE.md with PRD quality check prompt
+- Created prds/new-prd.sh helper script (made executable)
+- All content extracted from README.md inline documentation
+
+Commit: 13ceb74
+Notes: All template files now exist as standalone files. Content matches README.md descriptions.
+
+---
+2026-01-22T21:05:00Z
+PRD: 001_normalize_repo_structure
+Task: 002
+Status: done
+
+What I did:
+- Compared all 5 Ralph scripts (ralph-start.sh, ralph-clone.sh, ralph-once.sh, ralph-loop.sh, ralph-reset.sh) between README.md heredoc versions and actual files
+- Documented key differences found:
+  - ralph-start.sh: Actual uses named volumes (better), README used anonymous volumes
+  - ralph-once.sh: Actual is simplified (no logging), README had full logging - simplified is appropriate for quick testing
+  - ralph-clone.sh: Minor differences in volume mounts
+  - ralph-loop.sh and ralph-reset.sh: Nearly identical
+- Determined actual files are canonical (improved/updated versions)
+- Updated README.md Step 1.7 to remove embedded heredocs, now links to actual files with a table
+- Updated README.md Step 3.9 to reference actual files
+- Removed ~340 lines of duplicated script content from README
+
+Commit: 165a9a3
+Notes: README is now significantly shorter and references the actual scripts as source of truth.
+
+---
+2026-01-22T21:30:00Z
+PRD: 001_normalize_repo_structure
+Task: 003
+Status: done
+
+What I did:
+- Replaced 8 heredoc blocks in README with copy commands referencing actual files
+- Added markdown links to all template and script files for easy navigation
+- Reduced README from ~1254 lines to ~965 lines (~290 lines removed)
+- Renumbered steps 3.5-3.12 to 3.5-3.13 for proper sequencing
+- Preserved only necessary heredocs: Dockerfile (users create in ralph-docker) and .gitignore append (small addition)
+- Verified all 14 linked files exist and paths work as relative links
+
+Files modified:
+- README.md: Restructured to reference files instead of embedding
+- prds/001_normalize_repo_structure.json: Marked task 003 complete
+
+Commit: 337615c
+Notes: README is now a proper documentation hub. All file contents are in actual files, README links to them.
+
+---
+2026-01-22T21:45:00Z
+PRD: 001_normalize_repo_structure
+Task: 004
+Status: done
+
+What I did:
+- Added "Repository Structure" section to README.md after the intro
+- Created visual directory tree showing all files and directories
+- Explained purpose of each file and directory:
+  - Root scripts (ralph-*.sh, Dockerfile) for machine-level setup
+  - templates/ for files users copy to their projects
+  - prds/ for PRD templates and tools
+  - ralph-logs/ for iteration logs (gitignored)
+- Added "Key distinction" section explaining which files go where
+
+Files modified:
+- README.md: Added Repository Structure section (~39 lines)
+- prds/001_normalize_repo_structure.json: Marked task 004 complete
+
+Commit: 55f948d
+Notes: Users can now see the repo structure at a glance.
+
+---
 2026-01-22T23:25:00Z
+PRD: 002_readme_cleanup
 Task: 003
 Status: done
 
@@ -20,25 +106,26 @@ Notes: Single source of truth for Dockerfile content now established. README red
 
 ---
 2026-01-22T23:45:00Z
+PRD: 002_readme_cleanup
 Task: 001
 Status: done
 
 What I did:
-- Created templates/ directory
-- Created templates/UI_TESTING.md with accessibility-first testing standards
-- Updated README Step 3.7 to copy from templates/ instead of using heredoc
+- Moved UI_TESTING.md to templates/ directory (was at root from PRD 001)
+- Updated README Step 3.8 to copy from templates/ instead of root
 - Updated Key Files table to show file is copied from templates/
 - Verified all UI_TESTING.md references in README are still valid
 
 Files modified:
-- README.md: Changed Step 3.7 from heredoc creation to copy command
-- templates/UI_TESTING.md: Created new file
+- README.md: Changed Step 3.8 from root to templates/ path
+- templates/UI_TESTING.md: Moved from root
 
 Commit: 2d2fca2
-Notes: Templates directory now established for user-copy files. README reduced by ~53 lines.
+Notes: Templates directory now contains all user-copy files. Better organization.
 
 ---
 2026-01-22T23:55:00Z
+PRD: 002_readme_cleanup
 Task: 002
 Status: done
 
@@ -49,11 +136,12 @@ What I did:
 Files modified:
 - prds/999_dry_run_test.json: Reset all testsPassing flags from true to false
 
-Commit: (pending - will be included with other changes)
+Commit: 06331ae (included with other changes)
 Notes: Dry run PRD is now ready for new users to test their Ralph setup.
 
 ---
 2026-01-23T00:05:00Z
+PRD: 002_readme_cleanup
 Task: 004
 Status: done
 
@@ -61,16 +149,17 @@ What I did:
 - Expanded Key Files table into two sections: Machine-level and Project-level
 - Added Source column showing where each file comes from
 - Added intro text to Part 3 clarifying files go in project root
-- Updated Step 3.9 title and added clarifying text about copying from ~/ralph-docker/
+- Updated Step 3.10 title and added clarifying text about copying scripts
 
 Files modified:
-- README.md: Enhanced Key Files section and Step 3.9
+- README.md: Enhanced Key Files section and Step 3.10
 
-Commit: (pending - will be included with other changes)
+Commit: 06331ae (included with other changes)
 Notes: Users can now clearly understand: (1) which files go to ~/ralph-docker/ vs project root, (2) what the source of each file is, (3) which setup is one-time vs per-project.
 
 ---
 2026-01-23T00:15:00Z
+PRD: 002_readme_cleanup
 Task: 005
 Status: done
 
@@ -84,5 +173,5 @@ What I did:
 Files modified:
 - README.md: Added dry run testing section after "Test with Single Iteration First"
 
-Commit: (pending - will be committed with this sprint's changes)
+Commit: 06331ae (included with other changes)
 Notes: Users can now test their Ralph setup safely before running real tasks.
