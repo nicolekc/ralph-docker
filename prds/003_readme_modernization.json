@@ -13,7 +13,7 @@
         "Running /discover triggers project exploration workflow",
         "README Step 3.4 references the skill with brief usage instructions"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "002",
@@ -25,7 +25,7 @@
         "Skill applies task sizing and acceptance criteria checks from PRD_REFINE.md",
         "README updated to show /refine usage in PRD workflow sections"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "003",
@@ -38,7 +38,7 @@
         "README Part 3 is dramatically simplified to: clone Ralph repo, run install script, run /discover",
         "Script handles both 'fresh project' and 'existing project' scenarios"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "004",
@@ -52,7 +52,7 @@
         "The sequence of instructions reflects actual workflow without backtracking",
         "Part 4.1 no longer references running Claude outside Docker"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "005",
@@ -65,7 +65,7 @@
         "Concise—not more than ~15-20 lines",
         "The 'Key insight' content from the end is integrated or moved appropriately"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "006",
@@ -78,7 +78,7 @@
         "Directory entries explain what KIND of things live there",
         "Easier to scan and understand than the current tree"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "007",
@@ -91,7 +91,7 @@
         "Time estimates reflect the ACTUAL time after all improvements",
         "Replaces the current bullet-list time budget"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "008",
@@ -104,7 +104,7 @@
         "Install script (task 003) does NOT copy new-prd.sh",
         "Workflow is simpler: describe feature → Claude creates PRD → /refine → run Ralph"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "009",
@@ -116,7 +116,7 @@
         "Example is clearly marked as example/template (not real data)",
         "Format matches what RALPH_PROMPT.md expects Claude to write"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "010",
@@ -129,7 +129,7 @@
         "Part 7 flow is logical: setup → verify → dry run → real run",
         "Users won't waste a real PRD iteration discovering setup issues"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "011",
@@ -141,7 +141,7 @@
         "Part 5 is consistent with new PRD creation workflow (no new-prd.sh references)",
         "Part 5 references /refine skill if appropriate"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "012",

@@ -175,3 +175,246 @@ Files modified:
 
 Commit: 06331ae (included with other changes)
 Notes: Users can now test their Ralph setup safely before running real tasks.
+
+---
+2026-01-23T01:30:00Z
+PRD: 003_readme_modernization.json
+Task: 001
+Status: done
+
+What I did:
+- Created .claude/skills/ directory structure
+- Created .claude/skills/discover/SKILL.md with YAML frontmatter (name, description)
+- Skill contains project exploration instructions (tech stack, project structure, coding patterns, testing setup, dev server)
+- Moved long prompt from README Step 3.4 into the skill
+- Added new Step 3.4: Copy Claude Code Skills (copies .claude/skills/ directory)
+- Changed Step 3.5 to: Run Project Discovery (runs /discover skill)
+- Renumbered Steps 3.6-3.14 (previously 3.5-3.13)
+- Updated Step 3.14 commit command to include .claude/ directory
+
+Files modified:
+- .claude/skills/discover/SKILL.md (new)
+- README.md (restructured Step 3.4-3.14)
+
+Commit: a454549
+Notes: The discover skill replaces the embedded prompt, making project discovery simpler (/discover vs copy-paste). This establishes the skills infrastructure that Task 002 (refine skill) will build upon.
+
+---
+2026-01-23T02:00:00Z
+PRD: 003_readme_modernization.json
+Task: 002
+Status: done
+
+What I did:
+- Created .claude/skills/refine/ directory
+- Created .claude/skills/refine/SKILL.md with YAML frontmatter (name, description)
+- Skill instructions cover: right-sized tasks, too big (split), too small (merge), dependencies, acceptance criteria quality
+- Output format: KEEP/SPLIT/MERGE/FIX for each task, or "PRD is ready"
+- Kept PRD_REFINE.md as reference doc (skill uses same criteria)
+- Updated README Step 3.4 to document both discover and refine skills
+- Updated README Step 3.10 to note PRD_REFINE.md is reference for the skill
+- Updated README Steps 4.3 and 5.3 to use /refine command instead of manual prompt
+- Updated Quick Reference to mention /refine
+
+Files modified:
+- .claude/skills/refine/SKILL.md (new)
+- README.md (updated skill docs and PRD refinement workflow)
+
+Commit: b3d1a08
+Notes: The refine skill simplifies PRD quality checking. Users now run /refine <prd-path> instead of manually referencing PRD_REFINE.md. This unblocks Task 003 (install script) and Task 008 (remove new-prd.sh).
+
+---
+2026-01-23T03:00:00Z
+PRD: 003_readme_modernization.json
+Task: 003
+Status: done
+
+What I did:
+- Created install.sh script in repo root
+- Script copies all necessary files to target project:
+  - CLAUDE.md.template → CLAUDE.md (only if doesn't exist)
+  - progress.txt.template → progress.txt (only if doesn't exist)
+  - .claudeignore, RALPH_PROMPT.md, UI_TESTING.md
+  - ralph-loop.sh, ralph-once.sh (made executable)
+  - prds/PRD_TEMPLATE.json, prds/PRD_REFINE.md
+  - .claude/skills/discover/SKILL.md, .claude/skills/refine/SKILL.md
+  - .git-hooks/pre-push (made executable, configured git hooks path)
+  - Updates .gitignore to exclude ralph-logs/
+- Script is idempotent: detects unchanged files, backs up changed files, creates only missing files
+- Script verifies target is a git repository
+- Dramatically simplified README Part 3 from 14 steps to 5 steps
+- Updated time estimate from ~15 min to ~5 min
+- Updated Repository Structure to include install.sh
+- Updated Key Files tables in Quick Reference to show install.sh as source
+- Removed new-prd.sh from repository structure diagram (anticipating Task 008)
+- Updated Commands table to include install.sh
+
+Files modified:
+- install.sh (new)
+- README.md (simplified Part 3, updated Quick Reference)
+
+Commit: d1a533f
+Notes: Part 3 is now: clone Ralph → run install.sh → run /discover → commit. This unblocks other documentation tasks and makes onboarding much faster.
+
+---
+2026-01-23T04:00:00Z
+PRD: 003_readme_modernization.json
+Task: 004
+Status: done
+
+What I did:
+- Removed Step 1.2 (Install Claude Code) and Step 1.3 (Authenticate Claude Code) from Part 1
+- Added note in Step 1.4 that Claude Code is pre-installed in Docker image and users don't need it on their Mac
+- Added warning about never using --dangerously-skip-permissions with local Claude Code
+- Renumbered Part 1 steps (1.4→1.2, 1.5→1.3, 1.6→1.4, 1.7→1.5, 1.8→1.6)
+- Updated Part 1 time estimate from ~60 min to ~45 min
+- Added "First container setup: ~10 minutes (authentication)" to Time Budget
+- Completely restructured Part 4 to start with entering container first:
+  - Step 4.1: Enter the Container
+  - Step 4.2: Authenticate (First Run Only) - Claude auth AND gh auth together
+  - Step 4.3: Quick Assessment (inside container)
+  - Step 4.4-4.7: Generate PRD, refine, commit, run
+- Simplified Part 5 to remove implication of running Claude on Mac
+- Updated Quick Reference Daily Workflow to show container-first approach
+
+Files modified:
+- README.md (restructured Parts 1, 4, 5, and Quick Reference)
+
+Commit: af8a74e
+Notes: Auth flow now correctly reflects per-container authentication happening inside the container after ralph-start.sh. No more false claims about auth being shared across containers.
+
+---
+2026-01-23T05:00:00Z
+PRD: 003_readme_modernization.json
+Task: 005
+Status: done
+
+What I did:
+- Added "Why Ralph?" section after title, before Time Budget
+- Explains 5 key benefits: Docker isolation, automated feedback loop, incremental commits, human oversight, GitHub protection
+- Moved "Key insight" content from Summary section to new section at top
+- Section is concise (~12 lines including the key insight paragraph)
+- Removed redundant "Key insight" line from Summary section
+
+Files modified:
+- README.md (added Why Ralph? section, removed duplicate Key insight)
+
+Commit: 54abda7
+Notes: Benefits section provides clear value proposition before diving into setup instructions. New users now understand WHY to use Ralph before learning HOW.
+
+---
+2026-01-23T06:00:00Z
+PRD: 003_readme_modernization.json
+Task: 006
+Status: done
+
+What I did:
+- Replaced verbose ASCII directory tree (26 lines, including code block) with markdown table
+- Table shows 12 key files/directories with concise purpose descriptions
+- Directory entries (templates/, prds/, .claude/skills/, ralph-logs/) explain what kinds of files they contain
+- Condensed "Key distinction" section into simpler "Where things go" bullet points
+- Net reduction of 17 lines while improving scannability
+
+Files modified:
+- README.md (replaced Repository Structure section)
+
+Commit: 309af1a
+Notes: The markdown table is much easier to scan than the ASCII tree. Users can now quickly see what's in the repo without parsing nested structure.
+
+---
+2026-01-23T07:00:00Z
+PRD: 003_readme_modernization.json
+Task: 008
+Status: done
+
+What I did:
+- Deleted prds/new-prd.sh helper script
+- Verified README already documents natural language PRD creation workflow (Parts 4.4, 5.1)
+- Verified no references to new-prd.sh exist in README
+- Verified install.sh does not copy new-prd.sh (confirmed in Task 003)
+- Workflow is now: describe feature → Claude creates PRD → /refine → run Ralph
+
+Files modified:
+- prds/new-prd.sh (deleted)
+
+Commit: e6e10bb
+Notes: The new-prd.sh script was redundant. Claude Code creates better PRDs from natural language than a bash script could with template substitution.
+
+---
+2026-01-23T08:00:00Z
+PRD: 003_readme_modernization.json
+Task: 010
+Status: done
+
+What I did:
+- Restructured Part 7 (Running Ralph) for logical flow: enter container → verify → dry run → real PRD
+- Moved "Dry Run Test" section BEFORE "Run a Real PRD" (was after)
+- Removed `tail -f progress.txt` from monitoring instructions (doesn't work well)
+- Removed vague "If something's wrong, fix your CLAUDE.md or RALPH_PROMPT.md and try again" advice
+- Added step numbers (7.1-7.7) for consistent structure
+- Simplified and clarified instructions throughout Part 7
+- Users will now test their setup with dry run before wasting a real PRD iteration
+
+Files modified:
+- README.md (restructured Part 7)
+- prds/003_readme_modernization.json (marked task 010 complete)
+
+Commit: fdcd34d
+Notes: Part 7 now follows the recommended flow: setup → verify → dry run → real run. Users won't discover setup issues on their first real PRD.
+
+---
+2026-01-23T09:00:00Z
+PRD: 003_readme_modernization.json
+Task: 009
+Status: done
+
+What I did:
+- Added commented example entry format to templates/progress.txt.template
+- Example shows all required fields: timestamp, PRD reference, task ID, status, "What I did" bullets, commit hash, notes
+- Used HTML comment to mark it as an example (delete after first real entry)
+- Format matches RALPH_PROMPT.md specification (lines 50-63)
+
+Commit: cf24db7
+Notes: Example uses realistic content without being actual data. Users can now see exactly what progress entries should look like.
+
+---
+2026-01-23T10:00:00Z
+PRD: 003_readme_modernization.json
+Task: 011
+Status: done
+
+What I did:
+- Removed Step 8.2 (Review Commits separately) - merged into GitHub review step
+- Removed Step 8.3 (Run Tests) - tests already passed in container, redundant
+- Removed Step 8.4 (Manual Testing) - optional, doesn't need explicit instruction
+- Renumbered remaining steps: 8.5→8.2 (Review on GitHub), 8.6→8.3 (Pull Merged Changes)
+- Part 8 now focuses on: review progress.txt, review PR on GitHub, merge and pull
+- Verified Part 5 is consistent with new workflow:
+  - No references to new-prd.sh ✓
+  - Uses natural language PRD creation ✓
+  - References /refine skill in Step 5.2 ✓
+
+Commit: 5a446bb
+Notes: Part 8 reduced from 6 steps to 3 steps. Focused and non-redundant.
+
+---
+2026-01-23T11:00:00Z
+PRD: 003_readme_modernization.json
+Task: 007
+Status: done
+
+What I did:
+- Added Table of Contents section after "Why Ralph?" section
+- Created markdown table with 9 Parts, descriptions, and time estimates
+- Each Part number links to its section via GitHub markdown anchors
+- Time estimates updated based on post-improvement workflow:
+  - Part 1: ~45 min (reduced from ~60 min due to removing host Claude installation)
+  - Part 3: ~5 min (dramatically reduced due to install.sh)
+  - Part 4: ~20 min (added estimate for test infrastructure PRD)
+  - Part 7: "varies" (depends on PRD complexity)
+  - Part 9: "reference" (troubleshooting guide, not a timed activity)
+- Added summary grouping below table: one-time setup, per-project setup, per-feature cycle
+- Removed old bullet-list Time Budget format
+
+Commit: 431f3d0
+Notes: All dependencies (004, 005, 006, 010, 011) were complete. Only Task 012 (final coherency review) remains.
