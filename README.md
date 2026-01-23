@@ -28,41 +28,24 @@ Ralph is a workflow technique that lets Claude Code work autonomously on your co
 
 ## Repository Structure
 
-This repo contains everything you need to run the Ralph workflow. Here's what each file and directory is for:
+| File/Directory | Purpose |
+|----------------|---------|
+| `Dockerfile` | Docker image with Node.js, Claude Code, Playwright, and tools |
+| `install.sh` | Copies all Ralph files to your project in one command |
+| `ralph-start.sh` | Launch container with a local project folder mounted |
+| `ralph-clone.sh` | Clone a repo into Docker-managed storage and start container |
+| `ralph-reset.sh` | Remove a container to start fresh |
+| `ralph-loop.sh` | Run Claude iterations until done (copied to projects) |
+| `ralph-once.sh` | Run single Claude iteration for testing (copied to projects) |
+| `templates/` | Project files: CLAUDE.md.template, .claudeignore, .git-hooks/, UI_TESTING.md |
+| `prds/` | PRD template and refinement guide |
+| `.claude/skills/` | Claude Code skills: `/discover` and `/refine` |
+| `RALPH_PROMPT.md` | Instructions Claude reads each iteration |
+| `ralph-logs/` | Iteration logs (gitignored, local only) |
 
-```
-├── README.md                    # This guide - setup and workflow documentation
-├── RALPH_PROMPT.md              # Instructions Claude reads each iteration
-├── Dockerfile                   # Docker image definition for Ralph containers
-├── install.sh                   # Project setup script (copies files to your project)
-├── progress.txt                 # Work log (example/placeholder)
-│
-├── ralph-start.sh               # Launch container with local project mounted
-├── ralph-clone.sh               # Clone a repo into Docker-managed storage
-├── ralph-once.sh                # Run single Claude iteration (for testing)
-├── ralph-loop.sh                # Run Claude in a loop until done
-├── ralph-reset.sh               # Remove a container to start fresh
-│
-├── templates/                   # Files copied to your project by install.sh
-│   ├── CLAUDE.md.template       # Project context template (rename to CLAUDE.md)
-│   ├── progress.txt.template    # Initial progress log
-│   ├── UI_TESTING.md            # UI testing standards (reference for UI projects)
-│   ├── .claudeignore            # File exclusion patterns for Claude
-│   └── .git-hooks/
-│       └── pre-push             # Git safety hook (blocks pushes to main)
-│
-├── prds/                        # PRD templates and tools
-│   ├── PRD_TEMPLATE.json        # Template for creating new PRDs
-│   └── PRD_REFINE.md            # Prompt for refining PRDs
-│
-└── ralph-logs/                  # Iteration logs (gitignored, local only)
-```
-
-**Key distinction:**
-- **Machine-level scripts** (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`, `Dockerfile`) are installed once in `~/ralph-docker/` and manage containers
-- **Project setup** (`install.sh`) copies all project files in one command
-- **Project-level scripts** (`ralph-once.sh`, `ralph-loop.sh`) are copied to each project and run inside containers
-- **Templates** (`templates/`) and **PRD tools** (`prds/`) are copied by the install script
+**Where things go:**
+- **`~/ralph-docker/`**: Machine-level scripts (`ralph-start.sh`, `ralph-clone.sh`, `ralph-reset.sh`, `Dockerfile`) — installed once
+- **Your project root**: Everything else — copied by `install.sh`
 
 ---
 
