@@ -14,13 +14,23 @@ Ralph is a workflow technique that lets Claude Code work autonomously on your co
 
 ---
 
-**Time Budget:**
-- Machine setup (one-time): ~45 minutes
-- Project setup: ~5 minutes
-- First container setup: ~10 minutes (authentication)
-- Sprint planning: ~15 minutes
-- Feature planning: ~5 minutes each
-- Human verification: ~15 minutes
+## Table of Contents
+
+| Part | Description | Time |
+|------|-------------|------|
+| [1](#part-1-one-time-machine-setup-45-minutes) | One-Time Machine Setup | ~45 min |
+| [2](#part-2-github-branch-protection-10-min-one-time-per-repo) | GitHub Branch Protection | ~10 min |
+| [3](#part-3-project-setup-5-minutes-per-project) | Project Setup | ~5 min |
+| [4](#part-4-test-infrastructure-prd-your-first-ralph-run) | Test Infrastructure PRD | ~20 min |
+| [5](#part-5-feature-planning-for-each-sprint) | Feature Planning (Sprint) | ~15 min |
+| [6](#part-6-feature-planning-5-min-each) | Feature Planning (Detail) | ~5 min |
+| [7](#part-7-running-ralph) | Running Ralph | varies |
+| [8](#part-8-human-verification-15-min) | Human Verification | ~15 min |
+| [9](#part-9-troubleshooting) | Troubleshooting | reference |
+
+**One-time setup:** Parts 1-2 (~55 min total)
+**Per-project setup:** Part 3 (~5 min) + first container auth (~10 min)
+**Per-feature cycle:** Parts 4-8 (time varies by feature complexity)
 
 **Your Stack:** macOS, Claude Max, React Router, TypeScript, npm, Jest, Figma screenshots
 
