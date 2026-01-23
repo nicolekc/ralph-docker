@@ -282,3 +282,82 @@ Files modified:
 
 Commit: af8a74e
 Notes: Auth flow now correctly reflects per-container authentication happening inside the container after ralph-start.sh. No more false claims about auth being shared across containers.
+
+---
+2026-01-23T05:00:00Z
+PRD: 003_readme_modernization.json
+Task: 005
+Status: done
+
+What I did:
+- Added "Why Ralph?" section after title, before Time Budget
+- Explains 5 key benefits: Docker isolation, automated feedback loop, incremental commits, human oversight, GitHub protection
+- Moved "Key insight" content from Summary section to new section at top
+- Section is concise (~12 lines including the key insight paragraph)
+- Removed redundant "Key insight" line from Summary section
+
+Files modified:
+- README.md (added Why Ralph? section, removed duplicate Key insight)
+
+Commit: 54abda7
+Notes: Benefits section provides clear value proposition before diving into setup instructions. New users now understand WHY to use Ralph before learning HOW.
+
+---
+2026-01-23T06:00:00Z
+PRD: 003_readme_modernization.json
+Task: 006
+Status: done
+
+What I did:
+- Replaced verbose ASCII directory tree (26 lines, including code block) with markdown table
+- Table shows 12 key files/directories with concise purpose descriptions
+- Directory entries (templates/, prds/, .claude/skills/, ralph-logs/) explain what kinds of files they contain
+- Condensed "Key distinction" section into simpler "Where things go" bullet points
+- Net reduction of 17 lines while improving scannability
+
+Files modified:
+- README.md (replaced Repository Structure section)
+
+Commit: 309af1a
+Notes: The markdown table is much easier to scan than the ASCII tree. Users can now quickly see what's in the repo without parsing nested structure.
+
+---
+2026-01-23T07:00:00Z
+PRD: 003_readme_modernization.json
+Task: 008
+Status: done
+
+What I did:
+- Deleted prds/new-prd.sh helper script
+- Verified README already documents natural language PRD creation workflow (Parts 4.4, 5.1)
+- Verified no references to new-prd.sh exist in README
+- Verified install.sh does not copy new-prd.sh (confirmed in Task 003)
+- Workflow is now: describe feature → Claude creates PRD → /refine → run Ralph
+
+Files modified:
+- prds/new-prd.sh (deleted)
+
+Commit: e6e10bb
+Notes: The new-prd.sh script was redundant. Claude Code creates better PRDs from natural language than a bash script could with template substitution.
+
+---
+2026-01-23T08:00:00Z
+PRD: 003_readme_modernization.json
+Task: 010
+Status: done
+
+What I did:
+- Restructured Part 7 (Running Ralph) for logical flow: enter container → verify → dry run → real PRD
+- Moved "Dry Run Test" section BEFORE "Run a Real PRD" (was after)
+- Removed `tail -f progress.txt` from monitoring instructions (doesn't work well)
+- Removed vague "If something's wrong, fix your CLAUDE.md or RALPH_PROMPT.md and try again" advice
+- Added step numbers (7.1-7.7) for consistent structure
+- Simplified and clarified instructions throughout Part 7
+- Users will now test their setup with dry run before wasting a real PRD iteration
+
+Files modified:
+- README.md (restructured Part 7)
+- prds/003_readme_modernization.json (marked task 010 complete)
+
+Commit: fdcd34d
+Notes: Part 7 now follows the recommended flow: setup → verify → dry run → real run. Users won't discover setup issues on their first real PRD.

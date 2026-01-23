@@ -65,7 +65,7 @@
         "Concise—not more than ~15-20 lines",
         "The 'Key insight' content from the end is integrated or moved appropriately"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "006",
@@ -78,7 +78,7 @@
         "Directory entries explain what KIND of things live there",
         "Easier to scan and understand than the current tree"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "007",
@@ -104,7 +104,7 @@
         "Install script (task 003) does NOT copy new-prd.sh",
         "Workflow is simpler: describe feature → Claude creates PRD → /refine → run Ralph"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "009",
@@ -129,7 +129,7 @@
         "Part 7 flow is logical: setup → verify → dry run → real run",
         "Users won't waste a real PRD iteration discovering setup issues"
       ],
-      "testsPassing": false
+      "testsPassing": true
     },
     {
       "id": "011",

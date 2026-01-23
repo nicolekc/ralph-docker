@@ -454,104 +454,89 @@ Use Tailwind. Make responsive.
 
 ## Part 7: Running Ralph
 
-### Option A: Local Project (Mounted Folder)
+### Step 7.1: Enter the Container
 
+**Option A: Local Project (Mounted Folder)**
 ```bash
 ralph-start.sh /path/to/your/project
 ```
 
-### Option B: Repo Clone (Docker-Managed)
-
+**Option B: Repo Clone (Docker-Managed)**
 ```bash
 ralph-clone.sh https://github.com/your-username/your-repo.git
 ```
 
-### Inside the Container
+### Step 7.2: Verify Setup
 
 ```bash
-# Verify setup
-git status
-npm test
+git status    # Should show clean working tree or expected changes
+npm test      # Should pass (if you've completed test infrastructure PRD)
 ```
 
-### Test with Single Iteration First
+### Step 7.3: Dry Run Test (Recommended First Time)
 
-Before running the full loop, verify everything works:
+Before running real PRDs, verify your Ralph setup works with the dry run PRD. This makes no git commits and no code changes—it only edits the PRD file itself.
 
 ```bash
-./ralph-once.sh
+./ralph-loop.sh prds/999_dry_run_test.json
 ```
 
-Watch what Claude does. Check that it:
+**What success looks like:**
+- Ralph runs through 5 iterations without errors
+- All tasks in the PRD show `testsPassing: true`
+- The `<promise>COMPLETE</promise>` signal appears
+- No git commits were made
+
+**To reset for another test:**
+```bash
+# Copy fresh from Ralph repo, or manually set all testsPassing to false
+cp ~/ralph/prds/999_dry_run_test.json prds/
+```
+
+### Step 7.4: Run a Real PRD
+
+**Test single iteration first:**
+```bash
+./ralph-once.sh prds/001_test_infrastructure.json
+```
+
+Watch what Claude does. Verify it:
 - Reads the PRD correctly
 - Creates/uses a feature branch
 - Makes sensible changes
 - Runs tests and they pass
 - Commits properly
 
-If something's wrong, fix your CLAUDE.md or RALPH_PROMPT.md and try again.
-
-### Dry Run Test (No Git Commits)
-
-To test your Ralph setup without making any real changes to your codebase, use the dry run PRD. This is useful when:
-- Setting up Ralph for the first time
-- Verifying the loop mechanics work after configuration changes
-- Testing in a new environment
-
+**Run the full loop:**
 ```bash
-./ralph-loop.sh prds/999_dry_run_test.json
+./ralph-loop.sh prds/001_test_infrastructure.json 20    # Up to 20 iterations
+./ralph-loop.sh prds/001_test_infrastructure.json 50    # More for overnight runs
 ```
 
-The dry run PRD contains tasks that only edit the PRD file itself—no git commits, no code changes. Claude will cycle through 5 simple tasks, flipping `testsPassing` flags. When complete, you'll see the `<promise>COMPLETE</promise>` signal.
+### Step 7.5: Monitor Progress
 
-**What success looks like:**
-- Ralph runs through all 5 iterations without errors
-- The PRD file shows all tasks with `testsPassing: true`
-- No git commits were made
-- The COMPLETE signal appears
-
-**To reset for another test run:**
+In a separate terminal on your Mac:
 ```bash
-# Reset all tasks to testsPassing: false
-# (Edit prds/999_dry_run_test.json or copy fresh from Ralph repo)
-```
-
-### Run the Full Loop
-
-```bash
-# Run up to 20 iterations (exits early on COMPLETE signal)
-./ralph-loop.sh 20
-
-# Or more iterations for overnight runs
-./ralph-loop.sh 50
-```
-
-### Monitor (Separate Terminal on Mac)
-
-```bash
-cd /path/to/project
-tail -f progress.txt
 watch -n 5 'git log --oneline -10'
 ```
 
-### Stop Ralph
+### Step 7.6: Stop Ralph
 
 - **Graceful:** Wait for iteration to finish, then `Ctrl+C`
 - **Immediate:** `Ctrl+C` twice
 - **Automatic:** Claude outputs `<promise>COMPLETE</promise>` when all tasks done
 
-### Exit Container
+### Step 7.7: Exit and Resume
 
 ```bash
 exit
 # Container pauses but preserves state
 ```
 
-### Resume Later
-
+To resume later:
 ```bash
 ralph-start.sh /path/to/project  # Or ralph-clone.sh URL
-./ralph-loop.sh 20
+./ralph-loop.sh prds/your_prd.json 20
 ```
 
 ---
