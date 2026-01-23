@@ -18,7 +18,6 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 ```
 ├── README.md                    # This guide - setup and workflow documentation
 ├── RALPH_PROMPT.md              # Instructions Claude reads each iteration
-├── UI_TESTING.md                # UI testing standards (reference for UI projects)
 ├── Dockerfile                   # Docker image definition for Ralph containers
 ├── progress.txt                 # Work log (example/placeholder)
 │
@@ -31,6 +30,7 @@ This repo contains everything you need to run the Ralph workflow. Here's what ea
 ├── templates/                   # Files users copy to their projects
 │   ├── CLAUDE.md.template       # Project context template (rename to CLAUDE.md)
 │   ├── progress.txt.template    # Initial progress log
+│   ├── UI_TESTING.md            # UI testing standards (reference for UI projects)
 │   ├── .claudeignore            # File exclusion patterns for Claude
 │   └── .git-hooks/
 │       └── pre-push             # Git safety hook (blocks pushes to main)
@@ -125,60 +125,12 @@ mkdir -p ~/ralph-docker
 cd ~/ralph-docker
 ```
 
-Create `Dockerfile`:
+Copy the [Dockerfile](Dockerfile) from this repository:
 ```bash
-cat > Dockerfile << 'EOF'
-FROM node:20-bookworm-slim
-
-# Install GitHub CLI repo
-RUN apt-get update && apt-get install -y curl \
-    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-
-# Core tools:
-#   git           - Version control
-#   gh            - GitHub CLI for auth and PR creation
-#   sudo          - Claude sometimes needs elevated permissions
-#   ripgrep       - Fast code search (rg) - Claude uses this
-#   fd-find       - Fast file finder (fd) - Claude uses this
-#   jq            - JSON parsing in scripts
-#   tree          - Directory visualization
-#   openssh-client - SSH for git operations
-RUN apt-get update && apt-get install -y \
-    git gh sudo ripgrep fd-find jq tree openssh-client \
-    && rm -rf /var/lib/apt/lists/*
-
-# Playwright browsers (for UI testing - optional but recommended)
-RUN npx playwright install --with-deps chromium
-RUN npm install -g @playwright/mcp
-
-# Allow node user to sudo without password
-ARG USERNAME=node
-RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME
-
-# Create config directories for node user (gh, ssh need these)
-RUN mkdir -p /home/node/.config /home/node/.ssh /home/node/.local \
-    && chown -R node:node /home/node/.config /home/node/.ssh /home/node/.local \
-    && chmod 700 /home/node/.ssh
-
-# Configure git for claude-bot commits (as root, applies globally)
-RUN git config --global user.name "claude-bot" \
-    && git config --global user.email "claude-bot@users.noreply.github.com"
-
-# Switch to node user for Claude install (installs to ~/.local/bin)
-USER $USERNAME
-
-# Claude Code native install (as node user)
-RUN curl -fsSL https://claude.ai/install.sh | bash
-
-# Ensure claude is in PATH
-ENV PATH="/home/node/.local/bin:$PATH"
-
-WORKDIR /workspace
-CMD ["bash"]
-EOF
+cp ~/ralph/Dockerfile .
 ```
+
+The Dockerfile installs: Node.js 20, GitHub CLI (`gh`), Git, development tools (ripgrep, fd-find, jq, tree), Playwright with Chromium, and Claude Code. It configures commits as `claude-bot`.
 
 Build (takes ~10 min due to Playwright):
 ```bash
@@ -266,6 +218,8 @@ You then: Review on GitHub → Approve → Merge → Delete branch
 ---
 
 ## Part 3: Project Setup (~15 minutes per project)
+
+These files go in your project root (or subdirectories as specified). Repeat this setup for each project you want to use with Ralph.
 
 ### Step 3.0: Clone This Repository
 
@@ -412,10 +366,10 @@ This file contains UI testing standards. Claude reads it when working on UI task
 
 Copy from the Ralph repo:
 ```bash
-cp ~/ralph/UI_TESTING.md ./UI_TESTING.md
+cp ~/ralph/templates/UI_TESTING.md .
 ```
 
-See [UI_TESTING.md](UI_TESTING.md) for the full UI testing standards document.
+The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness. See [templates/UI_TESTING.md](templates/UI_TESTING.md) for the full document.
 
 ### Step 3.9: Copy PRD_REFINE.md (PRD Quality Check)
 
@@ -428,9 +382,9 @@ cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 
 See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
 
-### Step 3.10: Copy Ralph Scripts
+### Step 3.10: Copy Ralph Scripts to Project Root
 
-Copy the in-container scripts from the Ralph repo:
+Copy the in-container scripts from the Ralph repo to your project root:
 
 ```bash
 cp ~/ralph/ralph-loop.sh ./ralph-loop.sh
@@ -693,6 +647,31 @@ Watch what Claude does. Check that it:
 
 If something's wrong, fix your CLAUDE.md or RALPH_PROMPT.md and try again.
 
+### Dry Run Test (No Git Commits)
+
+To test your Ralph setup without making any real changes to your codebase, use the dry run PRD. This is useful when:
+- Setting up Ralph for the first time
+- Verifying the loop mechanics work after configuration changes
+- Testing in a new environment
+
+```bash
+./ralph-loop.sh prds/999_dry_run_test.json
+```
+
+The dry run PRD contains tasks that only edit the PRD file itself—no git commits, no code changes. Claude will cycle through 5 simple tasks, flipping `testsPassing` flags. When complete, you'll see the `<promise>COMPLETE</promise>` signal.
+
+**What success looks like:**
+- Ralph runs through all 5 iterations without errors
+- The PRD file shows all tasks with `testsPassing: true`
+- No git commits were made
+- The COMPLETE signal appears
+
+**To reset for another test run:**
+```bash
+# Reset all tasks to testsPassing: false
+# (Edit prds/999_dry_run_test.json or copy fresh from Ralph repo)
+```
+
 ### Run the Full Loop
 
 ```bash
@@ -872,15 +851,30 @@ git checkout main && git pull
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Project context (generated by discovery) |
-| `RALPH_PROMPT.md` | Loop instructions |
-| `UI_TESTING.md` | UI testing standards (reference) |
-| `prds/PRD_REFINE.md` | PRD quality check prompt |
-| `prds/###_name.json` | Numbered PRD files |
-| `prds/new-prd.sh` | Helper to create new PRD |
-| `progress.txt` | Work log |
+**Machine-level (one-time setup in `~/ralph-docker/`):**
+
+| File | Purpose | Source |
+|------|---------|--------|
+| `Dockerfile` | Builds Ralph Docker image | Copy from Ralph repo |
+| `ralph-start.sh` | Start container with local folder | Created via README heredoc |
+| `ralph-clone.sh` | Start container with cloned repo | Created via README heredoc |
+| `ralph-reset.sh` | Remove container to start fresh | Created via README heredoc |
+
+**Project-level (per-project in project root):**
+
+| File | Purpose | Source |
+|------|---------|--------|
+| `CLAUDE.md` | Project context | Create via README heredoc, then run discovery |
+| `RALPH_PROMPT.md` | Loop instructions for Claude | Create via README heredoc |
+| `UI_TESTING.md` | UI testing standards (optional) | Copy from Ralph repo `templates/` |
+| `prds/PRD_TEMPLATE.json` | Template for new PRDs | Create via README heredoc |
+| `prds/PRD_REFINE.md` | PRD quality check prompt | Create via README heredoc |
+| `prds/new-prd.sh` | Helper to create numbered PRDs | Create via README heredoc |
+| `ralph-loop.sh` | Run Ralph iterations | Copy from `~/ralph-docker/` |
+| `ralph-once.sh` | Run single iteration (testing) | Copy from `~/ralph-docker/` |
+| `progress.txt` | Work log | Create via README heredoc |
+| `.git-hooks/pre-push` | Block pushes to main | Create via README heredoc |
+| `.claudeignore` | Hide files from Claude | Create via README heredoc |
 
 ### Commands
 

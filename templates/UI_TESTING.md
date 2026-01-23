@@ -14,7 +14,7 @@ it will be accessible AND testable.
 ### Semantic HTML First
 - Use `<button>` not `<div onClick>`
 - Use `<nav>`, `<main>`, `<header>`, `<footer>` for landmarks
-- Use proper heading hierarchy (`<h1>` -> `<h2>` -> `<h3>`)
+- Use proper heading hierarchy (`<h1>` → `<h2>` → `<h3>`)
 - Use `<label>` elements properly associated with inputs
 
 ### ARIA Attributes for Interactive Elements
