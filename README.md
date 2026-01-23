@@ -271,7 +271,18 @@ cp ~/ralph/templates/CLAUDE.md.template ./CLAUDE.md
 
 See [templates/CLAUDE.md.template](templates/CLAUDE.md.template) for the starting point.
 
-### Step 3.4: Run Project Discovery
+### Step 3.4: Copy Claude Code Skills
+
+Copy the skills directory from the Ralph repo:
+
+```bash
+mkdir -p .claude/skills
+cp -r ~/ralph/.claude/skills/* .claude/skills/
+```
+
+This installs the `/discover` skill used in the next step. See [.claude/skills/discover/SKILL.md](.claude/skills/discover/SKILL.md) for the skill definition.
+
+### Step 3.5: Run Project Discovery
 
 Have Claude explore your project and complete CLAUDE.md with actual details.
 
@@ -280,47 +291,17 @@ cd /path/to/your/project
 claude
 ```
 
-Give Claude this prompt:
+Run the discover skill:
 
 ```
-Explore this project and update CLAUDE.md with:
-
-1. **Tech Stack**: What frameworks, libraries, and tools are used? (Check package.json, config files)
-
-2. **Project Structure**: Describe the folder organization and what goes where.
-
-3. **Coding Patterns**: Identify INTENTIONAL patterns and conventions:
-   - Component structure patterns
-   - State management approach
-   - Styling approach (CSS modules, Tailwind, styled-components, etc.)
-   - API/data fetching patterns
-   - Error handling patterns
-   
-   IMPORTANT: Only document patterns that appear intentional and consistent.
-   Ignore inconsistencies or anti-patterns—these are technical debt, not standards.
-
-4. **Testing Setup**: 
-   - What test framework is used?
-   - Where do tests live?
-   - Any testing utilities or patterns in use?
-   - How to run specific tests vs all tests?
-
-5. **Dev Server**: What port? Any environment setup needed?
-
-AVOID REDUNDANCY:
-- Do NOT duplicate information already in README.md or other docs
-- Do NOT document things that are obvious or easily discoverable
-- ONLY include: critical info, non-obvious patterns, context that saves 
-  searching the whole project
-- Keep it concise—this file should reduce cognitive load, not add to it
-
-Do NOT invent patterns that don't exist. Only document what you observe.
-Save the updated CLAUDE.md when done.
+/discover
 ```
+
+This explores your project and populates CLAUDE.md with tech stack, project structure, coding patterns, testing setup, and dev server details.
 
 Review the output and adjust anything that seems wrong.
 
-### Step 3.5: Copy RALPH_PROMPT.md
+### Step 3.6: Copy RALPH_PROMPT.md
 
 This is what Claude reads each iteration. The PRD filename is passed when invoking the script.
 
@@ -331,7 +312,7 @@ cp ~/ralph/RALPH_PROMPT.md ./RALPH_PROMPT.md
 
 See [RALPH_PROMPT.md](RALPH_PROMPT.md) for the full instructions Claude follows during each iteration.
 
-### Step 3.6: Create PRD Directory and Template
+### Step 3.7: Create PRD Directory and Template
 
 PRDs are numbered for history (e.g., `001_initial_setup.json`, `002_user_auth.json`). **Task IDs are for reference only—they do NOT imply execution order.** Ralph picks the best next task dynamically.
 
@@ -351,7 +332,7 @@ See [prds/PRD_TEMPLATE.json](prds/PRD_TEMPLATE.json) for the template structure 
 3. Run Ralph: `./ralph-loop.sh prds/001_user_authentication.json`
 4. When done, the numbered file serves as history
 
-### Step 3.7: Create progress.txt
+### Step 3.8: Create progress.txt
 
 Copy from the Ralph repo:
 ```bash
@@ -360,7 +341,7 @@ cp ~/ralph/templates/progress.txt.template ./progress.txt
 
 See [templates/progress.txt.template](templates/progress.txt.template) for the initial structure.
 
-### Step 3.8: Copy UI_TESTING.md (Reference for UI Projects)
+### Step 3.9: Copy UI_TESTING.md (Reference for UI Projects)
 
 This file contains UI testing standards. Claude reads it when working on UI tasks.
 
@@ -371,7 +352,7 @@ cp ~/ralph/templates/UI_TESTING.md .
 
 The file defines accessibility-first testing standards: semantic HTML, ARIA attributes for interactive elements, and using Playwright's accessibility snapshots to verify UI correctness. See [templates/UI_TESTING.md](templates/UI_TESTING.md) for the full document.
 
-### Step 3.9: Copy PRD_REFINE.md (PRD Quality Check)
+### Step 3.10: Copy PRD_REFINE.md (PRD Quality Check)
 
 This prompt helps refine PRDs to ensure tasks are right-sized.
 
@@ -382,7 +363,7 @@ cp ~/ralph/prds/PRD_REFINE.md ./prds/PRD_REFINE.md
 
 See [prds/PRD_REFINE.md](prds/PRD_REFINE.md) for the full PRD refinement checklist.
 
-### Step 3.10: Copy Ralph Scripts to Project Root
+### Step 3.11: Copy Ralph Scripts to Project Root
 
 Copy the in-container scripts from the Ralph repo to your project root:
 
@@ -394,7 +375,7 @@ chmod +x ralph-loop.sh ralph-once.sh
 
 See [ralph-loop.sh](ralph-loop.sh) and [ralph-once.sh](ralph-once.sh) for the current versions.
 
-### Step 3.11: Update .gitignore
+### Step 3.12: Update .gitignore
 
 ```bash
 cat >> .gitignore << 'EOF'
@@ -404,7 +385,7 @@ ralph-logs/
 EOF
 ```
 
-### Step 3.12: Create .claudeignore
+### Step 3.13: Create .claudeignore
 
 Prevent Claude from reading sensitive or wasteful files. Claude Code doesn't do RAG on large files—it reads them into context, which wastes tokens and can hit limits.
 
@@ -422,10 +403,10 @@ See [templates/.claudeignore](templates/.claudeignore) for the default exclusion
 - **Test artifacts** — Usually ignore (reports, screenshots)
 - **Ralph logs** — Optional (might help debugging, but large)
 
-### Step 3.13: Commit Setup
+### Step 3.14: Commit Setup
 
 ```bash
-git add CLAUDE.md RALPH_PROMPT.md UI_TESTING.md prds/ progress.txt ralph-loop.sh ralph-once.sh .git-hooks .gitignore .claudeignore
+git add CLAUDE.md RALPH_PROMPT.md UI_TESTING.md prds/ progress.txt ralph-loop.sh ralph-once.sh .git-hooks .gitignore .claudeignore .claude/
 git commit -m "Add Ralph workflow configuration"
 git push
 ```
