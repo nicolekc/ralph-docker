@@ -44,9 +44,10 @@ Dot-prefixed — this is machinery, not for casual browsing. Complex tasks accum
 
 ```
 .ralph-tasks/
-  <task-id>/
-    progress.txt           # What's been tried, what worked, what didn't
-    (any other files)      # Investigation notes, debug dumps, brain dumps, etc.
+  <prd-name>/              # Scoped by PRD (task IDs restart per PRD)
+    <task-id>/
+      progress.txt         # What's been tried, what worked, what didn't
+      (any other files)    # Investigation notes, debug dumps, brain dumps, etc.
 ```
 
 **What goes here:**
@@ -72,12 +73,18 @@ When the ralph-docker repo installs into itself:
 - `.ralph/` is the **installed copy** (generated, overwritten on install)
 - These are different directories — no conflict
 
+## AGENTS.md Pattern
+
+Projects can use `AGENTS.md` files in subdirectories to provide per-directory context to AI agents. These contain learnings, instructions, and conventions specific to the code in that directory. CLAUDE.md at the top level should instruct agents to read and write AGENTS.md files as they learn about the codebase.
+
+The right balance for AGENTS.md writes is an open question — too liberal creates noise, too conservative loses knowledge. See the knowledge file on this topic if one exists.
+
 ## .gitignore Considerations
 
 ```
 # Task workspace ephemeral files
-.ralph-tasks/*/debug-*
-.ralph-tasks/*/scratch-*
+.ralph-tasks/*/*/debug-*
+.ralph-tasks/*/*/scratch-*
 
 # Ralph logs (if using the bash runner)
 ralph-logs/
