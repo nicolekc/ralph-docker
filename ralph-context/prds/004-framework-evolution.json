@@ -5,9 +5,9 @@
   "tasks": [
     {
       "id": "001",
-      "description": "Integrate PRD_REFINE.md wisdom into the framework. The existing prds/PRD_REFINE.md contains hard-won insights: implementer trust balance, specification-creativity balance, concrete examples with tentative language, investigation task patterns, acceptance criteria quality. Split appropriately between an enhanced spec-reviewer role and a PRD authoring process. Don't lose content — it's battle-tested from 160+ Promptly tasks.",
-      "outcome": "PRD_REFINE.md insights are in the framework (enhanced spec-reviewer and/or process doc). /refine skill references the framework's version.",
-      "verification": "/refine skill works. Key insights (implementer trust, tentative language, investigation tasks) are preserved and findable.",
+      "description": "Integrate accumulated knowledge into the framework so ALL users benefit. Two sources: (1) prds/PRD_REFINE.md — hard-won insights from 160+ Promptly tasks: implementer trust balance, specification-creativity balance, concrete examples with tentative language, investigation task patterns, acceptance criteria quality. (2) ralph-context/knowledge/ files that contain generalizable guidance: success-criteria-format.md (who/what/how pattern for acceptance criteria), problem-statement-structure.md (discovered/whyItMatters/whatWasTried/constraints), and any other knowledge files that belong in the framework rather than in this project's context. Split appropriately between enhanced roles (spec-reviewer already partially enhanced), new process docs (PRD authoring), and framework templates. The knowledge files in ralph-context/ are working notes — the framework versions should be the canonical home.",
+      "outcome": "Generalizable knowledge is in the framework (roles, processes, templates). ralph-context/knowledge/ files that were framework-bound are either absorbed into framework files or moved to framework/. /refine skill references the framework's version of PRD_REFINE.md wisdom.",
+      "verification": "/refine skill works. Key insights (implementer trust, tentative language, success criteria format, problem statement structure) are in framework/ files, not only in ralph-context/. A fresh project installing the framework gets this guidance without needing ralph-docker's ralph-context/.",
       "dependencies": [],
       "status": "pending"
     },
