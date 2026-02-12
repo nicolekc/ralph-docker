@@ -1,1 +1,11 @@
-Task 007: pending
+## Context
+Adapt Docker infrastructure for multi-repo.
+Originally task 007 in the monolithic 001-bootstrap PRD.
+
+## Background
+- Current ralph-start.sh assumes one Docker container = one repo
+- Need to support multiple project repos in a single container
+- See docker-multi-repo.md in this directory for design challenges and open questions
+- Don't over-design — start with the simplest multi-mount approach and iterate
+- Keep the bash runner (ralph-loop.sh) working alongside subagent mode
+- Also document multi-level installation pattern (ralph-docker alongside target projects)

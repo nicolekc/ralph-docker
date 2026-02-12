@@ -1,9 +1,14 @@
-Task 003: Adapt Docker infrastructure for multi-repo
-Status: pending
+## Context
+Test and refine the /ralph skill end-to-end.
+Originally task 003 in the monolithic 001-bootstrap PRD.
 
-Context:
-- Current ralph-start.sh assumes one Docker container = one repo
-- Need to support multiple project repos in a single container
-- See docker-multi-repo.md in this directory for design challenges and open questions
-- Don't over-design — start with the simplest multi-mount approach and iterate
-- Keep the bash runner (ralph-loop.sh) working alongside subagent mode
+## Background
+- Needs a small test PRD (2-3 tasks) — do NOT use a bootstrap PRD
+- Verify: subagent dispatch via Task tool, architect/implementer/reviewer cycle
+- Verify: task state updates, .ralph-tasks/ gets populated
+- Test: circuit breaker (reviewer keeps rejecting, max 3 rounds)
+- Test: signoff gates ("architecture" signoff stops after architect phase)
+- Fix any issues discovered during the test
+
+## Dependencies
+- Requires PRD 001-foundation tasks (testability, install.sh) to be complete

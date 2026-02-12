@@ -1,1 +1,12 @@
-Task 010: pending
+## Context
+Adapt additional role prompts from open-source frameworks.
+Originally task 010 in the monolithic 001-bootstrap PRD.
+
+## Background
+- See role-adaptation-notes.md in this directory for source analysis
+- All source frameworks are MIT licensed (OMC, Superpowers, Gas Town)
+- Strip rigid commands and custom vocabulary; keep engineering principles
+- Each new role should follow the same pattern as existing roles in framework/roles/
+- Don't create roles speculatively — add them when needed by actual tasks
+- Should incorporate findings from principle adherence investigation (PRD 003, task 002)
+- The design review "round table" process is a priority (multiple perspectives)
