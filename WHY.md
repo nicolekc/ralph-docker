@@ -30,91 +30,91 @@
 
 **This is not a skill issue. It's a structural one.**
 
-Four things are going wrong, and none of them are about the AI being bad at coding:
-
-**Context decay.** Interactive prompting forces short cycles and frequent interruptions. Every time you steer, you break the agent's long-horizon planning. It loses the thread of what the system *should become* and starts optimizing for the thing on your screen right now.
-
-**Local optimization.** You see a bug, you fix the bug. The agent sees a test fail, it patches the test. Nobody steps back to ask "is this the right approach?" You're playing whack-a-mole, and each swing makes the next mole harder to hit.
-
-**Architecture drift.** Without explicit phases — spec, design, implement, review — everything collapses into one long vibe-coding session. You optimize what you can see, not what the system needs. Decisions get made implicitly and buried in the diff.
-
-**The specification trap.** The more detailed your task description, the worse the results. Give Claude the gist and it uses judgment — walks around obstacles, makes senior-engineer decisions. Give it exact steps and it follows them off a cliff. Your detailed instructions *replace* its reasoning instead of informing it.
+| | What's happening | The effect |
+|---|---|---|
+| 🔄 **Context decay** | Every time you steer, you break its long-horizon planning | Loses the thread of what the system *should become*. Optimizes for what's on your screen right now. |
+| 🔨 **Local optimization** | Bug → fix bug. Test fails → patch test. Repeat. | Whack-a-mole. Each swing makes the next mole harder to hit. Nobody asks "is this the right approach?" |
+| 🌊 **Architecture drift** | No explicit phases. Everything is one long vibe session. | You optimize what you can see, not what the system needs. Decisions get buried in the diff. |
+| 🪤 **The specification trap** | More detailed instructions → *worse* results | Detailed steps *replace* the agent's reasoning instead of informing it. Give it the gist and it uses judgment. Give it exact steps and it walks off a cliff. |
 
 **This is the same problem that engineering teams solved decades ago with code review, design docs, and tech leads.** But those solutions assume human teams. You're working with AI agents that start fresh every session, don't remember what they decided yesterday, and are constitutionally inclined to be helpful rather than critical of their own work.
 
 ---
 
-**The solutions people suggest don't help.**
+### ❌ The solutions people suggest don't help
 
-| "Just use..." | Why it doesn't work |
+| "Just use..." | Why it fails |
 |---|---|
-| **Jira / Linear** | Built for persistent human workers who remember context. AI sessions are ephemeral. A ticket system can't give a new session the judgment the last one developed. |
-| **CI/CD pipelines** | Catches bugs *after* they're written. You need structure that prevents incoherent work from starting. |
-| **Heavy agent frameworks** | 30 specialized agents, custom vocabulary, mandatory installs, Go 1.23+. You wanted a tool, not a religion. |
-| **Longer, more detailed prompts** | Counterintuitively, *more detailed instructions produce worse results*. The agent follows your exact steps off a cliff instead of using judgment when the plan doesn't survive contact with reality. |
-| **"Just keep iterating"** | This is the death spiral. Each iteration optimizes locally while drifting globally. More iterations make it worse, not better. |
+| **Jira / Linear** | Assumes persistent workers who remember. AI sessions are ephemeral. |
+| **CI/CD pipelines** | Catches bugs *after* they're written. You need to prevent incoherent work from starting. |
+| **Heavy agent frameworks** | 30 agents, custom vocabulary, mandatory installs. You wanted a tool, not a religion. |
+| **Longer prompts** | *More detail → worse results.* The agent follows your steps off a cliff instead of using judgment. |
+| **"Just keep iterating"** | This IS the death spiral. Each iteration drifts further. |
 
 ---
 
-**This framework is six independent tools.**
+### ✅ This framework is six independent tools
 
-| Tool | What it does | Without it |
-|---|---|---|
-| **The Seed** | Working principles that persist across every session — the agent's engineering standards | Each session reinvents its own standards, or has none |
-| **Roles** | Architect, reviewer, implementer — different *perspectives* on the same work | One voice writes, evaluates, and approves its own code |
-| **The PRD Format** | Tasks with clear outcomes and verification — "what done actually looks like" | Features are "done" when the code exists, not when it works |
-| **The State System** | Context that accumulates across sessions — decisions, investigations, knowledge | Every session starts from zero. Same mistakes, repeated. |
-| **The Knowledge Convention** | How learnings persist so the next session is smarter than the last | Hard-won insights evaporate when the session ends |
-| **The Orchestrator** | Enforces spec→design→implement→review phases so work doesn't collapse into one long vibe session | You manually manage every handoff, or more likely, you don't |
+| | Tool | What it does | Without it |
+|---|---|---|---|
+| 🌱 | **The Seed** | Engineering standards that persist across every session | Each session reinvents its own, or has none |
+| 🎭 | **Roles** | Architect, reviewer, implementer — different *perspectives* on the same work | One voice writes and approves its own code |
+| 📋 | **The PRD Format** | Tasks with outcomes and verification — "what done actually looks like" | "Done" = the code exists, not that it works |
+| 💾 | **The State System** | Context that accumulates across sessions — decisions, investigations, knowledge | Every session starts from zero |
+| 🧠 | **Knowledge Convention** | How learnings persist so the next session is smarter | Hard-won insights evaporate when the session ends |
+| 🎯 | **The Orchestrator** | Enforces spec → design → implement → review phases | Work collapses into one long vibe session |
 
-**Use all six. Or just one. Nothing requires anything else.**
-
-Want just the Seed to improve any Claude Code session? Copy one file. Want PRDs and roles but not the orchestrator? Use three files. Want the full system running autonomously? It's still just files in a directory.
+> **Use all six. Or just one. Nothing requires anything else.**
+>
+> Want the Seed to improve any Claude session? Copy one file.
+> Want PRDs + roles without the orchestrator? Three files.
+> Want the full system running autonomously? Still just files in a directory.
 
 ---
 
 ## The deeper story
 
-### Why "just use Claude Code" isn't the answer
+### Why "just use Claude Code" isn't enough
 
-Claude Code is exceptional at executing within a session. But "executing within a session" is a small part of building software that works. The gaps:
+| Scope | The gap |
+|---|---|
+| 🔬 **Single session** | Great first result, but the refinement loop is where quality collapses. No separate reviewer perspective. It patches locally instead of reconsidering globally. Helpful when it should be critical. |
+| 🔗 **Across sessions** | Context doesn't persist. Design rationale, ruled-out approaches, discovered constraints — gone. Next session re-makes decisions the last one already disproved. |
+| 🏗️ **Project scale** | Can't tell "code exists" from "actually works." Features accumulate without anyone verifying they cohere. |
 
-**Within a single session:** Claude gets a great first result, but the refinement loop is where quality collapses. Without separate architect/reviewer perspectives, the agent can't challenge its own assumptions. It patches locally instead of reconsidering globally. It's helpful when it should be critical.
+This framework fills those gaps with lightweight structure — not process for the sake of process, but the minimum scaffolding that prevents the death spiral.
 
-**Across sessions:** Context doesn't persist. The design rationale, the investigation that ruled out approach B, the subtle constraint discovered during implementation — all gone. The next session makes decisions the last session already disproved.
+### 🧪 The counterintuitive insight
 
-**At project scale:** Without explicit "what does done look like" criteria, you can't tell the difference between "the code exists" and "this actually works." Features accumulate without anyone verifying they cohere into a system.
-
-The framework fills these gaps with lightweight structure — not process for the sake of process, but the minimum scaffolding that prevents the death spiral.
-
-### The counterintuitive insight
-
-After 160+ tasks of real AI-assisted development, the single most important discovery was this:
+After 160+ tasks of real AI-assisted development:
 
 > **The more detailed the task specification, the worse the results.**
 
-When you give Claude the gist — the intent, the context, the "why" — it applies creativity when it hits obstacles. It walks around walls. It makes judgment calls that a senior engineer would make.
+| Give Claude... | It does... |
+|---|---|
+| The gist — intent, context, the "why" | Uses judgment. Walks around obstacles. Makes senior-engineer decisions. |
+| Exact step-by-step instructions | Follows them off a cliff. Forces step 3 to work instead of reconsidering. Optimizes against your spec, not reality. |
 
-When you give Claude exact step-by-step instructions, it follows them off a cliff. If step 3 doesn't work as expected, it forces step 3 to work instead of reconsidering the approach. It optimizes against your specification, not against reality.
+**The sweet spot: rich context + trust.** Enough to understand the intent. Enough freedom to execute with judgment. This is how a good tech lead manages a strong team — and how you should manage AI agents.
 
-The sweet spot: **rich context + trust.** Enough to understand the intent. Enough freedom to execute with judgment. This is exactly how a good tech lead manages a strong team — and it's how you should manage AI agents.
+### 🚫 What this is NOT
 
-### What this is NOT
+| | |
+|---|---|
+| Not a project management tool | No dashboards, burndowns, or sprint planning |
+| Not an agent framework | No custom runtime, agent registry, or execution engine |
+| Not a replacement for Claude Code | Makes it better at building real software. Doesn't compete with it. |
+| Not all-or-nothing | The heaviest thing about it is choosing which parts you want |
 
-- **Not a project management tool.** No dashboards, no burndown charts, no sprint planning.
-- **Not an agent framework.** No custom runtime, no agent registry, no execution engine.
-- **Not a replacement for Claude Code.** It makes Claude Code better at building real software. It doesn't compete with it.
-- **Not all-or-nothing.** The heaviest thing about it is choosing which parts you want.
-
-### Who this is for
+### 👋 Who this is for
 
 **You, if:**
-- You've used AI to build something real and felt the excitement of the first result followed by the frustration of the refinement death spiral
-- You've abandoned a project (or wanted to) because the codebase became untrusted spaghetti after too many AI-assisted iterations
-- You want to tech-lead a team of AI agents the way a good tech lead manages humans: clear intent, structured review, trust in execution
+- You've felt the excitement of the first AI result → then the frustration of the refinement death spiral
+- You've abandoned a project because the codebase became untrusted spaghetti
+- You want to tech-lead AI agents like a good tech lead manages humans
 - You want structure without bureaucracy
 
 **Not you, if:**
-- You're building one-off scripts or prototypes that don't need to be maintained
-- You have a large human engineering team with established process
-- You want AI to replace your judgment rather than amplify it
+- Building one-off scripts or throwaway prototypes
+- Large human team with process that already works
+- You want AI to replace your judgment, not amplify it
