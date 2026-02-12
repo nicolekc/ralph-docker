@@ -1,9 +1,0 @@
-## Context
-This task documents and implements branch/push hygiene for ralph executions.
-New task — didn't exist in the original 001-bootstrap PRD.
-
-## Background
-- framework/ralph.md now has a "Branch and Push Hygiene" section with initial guidance
-- Need to validate: branch naming convention, handling existing branches, concurrent PRD execution
-- Key question: one branch per PRD execution is probably enough, but what about re-runs?
-- Push retry logic: 4 retries with exponential backoff (2s, 4s, 8s, 16s) — already in ralph.md

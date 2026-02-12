@@ -34,32 +34,57 @@ ralph-context/
   knowledge/               # One file per learning, append-only
   prds/                    # Durable: task definitions (PRD files)
   designs/                 # Durable: design documents, investigations
+  tasks/                   # Durable per-task context (research, brain dumps, design notes)
+    <prd-name>/
+      <task-id>/
 ```
 
 If an override needs to *subtract* from a framework file, that's a signal the framework file is too prescriptive. Fix the framework, don't hack the override.
 
-### `.ralph-tasks/` — Per-Task Workspaces (machinery)
+### `ralph-context/tasks/` — Durable Task Context
 
-Dot-prefixed — this is machinery, not for casual browsing. Complex tasks accumulate context here.
+Task-specific context that humans prepare for agents or that emerges during design sessions. Research notes, brain dumps, design challenges, background material. This lives in `ralph-context/` because it's human-inspectable and survives beyond task execution.
+
+```
+ralph-context/tasks/
+  <prd-name>/
+    <task-id>/
+      (research notes, design docs, brain dumps, etc.)
+```
+
+**What goes here:**
+- Research or investigation notes prepared before task execution
+- Design challenge documents with open questions
+- Background material that gives the task implementer context beyond the PRD description
+- Brain dumps from design sessions
+
+### `.ralph-tasks/` — Ephemeral Agent Workspaces (machinery)
+
+Dot-prefixed — this is machinery, not for casual browsing. Created by agents during task execution. **Disposable after merge.**
 
 ```
 .ralph-tasks/
   <prd-name>/              # Scoped by PRD (task IDs restart per PRD)
     <task-id>/
-      progress.txt         # What's been tried, what worked, what didn't
-      (any other files)    # Investigation notes, debug dumps, brain dumps, etc.
+      progress.txt         # Agent execution log (append-only)
+      debug-*              # Debug traces (ephemeral)
+      scratch-*            # Scratch files (ephemeral)
 ```
 
 **What goes here:**
-- `progress.txt` — structured log of what's been tried (append-only)
-- Investigation notes, design thinking, brain dumps
+- `progress.txt` — agent execution log (what the agent tried, what worked, what failed)
 - Debug traces or reproduction steps
-- Prior attempt outputs (when a task is redone)
-- Any file that helps the next agent understand the task's history
+- Scratch files created during implementation
+- Anything the agent needs during execution but nobody needs after merge
+
+**NOT what goes here:**
+- Human-prepared context (goes in `ralph-context/tasks/`)
+- Design decisions (extract to `ralph-context/designs/`)
+- Reusable learnings (extract to `ralph-context/knowledge/`)
 
 ### progress.txt Conventions
 
-One `progress.txt` per task (not per role). Append-only, timestamped entries. Each entry records who did what and the result.
+One `progress.txt` per task (not per role). Append-only, timestamped entries. Each entry records who did what and the result. Created by agents during execution, not pre-populated.
 
 ```
 ## [timestamp] Architect
@@ -76,12 +101,7 @@ Verdict: [approved / issues found]
 Issues: [if any]
 ```
 
-This creates a single narrative thread for the task. A future agent or human can read it top-to-bottom and understand the full history.
-
-**Ephemeral vs durable:**
-- Task workspaces are **durable until the task merges to main**, then disposable
-- Debug logs and scratch files within it are **ephemeral** — useful during the task, can be cleaned up before merge
-- Design decisions and investigation conclusions should be extracted to `ralph-context/designs/` if they have lasting value
+This creates a single narrative thread for the task. A future agent or human can read it top-to-bottom and understand what happened during execution.
 
 ## CLAUDE.md
 

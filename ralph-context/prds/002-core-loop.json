@@ -13,7 +13,7 @@
     },
     {
       "id": "002",
-      "description": "Validate spec review gate and progress.txt conventions in practice. Run a spec review on the test PRD from task 001. Verify the spec reviewer catches at least one issue (intentionally include a vague criterion). Verify progress.txt is populated correctly during the build cycle with timestamped, per-role entries. Adjust conventions based on what actually works.",
+      "description": "Validate spec review gate and progress.txt conventions in practice. The spec reviewer was elevated from an optional role to a defined gate (step 0 in build-cycle.md). This task validates that it actually works: run a spec review on the test PRD from task 001. Intentionally include a vague criterion and verify the reviewer catches it. Also verify progress.txt gets populated correctly during the build cycle with timestamped, per-role entries. Adjust conventions based on what actually works.",
       "outcome": "Spec review gate works as a process step. Progress.txt conventions are validated and refined from real usage.",
       "verification": "Spec review produces actionable feedback on at least one task. Progress.txt contains coherent per-role entries from a completed build cycle.",
       "dependencies": ["001"],

@@ -21,7 +21,7 @@
     },
     {
       "id": "003",
-      "description": "Adapt additional role prompts from open-source frameworks. Focus on Gas Town (MIT) for engineering quality. See .ralph-tasks/004-framework-evolution/003/role-adaptation-notes.md. Consider: systematic debugger, investigator role, design review panel process. Only add what we'd actually use soon — not speculatively. Should incorporate findings from the principle adherence investigation (PRD 003, task 002).",
+      "description": "Adapt additional role prompts from open-source frameworks. Focus on Gas Town (MIT) for engineering quality. See ralph-context/tasks/004-framework-evolution/003/role-adaptation-notes.md. Consider: systematic debugger, investigator role, design review panel process. Only add what we'd actually use soon — not speculatively. Should incorporate findings from the principle adherence investigation (PRD 003, task 002).",
       "outcome": "1-2 new role prompts or processes that add genuine capability",
       "verification": "Concise (~1 page), follow P2/P8, work standalone, don't duplicate existing roles",
       "dependencies": [],
@@ -29,7 +29,7 @@
     },
     {
       "id": "004",
-      "description": "Adapt Docker infrastructure for multi-repo. Current ralph-start.sh assumes one container = one repo. See .ralph-tasks/004-framework-evolution/004/docker-multi-repo.md for design context. Keep it simple. Also document multi-level installation pattern (ralph-docker installed alongside target projects in Docker).",
+      "description": "Adapt Docker infrastructure for multi-repo. Current ralph-start.sh assumes one container = one repo. See ralph-context/tasks/004-framework-evolution/004/docker-multi-repo.md for design context. Keep it simple. Also document multi-level installation pattern (ralph-docker installed alongside target projects in Docker).",
       "outcome": "ralph-start.sh supports multiple projects. README documents multi-repo setup.",
       "verification": "Start container with two project directories. Both accessible, git works in each.",
       "dependencies": [],

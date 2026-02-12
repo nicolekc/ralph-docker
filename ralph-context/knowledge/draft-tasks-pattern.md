@@ -1,4 +1,6 @@
-# Draft Tasks Pattern
+# Draft Tasks Pattern (INITIAL THINKING — not settled design)
+
+> This is one approach to representing not-ready tasks. The design is under investigation (PRD 003, task 005). Alternatives include: separate directories, backlog PRDs, naming conventions. Do not treat this as the final design.
 
 Tasks in a PRD aren't always ready to execute. Some are seeds — placeholders that signal intent without being fully specified.
 
