@@ -7,8 +7,8 @@
 **Why it matters:** Bad specs → bad implementations → expensive rework. The entire Specification-Creativity Tradeoff (P3) depends on specs being the right quality — clear enough to act on but not so detailed they become recipes. The spec review gate catches both problems: vague specs AND over-specified specs.
 
 **What was tried:** The spec reviewer role was enhanced with:
-- Success criteria quality check (who/what/how pattern — see ralph-context/knowledge/success-criteria-format.md)
-- Problem statement completeness check (discovered/whyItMatters/whatWasTried/constraints — see ralph-context/knowledge/problem-statement-structure.md)
+- Success criteria quality check (who/what/how pattern — see ralph-context/tasks/000-prd-quality/001/success-criteria-format.md)
+- Problem statement completeness check (discovered/whyItMatters/whatWasTried/constraints — see ralph-context/tasks/000-prd-quality/001/problem-statement-structure.md)
 - The build cycle (framework/processes/build-cycle.md) now has an optional step 0: spec review gate
 
 **Constraints:**
@@ -17,9 +17,9 @@
 - Intentionally include a vague criterion in the test PRD to verify the reviewer catches it
 - Also validate progress.txt conventions — are the timestamped per-role entries practical?
 
-## Knowledge Files to Review
+## Files to Review
 
-- ralph-context/knowledge/success-criteria-format.md — the who/what/how pattern for acceptance criteria
-- ralph-context/knowledge/problem-statement-structure.md — 4-part problem description
+- ralph-context/tasks/000-prd-quality/001/success-criteria-format.md — the who/what/how pattern for acceptance criteria
+- ralph-context/tasks/000-prd-quality/001/problem-statement-structure.md — 4-part problem description
 - framework/roles/spec-reviewer.md — the enhanced spec reviewer role
 - framework/processes/build-cycle.md — step 0 is the spec review gate

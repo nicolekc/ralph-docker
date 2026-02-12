@@ -6,7 +6,7 @@
 
 **Why it matters:** Most real development alternates between structured PRD execution and exploratory vibe coding. If the framework only supports PRD mode, it misses half the value.
 
-**What was tried:** Initial thinking captured in ralph-context/knowledge/two-modes.md. The framework files are already usable in both modes by design (they're "tools lying around"), but nothing makes this explicit.
+**What was tried:** Initial thinking captured in two-modes.md co-located in this task's context folder. The framework files are already usable in both modes by design (they're "tools lying around"), but nothing makes this explicit.
 
 **Constraints:**
 - This task has "draft" status — Nicole wants to think about it more before it's ready

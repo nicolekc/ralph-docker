@@ -6,7 +6,7 @@
 
 **Why it matters:** Without testability, every subsequent task is building on an unverified foundation. Nicole explicitly flagged this as THE foundation — nothing else should proceed until we know we can verify the framework's behavior. This comes from her experience on Promptly where 160+ tasks were built on unverified assumptions.
 
-**What was tried:** The Novel Verification Methods pattern was developed specifically for this problem (see ralph-context/knowledge/novel-verification-methods.md). The meta-cognitive approach: what are we verifying → why can't we verify it with existing tools → what would give us visibility → build that.
+**What was tried:** The Novel Verification Methods pattern was developed specifically for this problem (see ralph-context/tasks/000-prd-quality/001/novel-verification-methods.md). The meta-cognitive approach: what are we verifying → why can't we verify it with existing tools → what would give us visibility → build that.
 
 **Constraints:**
 - Don't over-engineer the test infrastructure — apply the "do inline vs spin off" table from Novel Verification Methods

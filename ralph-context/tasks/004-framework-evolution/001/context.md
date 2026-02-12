@@ -1,29 +1,31 @@
-# Task Context: Integrate Knowledge into Framework
+# Task Context: Knowledge Integration Proposal
 
 ## Problem Statement
 
-**Discovered:** During the founding design session, several pieces of generalizable knowledge were captured in ralph-context/knowledge/. These are currently project-specific working notes, but they contain wisdom that EVERY user of ralph-docker needs. They should become part of the framework itself.
+**Discovered:** During the founding design session, generalizable knowledge was captured in working notes. These are now distributed across task context folders. Some of this knowledge benefits EVERY user of ralph-docker and belongs in the framework itself — but where exactly, and how much?
 
-**Why it matters:** A fresh project installing ralph-docker gets framework/ (via .ralph/) but NOT ralph-context/. If the success criteria format guidance, problem statement structure, etc. only live in ralph-context/, new projects don't benefit from them.
+**Why it matters:** A fresh project installing ralph-docker gets framework/ (via .ralph/) but NOT ralph-context/. If success criteria guidance, problem statement structure, design philosophy, etc. only live in ralph-context/, new projects don't benefit. But blindly copying everything into framework/ risks bloat and violating P8 (Lightning-Quick Descriptions).
 
-**What was tried:** Some knowledge was already partially integrated — the spec-reviewer role was enhanced with success criteria quality checks and problem statement completeness. But the full depth of the knowledge files hasn't been absorbed into the framework.
+**What was tried:** The spec-reviewer role was already partially enhanced with success criteria quality checks and problem statement completeness. But the full knowledge hasn't been systematically mapped to framework locations.
 
 **Constraints:**
-- Don't just copy files — the knowledge needs to be integrated into the right framework files (roles, processes, templates)
-- PRD_REFINE.md wisdom is battle-tested from 160+ Promptly tasks — don't lose content
-- The framework files should remain concise (P8: Lightning-Quick Descriptions)
-- Some knowledge depends on investigation outcomes (draft-tasks-pattern depends on PRD 003/005, two-modes depends on PRD 004/005)
+- This is an INVESTIGATION producing a PROPOSAL, not direct integration
+- The human reviews and decides what goes where
+- Framework files should remain concise (P8)
+- Some knowledge may be better as project context than framework content
+- Don't lose nuance by over-condensing — propose the right level of detail for each target
 
-## Knowledge Files to Integrate
+## Knowledge Sources to Review
 
-1. **success-criteria-format.md** → Belongs in spec-reviewer role and/or PRD authoring process. The who/what/how pattern for acceptance criteria.
-2. **problem-statement-structure.md** → Belongs in PRD template guidance and/or spec-reviewer. The discovered/whyItMatters/whatWasTried/constraints pattern.
-3. **PRD_REFINE.md** (in prds/) → Battle-tested insights about: implementer trust balance, tentative language in examples, investigation vs implementation tasks, acceptance criteria quality, task sizing. Should be split between spec-reviewer, a new PRD authoring process doc, and possibly the PRD template.
-4. **frameworks-research.md** → Anti-patterns section could become a framework process doc about "what not to do." Currently only in CLAUDE.md.
-5. **design-philosophy.md** → Core "what this framework IS and ISN'T" — could be part of the seed or a framework README.
+1. **design-philosophy.md** (co-located) — what the framework IS and ISN'T. Could be seed, framework README, or stay as project context.
+2. **frameworks-research.md** (co-located) — OMC/Superpowers/Gas Town analysis, universal patterns and anti-patterns. Anti-patterns section could become framework guidance.
+3. **success-criteria-format.md** (at ralph-context/tasks/000-prd-quality/001/) — who/what/how pattern. Partially in spec-reviewer already.
+4. **problem-statement-structure.md** (at ralph-context/tasks/000-prd-quality/001/) — 4-part structure. Partially in spec-reviewer already.
+5. **PRD_REFINE.md** (at prds/) — battle-tested insights from 160+ Promptly tasks.
 
-## What NOT to Integrate Yet
+## For Each Source, the Proposal Should Answer
 
-- draft-tasks-pattern.md — design unsettled (PRD 003/005 investigation)
-- two-modes.md — design unsettled (PRD 004/005)
-- principle-adherence-risks.md — more useful as project context than framework content
+- What specific content is generalizable vs project-specific?
+- Which framework file(s) should it live in? (existing role? new process doc? template?)
+- How much detail belongs in framework/ vs is too much for a composable tool?
+- Does integration require changes to multiple framework files (a coupling smell)?

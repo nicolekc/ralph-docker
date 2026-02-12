@@ -13,7 +13,7 @@
     },
     {
       "id": "002",
-      "description": "Investigation: principle adherence hardening. The design principles are written but there's a risk new sessions won't feel their weight (see ralph-context/knowledge/principle-adherence-risks.md). Investigate: can we test for principle adherence? Can we increase principle 'weight' without becoming prescriptive? Is there an experiment we can run (e.g., give a deliberately over-specified task and see if the AI pushes back)? Produce findings with specific recommendations. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: principle adherence hardening. The design principles are written but there's a risk new sessions won't feel their weight (see principle-adherence-risks.md in this task's context folder). Investigate: can we test for principle adherence? Can we increase principle 'weight' without becoming prescriptive? Is there an experiment we can run (e.g., give a deliberately over-specified task and see if the AI pushes back)? Produce findings with specific recommendations. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "Concrete recommendations for ensuring principle adherence — through testing, review checklists, seed improvements, or other means",
       "verification": "Document exists with actionable recommendations. At least one is implementable in a subsequent task.",
       "dependencies": [],
@@ -37,7 +37,7 @@
     },
     {
       "id": "005",
-      "description": "Investigation: how should not-ready tasks be represented? Current approach is a 'draft' status on tasks. But alternatives exist: separate directory for future tasks, a separate 'backlog' PRD, a naming convention (prefix with _), or something else. The design should balance: (1) signaling 'not ready' clearly, (2) not adding unnecessary framework machinery, (3) being inspectable by humans. See ralph-context/knowledge/draft-tasks-pattern.md for initial thinking (not settled). NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: how should not-ready tasks be represented? Current approach is a 'draft' status on tasks. But alternatives exist: separate directory for future tasks, a separate 'backlog' PRD, a naming convention (prefix with _), or something else. The design should balance: (1) signaling 'not ready' clearly, (2) not adding unnecessary framework machinery, (3) being inspectable by humans. See draft-tasks-pattern.md in this task's context folder for initial thinking (not settled). NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A recommendation for how to represent not-ready tasks, with rationale for the chosen approach",
       "verification": "Document exists with at least 3 options considered and a clear recommendation with tradeoffs.",
       "dependencies": [],

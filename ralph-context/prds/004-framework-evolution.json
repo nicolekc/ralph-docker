@@ -5,9 +5,9 @@
   "tasks": [
     {
       "id": "001",
-      "description": "Integrate accumulated knowledge into the framework so ALL users benefit. Two sources: (1) prds/PRD_REFINE.md — hard-won insights from 160+ Promptly tasks: implementer trust balance, specification-creativity balance, concrete examples with tentative language, investigation task patterns, acceptance criteria quality. (2) ralph-context/knowledge/ files that contain generalizable guidance: success-criteria-format.md (who/what/how pattern for acceptance criteria), problem-statement-structure.md (discovered/whyItMatters/whatWasTried/constraints), and any other knowledge files that belong in the framework rather than in this project's context. Split appropriately between enhanced roles (spec-reviewer already partially enhanced), new process docs (PRD authoring), and framework templates. The knowledge files in ralph-context/ are working notes — the framework versions should be the canonical home.",
-      "outcome": "Generalizable knowledge is in the framework (roles, processes, templates). ralph-context/knowledge/ files that were framework-bound are either absorbed into framework files or moved to framework/. /refine skill references the framework's version of PRD_REFINE.md wisdom.",
-      "verification": "/refine skill works. Key insights (implementer trust, tentative language, success criteria format, problem statement structure) are in framework/ files, not only in ralph-context/. A fresh project installing the framework gets this guidance without needing ralph-docker's ralph-context/.",
+      "description": "Investigation: propose where accumulated knowledge should integrate into the framework. Review the knowledge files now distributed across task contexts (design-philosophy.md, frameworks-research.md in this task's context folder; success-criteria-format.md and problem-statement-structure.md in 000-prd-quality/001/) and PRD_REFINE.md. For each piece of knowledge, propose: which framework file(s) it belongs in (roles, processes, templates, seed), what content to extract, and what to leave as project context. This is a PROPOSAL for the human, not direct integration. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A proposal document mapping each piece of generalizable knowledge to specific framework files, with rationale for what belongs in framework/ vs stays in ralph-context/",
+      "verification": "Document exists in ralph-context/designs/. Covers all knowledge sources (design-philosophy, frameworks-research, success-criteria-format, problem-statement-structure, PRD_REFINE.md). Each recommendation includes where and why.",
       "dependencies": [],
       "status": "pending"
     },
@@ -37,7 +37,7 @@
     },
     {
       "id": "005",
-      "description": "Design how ralph operates in two modes: (1) PRD auto-execution (the current /ralph skill) and (2) enhanced vibe coding (interactive sessions where ralph's tools and knowledge enhance the human's workflow without orchestrating). See ralph-context/knowledge/two-modes.md for initial thinking. Produce a design that keeps both modes coherent without adding framework complexity.",
+      "description": "Design how ralph operates in two modes: (1) PRD auto-execution (the current /ralph skill) and (2) enhanced vibe coding (interactive sessions where ralph's tools and knowledge enhance the human's workflow without orchestrating). See two-modes.md in this task's context folder for initial thinking. Produce a design that keeps both modes coherent without adding framework complexity.",
       "outcome": "A design for two-mode operation that doesn't require separate infrastructure for each mode",
       "verification": "Design exists. Both modes use the same framework files. No new framework files required for vibe coding mode.",
       "dependencies": [],

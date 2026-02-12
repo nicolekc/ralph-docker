@@ -6,7 +6,7 @@
 
 **Why it matters:** Without a "not ready" signal, ralph might try to execute vague or incomplete tasks, wasting time and producing bad output.
 
-**What was tried:** A "draft" status was added as a first pass (see ralph-context/knowledge/draft-tasks-pattern.md — annotated as "INITIAL THINKING, not settled design"). Ralph.md has "Skip tasks with status 'draft'" in the Rules section. But Nicole expressed uncertainty: "idk maybe a directory is better for drafts or future tasks."
+**What was tried:** A "draft" status was added as a first pass (see draft-tasks-pattern.md co-located in this task's context folder — annotated as "INITIAL THINKING, not settled design"). Ralph.md has "Skip tasks with status 'draft'" in the Rules section. But Nicole expressed uncertainty: "idk maybe a directory is better for drafts or future tasks."
 
 **Constraints:**
 - Nicole specifically flagged this as needing her own thinking before settling on a design
