@@ -1,0 +1,13 @@
+Task 005: Integrate existing PRD_REFINE.md wisdom into framework
+Status: pending
+
+Context:
+- The existing prds/PRD_REFINE.md is excellent — it already embodies many design principles
+- Key sections worth preserving: Implementer Trust Balance, Specification-Creativity balance,
+  Concrete Examples Are Valuable, acceptance criteria quality, investigation task patterns
+- This content should be integrated into the framework, probably as:
+  - Parts in framework/roles/spec-reviewer.md (enhanced)
+  - Parts in a framework process for PRD creation
+  - The /refine skill should reference the framework's version
+- Don't lose the existing content — it represents hard-won experience from Promptly
+- The tentative language pattern ("something like this should work") is a key insight

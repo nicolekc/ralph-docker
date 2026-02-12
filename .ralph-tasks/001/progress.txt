@@ -1,0 +1,11 @@
+Task 001: Update install script for new structure
+Status: pending
+
+Context:
+- The install script (install.sh) currently copies old-style files (RALPH_PROMPT.md, etc.)
+- It needs to also copy framework/ -> .ralph/ in the target project
+- It needs to create ralph-context/ and .ralph-tasks/ directories
+- The /ralph skill needs to be included in the install
+- When installing into ralph-docker itself, framework/ is source, .ralph/ is the installed copy
+- See docs/structure.md for the full layout
+- PRD_REFINE.md from the existing prds/ directory is EXCELLENT and should be preserved/integrated

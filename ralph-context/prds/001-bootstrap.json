@@ -1,0 +1,46 @@
+{
+  "name": "Framework Bootstrap",
+  "description": "Get the Ralph framework to the point where it can build itself: install script works, /ralph skill works, roles are tested, and the framework follows its own principles.",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "Update install.sh to copy the new framework structure. The script currently copies old-style files (RALPH_PROMPT.md at root, etc.). It needs to: (1) copy framework/ contents into target's .ralph/, (2) create ralph-context/ and .ralph-tasks/ with bare structure, (3) copy .claude/skills/ralph/ alongside existing discover/refine skills, (4) preserve backward compat for existing projects using old layout (RALPH_PROMPT.md, prds/, etc.) — or provide a migration path. The existing PRD_REFINE.md content is valuable and should be preserved/referenced.",
+      "outcome": "Running install.sh on a fresh project creates the full .ralph/, ralph-context/, .ralph-tasks/ structure with all framework files, skills, and bare templates",
+      "verification": "Install into a temp directory, verify all expected files exist, verify .ralph/ matches framework/ contents",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "002",
+      "description": "Test and refine the /ralph skill end-to-end. Run /ralph on this very PRD in an interactive session. Verify: subagents dispatch correctly via Task tool, architect/implementer/reviewer cycle works, task state updates, circuit breaker triggers if needed. Fix any issues discovered. This is a smoke test — it doesn't need to be perfect, it needs to work well enough to be useful.",
+      "outcome": "/ralph can be invoked in a Claude Code session, reads a PRD, dispatches subagents for the build cycle, and progresses through tasks",
+      "verification": "Successfully complete at least one task using /ralph on a test PRD",
+      "dependencies": ["001"],
+      "status": "pending"
+    },
+    {
+      "id": "003",
+      "description": "Adapt Docker infrastructure for multi-repo. Current ralph-start.sh assumes one container = one repo. Update to support mounting multiple project directories. Keep it simple — the minimal change that works. See .ralph-tasks/003/docker-multi-repo.md for design context and open questions. Don't over-engineer — a workspace root with multiple project mounts is probably enough.",
+      "outcome": "ralph-start.sh can mount multiple projects into a single container, each accessible at a distinct path",
+      "verification": "Start a container with two project directories mounted, verify both are accessible and git works in each",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "004",
+      "description": "Research and adapt additional role prompts from Gas Town (steveyegge/gastown, MIT). Focus on engineering quality principles, not commands or custom vocabulary. Steve Yegge's roles encode decades of software engineering wisdom. Strip the steam-engine metaphor and rigid commands; keep the judgment. Also consider whether a systematic debugging process (adapted from Superpowers) would be valuable. See .ralph-tasks/004/role-adaptation-notes.md for detailed source analysis. Don't create roles speculatively — only add what we'd actually use in the next few tasks.",
+      "outcome": "1-2 new role prompts in framework/roles/ that follow existing patterns and add genuine capability we don't currently have",
+      "verification": "New roles are concise (~1 page), follow principles P2 and P8, work standalone, and don't duplicate existing roles",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "005",
+      "description": "Integrate PRD_REFINE.md wisdom into the framework. The existing prds/PRD_REFINE.md contains hard-won insights from the Promptly project: implementer trust balance, specification-creativity balance, concrete examples with tentative language, investigation task patterns, acceptance criteria quality. This content should become part of the framework — probably split between an enhanced spec-reviewer role and a PRD authoring process. Don't lose any of the existing content. See .ralph-tasks/005/progress.txt for notes.",
+      "outcome": "PRD_REFINE.md insights are integrated into framework files (spec-reviewer.md enhanced, possibly a new process), and the /refine skill references the framework version",
+      "verification": "The /refine skill works with the new structure. Key insights (implementer trust, tentative language pattern, investigation tasks) are preserved and findable",
+      "dependencies": ["001"],
+      "status": "pending"
+    }
+  ]
+}

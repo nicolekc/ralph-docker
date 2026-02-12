@@ -18,7 +18,7 @@ Your PRD file is: $ARGUMENTS
    - Dispatch **implementer** subagent → implements the approach, runs tests, commits
    - Dispatch **reviewer** subagent (role: `.ralph/roles/code-reviewer.md`) → approves or flags issues
    - If issues: implementer fixes with feedback, back to review (max 3 rounds)
-   - If blocked after 3 rounds: record in `tasks/<task-id>/progress.txt`, move on
+   - If blocked after 3 rounds: record in `.ralph-tasks/<task-id>/progress.txt`, move on
 4. After all tasks: push branch, report results
 
 ## Subagent Dispatch
@@ -26,8 +26,8 @@ Your PRD file is: $ARGUMENTS
 Use the **Task tool** for each subagent. Each gets clean context:
 - The relevant role prompt content
 - The specific task description
-- Any project-specific role overrides from `local/overrides/roles/`
-- Accumulated context from `tasks/<task-id>/` if it exists
+- Any project-specific role overrides from `ralph-context/overrides/roles/`
+- Accumulated context from `.ralph-tasks/<task-id>/` if it exists
 
 ## Rules
 

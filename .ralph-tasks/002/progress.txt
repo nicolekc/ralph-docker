@@ -1,0 +1,13 @@
+Task 002: Refine and test the /ralph skill end-to-end
+Status: pending
+
+Context:
+- The /ralph skill (.claude/skills/ralph/SKILL.md) is written but untested
+- It needs to work in an interactive Claude Code session on subscription plan
+- The skill dispatches subagents via the Task tool
+- Each subagent gets: role prompt content, task description, accumulated context
+- The build cycle is: architect -> implement -> review -> (fix -> review)* -> done
+- See framework/ralph.md for full orchestrator instructions
+- See framework/processes/build-cycle.md for the cycle definition
+- Must handle: task dependencies, parallel independent tasks, circuit breaker at 3 rounds
+- The skill references .ralph/ paths which must exist (self-installed in this repo)
