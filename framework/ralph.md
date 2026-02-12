@@ -85,13 +85,29 @@ If after 3 review cycles a task still has unresolved issues:
 
 ## Task State
 
-Tasks track: pending, in_progress, complete, blocked, needs_human_review, redo.
+Tasks track: draft, pending, in_progress, complete, blocked, needs_human_review, redo.
+
+- **draft**: Not ready to execute. Skip entirely. Needs human refinement before becoming pending.
+- **pending**: Ready to execute. Has clear outcome and verification.
+- **in_progress**: Currently being worked on.
+- **complete**: Done and verified.
+- **blocked**: Hit circuit breaker or unresolvable issue. Needs human attention.
+- **needs_human_review**: Non-code deliverable produced, awaiting human review.
+- **redo**: Human has marked for redo with feedback.
 
 When a task is marked for redo by a human, re-run the build cycle with their feedback as additional context. Then check dependent tasks — they may need adaptation.
+
+## Branch and Push Hygiene
+
+- Create a feature branch for each PRD execution (e.g., `ralph/<prd-name>`).
+- Make small, logical commits per task with clear messages.
+- Push the branch when done (or at signoff gate). Do not merge to main.
+- If a push fails, retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s).
 
 ## Rules
 
 - You coordinate. You do not implement.
 - One task at a time unless tasks are explicitly independent (then dispatch in parallel).
 - Read the project's CLAUDE.md before starting. It has project-specific context.
+- Skip tasks with status "draft" — they are not ready for execution.
 - After completing all tasks (or reaching a signoff gate), push the branch. Do not merge to main.

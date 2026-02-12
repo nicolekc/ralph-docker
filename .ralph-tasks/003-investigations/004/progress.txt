@@ -1,0 +1,13 @@
+## Context
+Investigation: parallelization principles for ralph task execution.
+New task — didn't exist in the original 001-bootstrap PRD.
+
+## Background
+- framework/ralph.md says "One task at a time unless tasks are explicitly independent (then dispatch in parallel)"
+- build-cycle.md has a brief "Parallel Tasks" section
+- Key questions to investigate:
+  - File conflict detection when parallel tasks modify overlapping files
+  - Shared test infrastructure (one task breaks tests another task depends on)
+  - When is parallelization safe vs risky?
+  - How do investigation tasks (non-code) parallelize vs code tasks?
+- Should be informed by real experience from PRD 002 if available

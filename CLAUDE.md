@@ -25,7 +25,7 @@ This repo is the Ralph agent framework — composable tools for AI-assisted soft
 
 ## Framework Design Anti-Patterns (observed, not theoretical)
 
-These come from analysis of OMC (~30 agents), Superpowers (~14 skills), and Gas Town (Go CLI). All three are MIT licensed. See `.ralph-tasks/001-bootstrap/001/frameworks-research.md` for the full analysis.
+These come from analysis of OMC (~30 agents), Superpowers (~14 skills), and Gas Town (Go CLI). All three are MIT licensed. See `.ralph-tasks/001-foundation/001/frameworks-research.md` for the full analysis.
 
 - **The prescriptiveness trap**: More "MUST do X" rules → more corner cases → more patches → explosion in complexity. AI-designed frameworks are especially susceptible because AI has no pressure toward simplicity.
 - **Anti-rationalization tables**: Preemptively blocking the AI from making excuses is an adversarial arms race. Trust and correct after, don't pre-empt.
@@ -43,10 +43,19 @@ These come from analysis of OMC (~30 agents), Superpowers (~14 skills), and Gas 
 
 In a Claude Code session:
 ```
-/ralph ralph-context/prds/001-bootstrap.json
+/ralph ralph-context/prds/001-foundation.json
 ```
 
 Ralph reads the PRD, dispatches subagents for each task (architect → implement → review), commits, and pushes when done.
+
+## PRD Roadmap
+
+PRDs are organized by evolution of complexity, each with a human checkpoint:
+
+1. **001-foundation** — Install and test infrastructure. Must complete first.
+2. **002-core-loop** — Validate /ralph end-to-end. Proves the build cycle works.
+3. **003-investigations** — Non-code deliverables needing human review. Can run in parallel.
+4. **004-framework-evolution** — Enrich the framework. Depends on validated core + investigation findings.
 
 ## Project-Specific Context
 
@@ -63,5 +72,9 @@ The goal is NOT to build another comprehensive agent framework. It IS to build s
 
 - `ralph-context/knowledge/novel-verification-methods.md` — How to create verification infrastructure when existing tools don't cover something. Meta-cognitive pattern, not a tool list.
 - `ralph-context/knowledge/principle-adherence-risks.md` — Known risks of principle drift. Architects and reviewers should reference this.
-- `.ralph-tasks/001-bootstrap/002/design-philosophy.md` — What the framework IS and ISN'T. The Promptly experience.
-- `.ralph-tasks/001-bootstrap/001/frameworks-research.md` — Full OMC/Superpowers/Gas Town analysis.
+- `ralph-context/knowledge/success-criteria-format.md` — How to write acceptance criteria that actually verify behavior.
+- `ralph-context/knowledge/problem-statement-structure.md` — How to structure problem descriptions for implementers.
+- `ralph-context/knowledge/draft-tasks-pattern.md` — The "draft" status and how tasks flow from draft → pending.
+- `ralph-context/knowledge/two-modes.md` — PRD auto-execution vs enhanced vibe coding.
+- `.ralph-tasks/001-foundation/002/design-philosophy.md` — What the framework IS and ISN'T. The Promptly experience.
+- `.ralph-tasks/001-foundation/001/frameworks-research.md` — Full OMC/Superpowers/Gas Town analysis.

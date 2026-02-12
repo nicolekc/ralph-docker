@@ -1,0 +1,47 @@
+{
+  "name": "Framework Evolution",
+  "description": "Build on the validated core loop and investigation findings. Enrich the framework while keeping it composable. Human checkpoint: Has the framework stayed true to its principles? Is it growing in the right direction or becoming what it criticizes?",
+  "signoff": "full",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "Integrate PRD_REFINE.md wisdom into the framework. The existing prds/PRD_REFINE.md contains hard-won insights: implementer trust balance, specification-creativity balance, concrete examples with tentative language, investigation task patterns, acceptance criteria quality. Split appropriately between an enhanced spec-reviewer role and a PRD authoring process. Don't lose content — it's battle-tested from 160+ Promptly tasks.",
+      "outcome": "PRD_REFINE.md insights are in the framework (enhanced spec-reviewer and/or process doc). /refine skill references the framework's version.",
+      "verification": "/refine skill works. Key insights (implementer trust, tentative language, investigation tasks) are preserved and findable.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "002",
+      "description": "Create the 6 standalone design docs for the framework's independent systems: (1) The Seed, (2) The Knowledge Convention, (3) The PRD Format, (4) The State System, (5) Role Definitions, (6) The Orchestrator Pattern. Each ~1 page in ralph-context/designs/. These explain what, why, which principles, and how each composes with the others.",
+      "outcome": "6 design docs, each self-contained, each traceable to design principles",
+      "verification": "Each under 2 pages. Each references at least one principle. No doc requires another to make sense.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "003",
+      "description": "Adapt additional role prompts from open-source frameworks. Focus on Gas Town (MIT) for engineering quality. See .ralph-tasks/001-bootstrap/004/role-adaptation-notes.md. Consider: systematic debugger, investigator role, design review panel process. Only add what we'd actually use soon — not speculatively. Should incorporate findings from the principle adherence investigation (PRD 003, task 002).",
+      "outcome": "1-2 new role prompts or processes that add genuine capability",
+      "verification": "Concise (~1 page), follow P2/P8, work standalone, don't duplicate existing roles",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "004",
+      "description": "Adapt Docker infrastructure for multi-repo. Current ralph-start.sh assumes one container = one repo. See .ralph-tasks/001-bootstrap/003/docker-multi-repo.md for design context. Keep it simple. Also document multi-level installation pattern (ralph-docker installed alongside target projects in Docker).",
+      "outcome": "ralph-start.sh supports multiple projects. README documents multi-repo setup.",
+      "verification": "Start container with two project directories. Both accessible, git works in each.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "005",
+      "description": "Design how ralph operates in two modes: (1) PRD auto-execution (the current /ralph skill) and (2) enhanced vibe coding (interactive sessions where ralph's tools and knowledge enhance the human's workflow without orchestrating). See ralph-context/knowledge/two-modes.md for initial thinking. Produce a design that keeps both modes coherent without adding framework complexity.",
+      "outcome": "A design for two-mode operation that doesn't require separate infrastructure for each mode",
+      "verification": "Design exists. Both modes use the same framework files. No new framework files required for vibe coding mode.",
+      "dependencies": [],
+      "status": "draft"
+    }
+  ]
+}

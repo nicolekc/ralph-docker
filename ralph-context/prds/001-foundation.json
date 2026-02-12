@@ -1,0 +1,23 @@
+{
+  "name": "Foundation",
+  "description": "Get the basics working: install the framework correctly and establish how to verify it. This must complete before anything else is trustworthy. Human checkpoint: Can I install the framework? Can I test things?",
+  "signoff": "full",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "Establish testability foundations for the framework itself. The framework is unusual — it's prompt files, a skill, directory conventions, and an orchestrator. Apply the Novel Verification Methods pattern (see ralph-context/knowledge/novel-verification-methods.md): what are we verifying, why can't we verify it with existing tools, what would give us visibility? Key things to test: (1) Does /ralph correctly dispatch subagents? (dry-run or logging mode) (2) Do role prompts produce the expected kind of output? (3) Does the build cycle terminate correctly (circuit breaker, signoff gates)? (4) Does self-installation produce correct .ralph/ from framework/? Don't over-engineer the test infrastructure — apply the 'do inline vs spin off' table. But DO create enough foundation that subsequent tasks can be verified.",
+      "outcome": "A verification approach exists for the framework's key mechanisms: orchestrator dispatch, role prompt behavior, build cycle flow, self-installation correctness",
+      "verification": "At least one automated check exists for each key mechanism. The approach is documented so future tasks know how to add tests.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "002",
+      "description": "Update install.sh for the new framework structure. The script currently copies old-style files (RALPH_PROMPT.md at root, etc.). It needs to: (1) copy framework/ contents into target's .ralph/, (2) create ralph-context/ and .ralph-tasks/ with bare structure, (3) copy .claude/skills/ (ralph, discover, refine), (4) handle self-installation (when target IS the ralph-docker repo, don't create circular copies). The existing PRD_REFINE.md content is valuable — preserve it in the framework. Backward compat with old layout is NOT required (only promptly used it, and we'll update promptly separately).",
+      "outcome": "Running install.sh on a fresh project creates the full .ralph/, ralph-context/, .ralph-tasks/ structure with all framework files and skills",
+      "verification": "Install into a temp directory. Verify all expected files exist. Verify .ralph/ matches framework/ contents. Verify the self-install case works.",
+      "dependencies": [],
+      "status": "pending"
+    }
+  ]
+}

@@ -5,8 +5,10 @@ The standard process for completing a task. Used by Ralph when orchestrating, or
 ## The Cycle
 
 ```
-architect → implement → review → (fix → review)* → done
+[spec review] → architect → implement → review → (fix → review)* → done
 ```
+
+0. **Spec review** (optional gate): Before the first task in a new PRD, review all task specs for clarity, scope, and specification-creativity balance. This is a gate — if specs need revision, stop and revise before proceeding. Can be skipped for well-refined PRDs.
 
 1. **Architect** analyzes the task. Produces an approach (what to change, why, constraints). Does NOT produce step-by-step instructions — the implementer is skilled.
 

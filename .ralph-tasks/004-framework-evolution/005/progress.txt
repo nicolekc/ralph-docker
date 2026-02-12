@@ -1,0 +1,11 @@
+## Context
+Design two-mode operation: PRD auto-execution and enhanced vibe coding.
+New task (DRAFT status — not ready for execution).
+
+## Background
+- Initial thinking captured in ralph-context/knowledge/two-modes.md
+- PRD execution = /ralph skill, automated build cycle, subagent dispatch
+- Vibe coding = human-driven interactive session, ralph's tools "lying around"
+- Key insight: most real development alternates between both modes
+- Framework should support both without forcing either
+- The framework files are already usable in both modes — this design makes it explicit

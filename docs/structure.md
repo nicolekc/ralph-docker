@@ -57,6 +57,27 @@ Dot-prefixed — this is machinery, not for casual browsing. Complex tasks accum
 - Prior attempt outputs (when a task is redone)
 - Any file that helps the next agent understand the task's history
 
+### progress.txt Conventions
+
+One `progress.txt` per task (not per role). Append-only, timestamped entries. Each entry records who did what and the result.
+
+```
+## [timestamp] Architect
+Approach: [brief summary]
+Key decisions: [what and why]
+
+## [timestamp] Implementer
+Changes: [files modified]
+Tests: [pass/fail summary]
+Committed: [hash]
+
+## [timestamp] Reviewer (round 1)
+Verdict: [approved / issues found]
+Issues: [if any]
+```
+
+This creates a single narrative thread for the task. A future agent or human can read it top-to-bottom and understand the full history.
+
 **Ephemeral vs durable:**
 - Task workspaces are **durable until the task merges to main**, then disposable
 - Debug logs and scratch files within it are **ephemeral** — useful during the task, can be cleaned up before merge

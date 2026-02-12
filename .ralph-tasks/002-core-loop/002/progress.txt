@@ -1,0 +1,9 @@
+## Context
+This task validates the spec review gate and progress.txt conventions.
+New task — didn't exist in the original 001-bootstrap PRD.
+
+## Background
+- Spec reviewer role was enhanced with success criteria format and problem statement checks
+- Build cycle now includes optional spec review gate as step 0
+- Progress.txt conventions documented in docs/structure.md
+- This task should intentionally include a vague criterion in a test PRD to verify the spec reviewer catches it
