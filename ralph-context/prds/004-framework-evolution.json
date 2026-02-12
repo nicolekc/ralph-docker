@@ -58,6 +58,14 @@
       "verification": "Run the install on a fresh directory. Framework structure is created correctly. Output explains what was created and what to do next. Partial install option exists.",
       "dependencies": [],
       "status": "pending"
+    },
+    {
+      "id": "008",
+      "description": "Extend WHY.md into a full positioning piece / 'Welcome to [framework name]' blog post. WHY.md currently serves as a glanceable conversation starter (the 'zoom call' version). This task is about building the long-form version: a Steve Yegge-style narrative post that could be published, shared, and enhanced with AI-generated illustrations. It should tell the story — the 160+ tasks that led here, the frameworks that were tried and rejected, the counterintuitive discovery about specification vs creativity, and the vision for where this goes. Think Gas Town's 'Welcome to Gas Town' post but for this framework's philosophy. Should incorporate the competitive analysis (vs OMC, Superpowers, Gas Town) in a way that's fair but clear about what's different. Audience: technical PMs, founders using AI to build, solo developers who've felt the pain but don't know what to call it. NON-CODE DELIVERABLE — needs human review and heavy human editing (voice matters here).",
+      "outcome": "A draft blog post / positioning document that tells the framework's story, suitable for human editing into a publishable piece",
+      "verification": "Draft exists. Tells a narrative (not just lists features). Addresses the 'doesn't Claude Code already do this?' objection directly. References real experience, not hypotheticals. Under 10 pages. Could be read by a non-engineer PM and make sense.",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
