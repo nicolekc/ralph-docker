@@ -1,0 +1,15 @@
+{
+  "name": "",
+  "description": "",
+  "signoff": "full",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "",
+      "outcome": "",
+      "verification": "",
+      "dependencies": [],
+      "status": "pending"
+    }
+  ]
+}

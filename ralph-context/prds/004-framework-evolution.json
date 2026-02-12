@@ -1,0 +1,71 @@
+{
+  "name": "Framework Evolution",
+  "description": "Build on the validated core loop and investigation findings. Enrich the framework while keeping it composable. Human checkpoint: Has the framework stayed true to its principles? Is it growing in the right direction or becoming what it criticizes?",
+  "signoff": "full",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "Investigation: propose where accumulated knowledge should integrate into the framework. Review the knowledge files now distributed across task contexts (design-philosophy.md, frameworks-research.md in this task's context folder; success-criteria-format.md and problem-statement-structure.md in 000-prd-quality/001/) and PRD_REFINE.md. For each piece of knowledge, propose: which framework file(s) it belongs in (roles, processes, templates, seed), what content to extract, and what to leave as project context. This is a PROPOSAL for the human, not direct integration. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A proposal document mapping each piece of generalizable knowledge to specific framework files, with rationale for what belongs in framework/ vs stays in ralph-context/",
+      "verification": "Document exists in ralph-context/designs/. Covers all knowledge sources (design-philosophy, frameworks-research, success-criteria-format, problem-statement-structure, PRD_REFINE.md). Each recommendation includes where and why.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "002",
+      "description": "Create the 6 standalone design docs for the framework's independent systems: (1) The Seed, (2) The Knowledge Convention, (3) The PRD Format, (4) The State System, (5) Role Definitions, (6) The Orchestrator Pattern. Each ~1 page in ralph-context/designs/. These explain what, why, which principles, and how each composes with the others.",
+      "outcome": "6 design docs, each self-contained, each traceable to design principles",
+      "verification": "Each under 2 pages. Each references at least one principle. No doc requires another to make sense.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "003",
+      "description": "Adapt additional role prompts from open-source frameworks. Focus on Gas Town (MIT) for engineering quality. See ralph-context/tasks/004-framework-evolution/003/role-adaptation-notes.md. Consider: systematic debugger, investigator role, design review panel process. Only add what we'd actually use soon — not speculatively. Should incorporate findings from the principle adherence investigation (PRD 003, task 002).",
+      "outcome": "1-2 new role prompts or processes that add genuine capability",
+      "verification": "Concise (~1 page), follow P2/P8, work standalone, don't duplicate existing roles",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "004",
+      "description": "Adapt Docker infrastructure for multi-repo. Current ralph-start.sh assumes one container = one repo. See ralph-context/tasks/004-framework-evolution/004/docker-multi-repo.md for design context. Keep it simple. Also document multi-level installation pattern (ralph-docker installed alongside target projects in Docker).",
+      "outcome": "ralph-start.sh supports multiple projects. README documents multi-repo setup.",
+      "verification": "Start container with two project directories. Both accessible, git works in each.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "005",
+      "description": "Design how ralph operates in two modes: (1) PRD auto-execution (the current /ralph skill) and (2) enhanced vibe coding (interactive sessions where ralph's tools and knowledge enhance the human's workflow without orchestrating). See two-modes.md in this task's context folder for initial thinking. Produce a design that keeps both modes coherent without adding framework complexity.",
+      "outcome": "A design for two-mode operation that doesn't require separate infrastructure for each mode",
+      "verification": "Design exists. Both modes use the same framework files. No new framework files required for vibe coding mode.",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "006",
+      "description": "Write the framework README. This is the front door — the first thing someone reads. It should describe the six project primitives (Seed, Knowledge Convention, PRD Format, State System, Role Definitions, Orchestrator Pattern), explain what the framework IS in plain language, and show how to adopt parts of it without buying the whole thing. Partial adoption matters: someone might want the PRD format and roles but not the orchestrator. Someone might want the seed pattern but not the state system. The README should make these paths visible. Should be informed by the naming/organization audit (003/008) and the six design docs (004/002) if available, but doesn't block on them. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A README that a new developer can read and understand: what this is, what the six primitives are, how to adopt all or parts of it",
+      "verification": "README exists. Describes all six primitives in plain language. Includes at least 2 partial adoption paths. Does not require reading any other document to make sense. Under 3 pages.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "007",
+      "description": "Design and build the install/onboarding process. Currently there's an install.sh (PRD 001/002) but it may be stale relative to the current framework structure, and there's no clear onboarding path for a new project. This task covers: (1) audit what install.sh currently does vs what it should do, (2) design the install experience end-to-end (what does a new user run? what do they see? what's created?), (3) implement it. Consider: should install be a script, a CLI command, an interactive wizard? What's the minimal install for partial adoption? What does 'ralph init' (or whatever it's called) look like? Should be informed by the naming/organization audit (003/008) for directory names and structure. Note: PRD 001/002 exists and covers the mechanical update of install.sh — this task is broader (the experience, not just the script).",
+      "outcome": "A working install process that a new user can run to set up the framework in their project, with clear output showing what was created",
+      "verification": "Run the install on a fresh directory. Framework structure is created correctly. Output explains what was created and what to do next. Partial install option exists.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "008",
+      "description": "Extend WHY.md into a full positioning piece / 'Welcome to [framework name]' blog post. WHY.md currently serves as a glanceable conversation starter (the 'zoom call' version). This task is about building the long-form version: a Steve Yegge-style narrative post that could be published, shared, and enhanced with AI-generated illustrations. It should tell the story — the 160+ tasks that led here, the frameworks that were tried and rejected, the counterintuitive discovery about specification vs creativity, and the vision for where this goes. Think Gas Town's 'Welcome to Gas Town' post but for this framework's philosophy. Should incorporate the competitive analysis (vs OMC, Superpowers, Gas Town) in a way that's fair but clear about what's different. Audience: technical PMs, founders using AI to build, solo developers who've felt the pain but don't know what to call it. NON-CODE DELIVERABLE — needs human review and heavy human editing (voice matters here).",
+      "outcome": "A draft blog post / positioning document that tells the framework's story, suitable for human editing into a publishable piece",
+      "verification": "Draft exists. Tells a narrative (not just lists features). Addresses the 'doesn't Claude Code already do this?' objection directly. References real experience, not hypotheticals. Under 10 pages. Could be read by a non-engineer PM and make sense.",
+      "dependencies": [],
+      "status": "pending"
+    }
+  ]
+}
