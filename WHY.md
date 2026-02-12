@@ -30,13 +30,15 @@
 
 **This is not a skill issue. It's a structural one.**
 
-Three things are going wrong, and none of them are about the AI being bad at coding:
+Four things are going wrong, and none of them are about the AI being bad at coding:
 
 **Context decay.** Interactive prompting forces short cycles and frequent interruptions. Every time you steer, you break the agent's long-horizon planning. It loses the thread of what the system *should become* and starts optimizing for the thing on your screen right now.
 
 **Local optimization.** You see a bug, you fix the bug. The agent sees a test fail, it patches the test. Nobody steps back to ask "is this the right approach?" You're playing whack-a-mole, and each swing makes the next mole harder to hit.
 
 **Architecture drift.** Without explicit phases — spec, design, implement, review — everything collapses into one long vibe-coding session. You optimize what you can see, not what the system needs. Decisions get made implicitly and buried in the diff.
+
+**The specification trap.** The more detailed your task description, the worse the results. Give Claude the gist and it uses judgment — walks around obstacles, makes senior-engineer decisions. Give it exact steps and it follows them off a cliff. Your detailed instructions *replace* its reasoning instead of informing it.
 
 **This is the same problem that engineering teams solved decades ago with code review, design docs, and tech leads.** But those solutions assume human teams. You're working with AI agents that start fresh every session, don't remember what they decided yesterday, and are constitutionally inclined to be helpful rather than critical of their own work.
 
