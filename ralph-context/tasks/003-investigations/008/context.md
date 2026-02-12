@@ -19,14 +19,24 @@ The framework's directory names and concepts were named quickly during initial d
 | **.ralph** vs **ralph-context** | Should the framework root be a dotfile? Dotfiles signal "config/hidden." A visible directory signals "this is part of the project." Which is right? |
 | **.tasks** | Nicole mentioned this as another option for the tasks directory. Dotfile convention would hide it from casual `ls`. |
 
+### Beyond Names: Is the Organization Right?
+
+This isn't just a rename exercise. The current directory *structure* may also be wrong. Questions to consider:
+
+- **Should prds/ be top-level?** Currently nested inside ralph-context/. But PRDs are the primary human-facing artifact — maybe they deserve top-level visibility instead of being buried inside a framework directory.
+- **Is the nesting depth right?** ralph-context/tasks/003-investigations/008/ is four levels deep. Is that too deep? Would flatter be better for discoverability?
+- **Are things grouped correctly?** designs/ and knowledge/ are siblings, but they serve very different purposes. tasks/ and prds/ are siblings but one is the source of truth and the other is supplementary context.
+- **Too many artifacts sprinkled around?** Visibility is good, but scattering things across the tree makes it hard to know where to look. What's the right balance?
+
 ### What This Investigation Should Cover
 
 1. **Audit every named directory** in the framework root and one level deep
-2. **Propose 2-3 coherent naming schemes** — each scheme should be internally consistent (don't mix metaphors)
-3. **Consider the audience**: a new developer encountering this directory for the first time, a runner (AI agent) navigating by convention, a human reviewing work
-4. **Flag breaking changes**: which renames would require updating seeds, role prompts, PRD references, and framework code? Which are cosmetic (no references to update)?
-5. **The dotfile question**: should the framework root be hidden (`.ralph`, `.framework`) or visible (`ralph-context`, `project-context`)? What are the tradeoffs?
-6. **Recommend one scheme** with honest rationale
+2. **Question the organization** — not just names, but whether the nesting and grouping is correct
+3. **Propose 2-3 coherent schemes** — each covers BOTH names and structure (don't just rename a bad structure)
+4. **Consider the audience**: a new developer encountering this directory for the first time, a runner (AI agent) navigating by convention, a human reviewing work
+5. **Flag breaking changes**: which renames/moves would require updating seeds, role prompts, PRD references, and framework code? Which are cosmetic (no references to update)?
+6. **The dotfile question**: should the framework root be hidden (`.ralph`, `.framework`) or visible (`ralph-context`, `project-context`)? What are the tradeoffs?
+7. **Recommend one scheme** with honest rationale
 
 ### Naming Principles to Consider
 

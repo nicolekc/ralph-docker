@@ -42,6 +42,22 @@
       "verification": "Design exists. Both modes use the same framework files. No new framework files required for vibe coding mode.",
       "dependencies": [],
       "status": "draft"
+    },
+    {
+      "id": "006",
+      "description": "Write the framework README. This is the front door — the first thing someone reads. It should describe the six project primitives (Seed, Knowledge Convention, PRD Format, State System, Role Definitions, Orchestrator Pattern), explain what the framework IS in plain language, and show how to adopt parts of it without buying the whole thing. Partial adoption matters: someone might want the PRD format and roles but not the orchestrator. Someone might want the seed pattern but not the state system. The README should make these paths visible. Should be informed by the naming/organization audit (003/008) and the six design docs (004/002) if available, but doesn't block on them. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A README that a new developer can read and understand: what this is, what the six primitives are, how to adopt all or parts of it",
+      "verification": "README exists. Describes all six primitives in plain language. Includes at least 2 partial adoption paths. Does not require reading any other document to make sense. Under 3 pages.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "007",
+      "description": "Design and build the install/onboarding process. Currently there's an install.sh (PRD 001/002) but it may be stale relative to the current framework structure, and there's no clear onboarding path for a new project. This task covers: (1) audit what install.sh currently does vs what it should do, (2) design the install experience end-to-end (what does a new user run? what do they see? what's created?), (3) implement it. Consider: should install be a script, a CLI command, an interactive wizard? What's the minimal install for partial adoption? What does 'ralph init' (or whatever it's called) look like? Should be informed by the naming/organization audit (003/008) for directory names and structure. Note: PRD 001/002 exists and covers the mechanical update of install.sh — this task is broader (the experience, not just the script).",
+      "outcome": "A working install process that a new user can run to set up the framework in their project, with clear output showing what was created",
+      "verification": "Run the install on a fresh directory. Framework structure is created correctly. Output explains what was created and what to do next. Partial install option exists.",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
