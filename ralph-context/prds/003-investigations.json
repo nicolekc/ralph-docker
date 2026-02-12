@@ -58,6 +58,14 @@
       "verification": "Document exists. Audits existing framework files for where this is already addressed (or missed). Proposes at least one concrete integration point. Avoids creating a rigid template (that would defeat the purpose).",
       "dependencies": [],
       "status": "pending"
+    },
+    {
+      "id": "008",
+      "description": "Investigation: naming audit. The current names were chosen quickly and some are confusing or wrong. 'ralph-context' sounds like it's ralph-specific state, but it's actually the framework's working directory. 'tasks' could mean runtime tasks or the task context folders. 'knowledge' and 'overrides' are vague. The project itself is 'ralph-docker' but that's just the test repo. Audit every named directory and concept in the framework, propose 2-3 naming schemes with rationale, and flag which renames would be breaking vs cosmetic. Scope includes: the framework root directory name, all subdirectories (prds, tasks, designs, knowledge, overrides, overrides/roles), the dotfile question (.ralph vs ralph-context vs something else), and any key concepts that have ambiguous names. See this task's context folder for the specific items flagged. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A naming options document with 2-3 coherent naming schemes, rationale for each, a recommendation, and a migration impact assessment",
+      "verification": "Document exists. Covers every directory in the framework root. Each proposed scheme is internally consistent (not a mix-and-match). Flags breaking changes honestly. Includes a recommendation.",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
