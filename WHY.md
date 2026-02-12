@@ -1,8 +1,32 @@
-# The first result is almost right. Getting from "almost" to "done" is where everything falls apart.
+# The death spiral of AI-assisted development
 
-You ask Claude to build a feature. The first pass is impressive — 80% of the way there. Then you notice a bug. You point it out. Claude fixes it but breaks something else. You point that out. It fixes that, introduces a subtle regression. You're tweaking, reacting, patching. Each fix is local and reasonable. The whole thing is drifting.
+```
+  "Build me a feature"
+         ↓
+  First result: impressive. 80% there.
+         ↓
+  "Fix this bug" → fixed, but broke something else
+         ↓
+  "Fix that too" → fixed, but subtle regression
+         ↓
+  "Be more specific" → follows instructions literally, stops thinking
+         ↓
+  Reactive patching. Whack-a-mole. Going in circles.
+         ↓
+  Weird warts buried 3 steps back. Don't know what depends on them.
+         ↓
+  Ship it broken   — or —   throw it away and start over.
+```
 
-Forty minutes later, you've gone in circles. There are weird warts buried three steps back that you didn't notice at the time, and you don't know how much of the work since then depends on them. The code "works" but you don't trust it. You either ship something you're not confident in, or you throw it away and start over.
+**Your instinct is to give more detail. It makes things worse.**
+
+```
+  What you try             What actually happens
+  ─────────────────────    ─────────────────────────────────────────
+  More detailed prompts  → Worse results. Follows instructions off a cliff.
+  More iterations        → More drift. Each fix breaks something else.
+  More steering          → Less coherence. You break its long-horizon planning.
+```
 
 **This is not a skill issue. It's a structural one.**
 
