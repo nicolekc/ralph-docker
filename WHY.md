@@ -1,4 +1,4 @@
-# The death spiral of AI-assisted development
+# The death spiral of AI-assisted product development
 
 ```
   "Build me a feature"
@@ -28,7 +28,7 @@
   More steering          → Less coherence. You break its long-horizon planning.
 ```
 
-**This is not a skill issue. It's a structural one.**
+**This is not a skill issue. It's a structural one.** And it hits hardest when you're building product — not patching bugs in existing code, but generating significant new greenfield territory where every decision compounds and there's no existing architecture to anchor against.
 
 | | What's happening | The effect |
 |---|---|---|
@@ -109,12 +109,12 @@ After 160+ tasks of real AI-assisted development:
 ### 👋 Who this is for
 
 **You, if:**
+- You're using AI to build *product* — new features, new systems, greenfield territory where decisions compound
 - You've felt the excitement of the first AI result → then the frustration of the refinement death spiral
 - You've abandoned a project because the codebase became untrusted spaghetti
 - You want to tech-lead AI agents like a good tech lead manages humans
-- You want structure without bureaucracy
 
 **Not you, if:**
+- Fixing bugs or making isolated changes to a large existing codebase (Claude Code is already great at this)
 - Building one-off scripts or throwaway prototypes
 - Large human team with process that already works
-- You want AI to replace your judgment, not amplify it
