@@ -50,6 +50,14 @@
       "verification": "Document exists in ralph-context/designs/. Covers: artifact format, filesystem location convention, how ralph knows to skip parked tasks, how a web companion discovers pending questions, how work resumes after human responds. Design is loosely-coupled (no ralph-specific API required for the companion).",
       "dependencies": [],
       "status": "pending"
+    },
+    {
+      "id": "007",
+      "description": "Investigation: preserving architectural intent in task contexts. When a human states WHY something matters — not the requirement, but the reasoning and vision behind it — that context is often more valuable than the requirement itself. A future runner can satisfy every listed criterion and still miss the point if the original intent is lost. Investigate: does the framework already guide this? Where should it live? How do we get runners to recognize and preserve high-signal human reasoning without prescribing a rigid format? See this task's context folder for the originating story. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A recommendation for how the framework should guide preservation of architectural intent and original human reasoning in task contexts — through existing mechanisms, new conventions, or role guidance",
+      "verification": "Document exists. Audits existing framework files for where this is already addressed (or missed). Proposes at least one concrete integration point. Avoids creating a rigid template (that would defeat the purpose).",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
