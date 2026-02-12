@@ -18,6 +18,14 @@
       "verification": "Install into a temp directory. Verify all expected files exist. Verify .ralph/ matches framework/ contents. Verify the self-install case works.",
       "dependencies": [],
       "status": "pending"
+    },
+    {
+      "id": "003",
+      "description": "Clean up legacy artifacts from pre-restructure. The repo has files from the old flat layout that no longer match the framework structure: root templates/ directory (old .claudeignore, CLAUDE.md.template, UI_TESTING.md, progress.txt.template, .git-hooks/), and .claude/skills/refine/ references the old PRD format (testsPassing, numeric task IDs). Audit each artifact — preserve any valuable content by integrating it into the right framework location, then remove the old files. Don't lose content, but don't keep dead weight.",
+      "outcome": "Legacy artifacts removed or migrated. No orphaned files from the old layout remain. Any valuable content preserved in its new framework-appropriate location.",
+      "verification": "Root templates/ directory removed (or emptied to .gitkeep if convention requires it). .claude/skills/refine/ updated to reference current PRD format. No file references old-style paths (RALPH_PROMPT.md, testsPassing, etc.).",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }

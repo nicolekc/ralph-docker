@@ -42,6 +42,14 @@
       "verification": "Document exists with at least 3 options considered and a clear recommendation with tradeoffs.",
       "dependencies": [],
       "status": "pending"
+    },
+    {
+      "id": "006",
+      "description": "Investigation: human-blocking and task parking mechanism. When a running task hits a point where it CANNOT safely proceed without human input, how does it signal this? Design a filesystem-native pattern where: (1) the agent recognizes it's blocked and writes a structured artifact explaining what it needs, (2) the task is parked in a reviewable state, (3) ralph continues parallelizing other available tasks, (4) when the human responds (eventually via a web companion), work can resume. The filesystem design must be loosely-coupled (a web companion can discover and display these artifacts without knowing ralph internals) and tightly-cohesive (the blocking artifact contains everything needed to understand and respond). This is DISTINCT from 003/003 (human inbox for completed deliverables) — this is about runtime interruption during execution. NON-CODE DELIVERABLE — needs human review.",
+      "outcome": "A design for task parking that supports: block signaling, structured 'what I need' artifacts, continuation of parallel work, and eventual web companion integration — all filesystem-native",
+      "verification": "Document exists in ralph-context/designs/. Covers: artifact format, filesystem location convention, how ralph knows to skip parked tasks, how a web companion discovers pending questions, how work resumes after human responds. Design is loosely-coupled (no ralph-specific API required for the companion).",
+      "dependencies": [],
+      "status": "pending"
     }
   ]
 }
