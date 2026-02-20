@@ -1,6 +1,6 @@
 {
   "name": "Bootstrap Cleanup",
-  "description": "Complete the bootstrap by cleaning up artifacts from the old framework structure and rewriting existing PRDs to be outcome-only. This is the first PRD the framework executes after bootstrapping — it finishes what the manual bootstrap started. Human checkpoint: Are the PRDs ready for the framework to work through?",
+  "description": "Complete the bootstrap by cleaning up artifacts from the old framework structure and rewriting existing PRDs to be outcome-only. This is the first PRD the framework executes after bootstrapping — it finishes what the manual bootstrap started. Read ralph-context/tasks/bootstrap/plan.md for the full bootstrap vision and WHY behind these cleanup tasks. Human checkpoint: Are the PRDs ready for the framework to work through?",
   "signoff": "full",
   "tasks": [
     {
