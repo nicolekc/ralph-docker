@@ -10,10 +10,11 @@ Product Planning (human, outcome-focused)
   → Human Revision
   → Sizing & Role Planning (AI decides how many perspectives needed)
   → [Full Cascade]:
-      planner → investigator → architect → design reviewer
+      planner → explorer → architect → design reviewer
         → (loop until they agree)
-        → implementation engineer (TDD, creative license)
-        → QA engineer (assesses verification, writes new tests, sends bugs back)
+        → implementer (TDD, creative license)
+        → code-cleaner (fixes directly, no kickback)
+        → qa-engineer (verifies, can kick back to implementer)
         → complete
 ```
 
@@ -39,7 +40,7 @@ These are the minimal changes needed before the framework can orchestrate its ow
 
 **Files to create** (under `framework/perspectives/`):
 - `architect.md` — How to analyze systems, evaluate tradeoffs, think structurally. NO "What You Produce."
-- `code-reviewer.md` — How to evaluate code: correctness then quality. NO output format prescription.
+- `code-cleaner.md` — Applies code review principles to make fixes directly. No kickback, no opinions — just fixes.
 - `design-reviewer.md` — How to evaluate designs. Light cleanup to remove hard skills.
 - `spec-reviewer.md` — How to evaluate specs. Light cleanup.
 - `explorer.md` — How to trace codebases: entry points, call chains, layers. Inspired by feature-dev's code-explorer.
@@ -54,13 +55,13 @@ These are the minimal changes needed before the framework can orchestrate its ow
 
 **Core design**:
 - Ralph reads the PRD, works through ALL incomplete tasks
-- For each task, dispatches subagents as the build cycle requires. No agent works on more than one task. Within a task, dispatch as many perspective-based subagents as needed.
-- Subagent dispatch is NOT dynamic prompt composition. Ralph says: "Follow the build cycle. Apply the architect perspective from `.ralph/perspectives/architect.md`. Read task context at `ralph-context/tasks/<prd>/<task>/`. The task is: [description]." The agent reads files itself.
+- **Hard invariant**: One subagent works on exactly one (task, pipeline step) tuple. It completes that step, pushes, and stops. Ralph decides what to dispatch next.
+- Subagent dispatch is NOT dynamic prompt composition. Ralph says: "Apply the architect perspective from `.ralph/perspectives/architect.md`. Read task context at `ralph-context/tasks/<prd>/<task>/`. The task is: [description]." The agent reads files itself.
 - Proportionality: Ralph decides what's proportionate. A rename skips architect. A redesign gets the full cycle. This is judgment, not a menu.
 - Context flows through shared task directories. Agents read what's there, add what the next agent needs. No prescribed formats.
-- Parallel independent tasks: dispatch multiple subagent chains simultaneously. No agent crosses task boundaries.
+- Parallel independent tasks: dispatch multiple subagents for independent tasks simultaneously.
 - Circuit breaker: 3 rounds max, then block and move on.
-- Push branch when all tasks complete or all remaining are blocked.
+- Each runner pushes after finishing their step. PR created on first completed step and evolves with each push.
 
 **Two execution modes** (same core instructions, documented in ralph.md):
 
@@ -84,17 +85,13 @@ Add to `framework/seed.md` (travels with the framework to every project):
 - **Shared context**: Task directories accumulate naturally. Read what's there. Write what the next agent needs. No prescribed formats.
 - **Verification rigor** (the big one): Do not accept surface-level evidence that something works. Actively seek the strongest possible verification — build the thing, run the thing, prove it works. If a test framework isn't functioning, fixing it IS part of verification. If a dependency is missing, finding and integrating it IS part of verification. You don't get to say "verified" until you've genuinely tried to break it. This is not a per-task checklist — it's a universal principle about what "done" means.
 
-### B4. CLAUDE.md Role Selection
+### B4. CLAUDE.md → seed.md Entry Point
 
-At the top of CLAUDE.md (both ralph-docker and target project templates):
+CLAUDE.md in any repo gets a one-liner: "Read `.ralph/seed.md` before starting any task."
 
-```
-Before starting any task, select the most appropriate perspective from
-`.ralph/perspectives/` and apply it to your work. Always load `seed.md`
-as your base working style.
-```
+seed.md is the framework entry point. It contains the working principles AND navigates to perspectives and processes: "Pick a perspective from `.ralph/perspectives/`. When working on PRD tasks, also read `.ralph/processes/prd.md`."
 
-Works because perspectives contain NO hard skills.
+The chain: CLAUDE.md → seed.md → perspectives + processes. seed.md is the single file that bootstraps framework awareness.
 
 ### B5. Progressive Context Architecture
 
@@ -135,7 +132,7 @@ State explicitly that `framework/` IS the separation line:
 
 **Create**:
 - `framework/perspectives/architect.md`
-- `framework/perspectives/code-reviewer.md`
+- `framework/perspectives/code-cleaner.md`
 - `framework/perspectives/design-reviewer.md`
 - `framework/perspectives/spec-reviewer.md`
 - `framework/perspectives/explorer.md`
@@ -236,11 +233,10 @@ No sub-folders, no nesting. The architect's output is in the same folder the eng
 
 ### Branch/PR Management
 
-- Single task = single PR
-- Branch references in task plans and logs are essential
-- PRs cascade by dependencies figured out at planning time
-- NO PRs for each planning stage — only for implementation
-- CLAUDE.md instructs how to check out the right branch based on completed dependencies
+- One branch per PRD: `ralph/<prd-name>`. One PR per PRD.
+- PR created after first completed pipeline step — it's a living dashboard that evolves with each push.
+- Each runner pushes after finishing their work so the PR stays current.
+- The human can review the PRD file on the PR at any time to see pipeline progress.
 
 ### QA Engineer Perspective
 

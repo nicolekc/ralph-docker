@@ -21,7 +21,7 @@ Active roles — the planner may only include these in pipelines:
 
 Future roles (not yet available — do not use in pipelines):
 
-- **tester** — Verifies implementation through testing, can kick back to implementer
+- **qa-engineer** — Verifies implementation through testing, can kick back to implementer
 
 ## Your Job
 

@@ -69,9 +69,9 @@
     },
     {
       "id": "009",
-      "description": "Build the tester role and kickback loop infrastructure. Currently only design-reviewer can kick back (to architect). The tester role verifies implementation through testing and can kick back to implementer — it replaces what code-reviewer used to do but with actual test execution instead of review opinions. Design the kickback mechanism as a general pattern: a role declares what role it kicks back to, the process handles the loop (max 3 rounds, then blocked). Implement the tester perspective and update processes/prd.md with the kickback loop rules. Move tester from 'future roles' to 'active roles' in ralph.md when done.",
-      "outcome": "Tester role exists and works. Kickback loops are a documented, general mechanism in the process. design-reviewer→architect and tester→implementer both use the same pattern.",
-      "verification": "Tester perspective exists in framework/perspectives/. processes/prd.md documents kickback rules. ralph.md lists tester as active. A pipeline with tester can be planned and executed.",
+      "description": "Build the qa-engineer role and kickback loop infrastructure. Currently only design-reviewer can kick back (to architect). The qa-engineer verifies implementation through testing and can kick back to implementer — it replaces what code-reviewer used to do but with actual test execution instead of review opinions. Design the kickback mechanism as a general pattern: a role declares what role it kicks back to, the process handles the loop (max 3 rounds, then blocked). Implement the qa-engineer perspective and update processes/prd.md with the kickback loop rules. Move qa-engineer from 'future roles' to 'active roles' in ralph.md when done.",
+      "outcome": "qa-engineer role exists and works. Kickback loops are a documented, general mechanism in the process. design-reviewer→architect and qa-engineer→implementer both use the same pattern.",
+      "verification": "qa-engineer perspective exists in framework/perspectives/. processes/prd.md documents kickback rules. ralph.md lists qa-engineer as active. A pipeline with qa-engineer can be planned and executed.",
       "dependencies": [],
       "status": "pending"
     }
