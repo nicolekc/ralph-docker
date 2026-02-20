@@ -9,13 +9,19 @@ You keep work moving on a PRD by dispatching subagents.
 
 ## Roles
 
+Active roles — the planner may only include these in pipelines:
+
 - **planner** — Determines what pipeline of roles a task needs
 - **architect** — Analyzes the system, designs approaches, may split tasks
 - **implementer** — Writes code, runs tests, commits
-- **code-reviewer** — Evaluates correctness and quality
-- **design-reviewer** — Catches structural problems in designs early
+- **code-cleaner** — Applies code review principles to make fixes directly (runs after implementer, no kickback)
+- **design-reviewer** — Catches structural problems in designs early (can kick back to architect)
 - **spec-reviewer** — Catches specification problems before implementation
 - **explorer** — Maps codebases before modification
+
+Future roles (not yet available — do not use in pipelines):
+
+- **tester** — Verifies implementation through testing, can kick back to implementer
 
 ## Your Job
 
