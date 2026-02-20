@@ -12,7 +12,7 @@
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
-        {"role": "architect", "status": "pending"},
+        {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "pending"},
         {"role": "code-cleaner", "status": "pending"}
       ]
