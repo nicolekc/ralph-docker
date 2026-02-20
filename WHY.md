@@ -67,7 +67,7 @@
 > **Use all six. Or just one. Nothing requires anything else.**
 >
 > Want the Seed to improve any Claude session? Copy one file.
-> Want PRDs + roles without the orchestrator? Three files.
+> Want PRDs + perspectives without the orchestrator? Three files.
 > Want the full system running autonomously? Still just files in a directory.
 
 ---

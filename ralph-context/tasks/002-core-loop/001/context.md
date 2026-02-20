@@ -6,7 +6,7 @@
 
 **Why it matters:** /ralph is the core mechanism of the framework. If it doesn't work, everything built on top of it is theoretical. This is the proof that the design actually functions.
 
-**What was tried:** The skill was written based on the ralph.md orchestrator prompt and the build cycle process. The prompts reference each other correctly in theory (ralph.md → roles/ → processes/build-cycle.md), but no actual execution has been attempted.
+**What was tried:** The skill was written based on the ralph.md orchestrator prompt and the build cycle process. The prompts reference each other correctly in theory (ralph.md → perspectives/ → processes/build-cycle.md), but no actual execution has been attempted.
 
 **Constraints:**
 - Create a dedicated test PRD with 2-3 small tasks — do NOT use the bootstrap PRDs, they're real work

@@ -71,7 +71,7 @@
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
-        {"role": "implementer", "status": "pending"}
+        {"role": "implementer", "status": "complete"}
       ]
     }
   ]

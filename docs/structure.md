@@ -6,16 +6,19 @@ How the framework files are organized in a project that uses Ralph.
 
 ### `.ralph/` — Framework Files (copied, don't edit)
 
-Installed from the framework repo. Contains roles, processes, the seed, and templates. Treat as read-only. If the framework updates, these files get replaced.
+Installed from the framework repo. Contains perspectives, processes, the seed, and templates. Treat as read-only. If the framework updates, these files get replaced.
 
 ```
 .ralph/
   seed.md                  # Working style principles
   ralph.md                 # Orchestrator instructions
-  roles/
+  perspectives/
     architect.md
+    code-cleaner.md
     code-reviewer.md
     design-reviewer.md
+    explorer.md
+    planner.md
     spec-reviewer.md
   processes/
     build-cycle.md
@@ -30,7 +33,7 @@ No dot — this is human-inspectable. Everything specific to this project. Start
 ```
 ralph-context/
   overrides/               # Additions to .ralph/ (mirror the structure)
-    roles/                 # e.g., architect.md with project-specific context
+    perspectives/          # e.g., architect.md with project-specific context
   knowledge/               # One file per learning, append-only
   prds/                    # Durable: task definitions (PRD files)
   designs/                 # Durable: design documents, investigations

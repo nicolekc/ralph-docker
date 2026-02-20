@@ -6,7 +6,7 @@
 
 **Why it matters:** Legacy artifacts mislead both humans and AI agents. An agent reading `templates/CLAUDE.md.template` or `.claude/skills/refine/SKILL.md` will follow outdated patterns (old PRD format with `testsPassing`, old file paths like `RALPH_PROMPT.md`). This undermines the framework's own quality.
 
-**What was tried:** The framework was restructured into `framework/` with roles, processes, templates subdirectories. But the old files were never cleaned up.
+**What was tried:** The framework was restructured into `framework/` with perspectives, processes, templates subdirectories. But the old files were never cleaned up.
 
 **Constraints:**
 - Don't lose valuable content — audit before deleting
