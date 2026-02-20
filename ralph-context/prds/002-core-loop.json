@@ -5,7 +5,7 @@
   "tasks": [
     {
       "id": "001",
-      "description": "Test and refine the /ralph skill end-to-end. Run /ralph on a small test PRD (NOT a bootstrap PRD — create a dedicated 2-3 task test PRD). Verify: subagents dispatch correctly via Task tool, architect/implementer/reviewer cycle produces actual output, task state updates, .ralph-tasks/ gets populated, circuit breaker works if reviewer keeps rejecting, signoff gates work ('architecture' signoff stops after architect phase). Fix issues discovered.",
+      "description": "Test and refine the /ralph skill end-to-end. The skill has never been executed — it needs to be proven working on a real (non-bootstrap) PRD. The full build cycle should work: subagent dispatch, architect/implementer/reviewer progression, task state updates, circuit breaker on repeated rejection, and signoff gates. Fix issues discovered during testing.",
       "outcome": "/ralph can be invoked, dispatches subagents, progresses through the build cycle, and handles both happy path and circuit breaker",
       "verification": "Successfully complete at least one task from a test PRD using /ralph. Also trigger a circuit breaker and a signoff gate to verify they work.",
       "dependencies": [],
@@ -13,7 +13,7 @@
     },
     {
       "id": "002",
-      "description": "Validate spec review gate and progress.txt conventions in practice. The spec reviewer was elevated from an optional role to a defined gate (step 0 in build-cycle.md). This task validates that it actually works: run a spec review on the test PRD from task 001. Intentionally include a vague criterion and verify the reviewer catches it. Also verify progress.txt gets populated correctly during the build cycle with timestamped, per-role entries. Adjust conventions based on what actually works.",
+      "description": "Validate spec review gate and progress.txt conventions in practice. The spec reviewer was elevated from an optional role to a defined gate, but it has never been tested with real execution. This task validates that the gate catches quality issues in task specifications and that progress.txt conventions produce useful output during a real build cycle. Adjust conventions based on what actually works.",
       "outcome": "Spec review gate works as a process step. Progress.txt conventions are validated and refined from real usage.",
       "verification": "Spec review produces actionable feedback on at least one task. Progress.txt contains coherent per-role entries from a completed build cycle.",
       "dependencies": ["001"],
@@ -21,7 +21,7 @@
     },
     {
       "id": "003",
-      "description": "Document and implement branch/push hygiene for ralph executions. How does ralph name branches? How does it handle existing branches? What happens if multiple PRDs run concurrently? Produce a clear convention and update ralph.md if needed. Keep it simple — one branch per PRD execution is probably enough.",
+      "description": "Document and implement branch/push hygiene for ralph executions. Ralph needs clear, validated conventions for branch naming, handling existing branches, and concurrent PRD executions. The convention should be simple and documented.",
       "outcome": "Branch naming convention documented. Ralph creates and pushes branches correctly.",
       "verification": "Run /ralph and verify it creates a properly named branch, makes clean commits, and pushes successfully.",
       "dependencies": ["001"],

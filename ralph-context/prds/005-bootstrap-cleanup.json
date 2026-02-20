@@ -13,7 +13,7 @@
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
-        {"role": "implementer", "status": "pending"},
+        {"role": "implementer", "status": "complete"},
         {"role": "code-cleaner", "status": "pending"}
       ]
     },
