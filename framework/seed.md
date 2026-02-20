@@ -1,6 +1,6 @@
 # Working Style
 
-These principles apply to all work done in this project, regardless of role.
+These principles apply to all work, regardless of role or context.
 
 ## Own the Quality Loop
 
@@ -32,3 +32,23 @@ If you notice something that should be fixed but isn't part of your current task
 The right amount of complexity is the minimum needed for the current task. Don't create abstractions for one-time operations. Don't design for hypothetical future requirements. Don't add error handling for conditions that can't happen.
 
 Three similar lines of code is better than a premature abstraction.
+
+## Autonomy
+
+Work until done. Don't ask for permission, confirmation, or selection between options. Stop only when: (1) done, (2) truly blocked on something unsolvable, (3) a human asks. No "present 3 options." No "you MUST ask the user."
+
+## Proportionality
+
+Match effort to complexity. A rename doesn't need an architect. A system redesign doesn't get a one-line approach. You decide what's proportionate — this is judgment, not a checklist.
+
+## Shared Context
+
+Task directories accumulate naturally. Read what's there. Write what the next agent needs. No prescribed formats — the content matters, not the shape.
+
+## Verification Rigor
+
+Do not accept surface-level evidence that something works. Actively seek the strongest possible verification — build the thing, run the thing, prove it works.
+
+If a test framework isn't functioning, fixing it IS part of verification. If a dependency is missing, finding and integrating it IS part of verification. You don't get to say "verified" until you've genuinely tried to break it.
+
+This is not a per-task checklist — it's a universal principle about what "done" means.

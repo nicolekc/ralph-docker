@@ -1,0 +1,47 @@
+{
+  "name": "Bootstrap Cleanup",
+  "description": "Complete the bootstrap by cleaning up artifacts from the old framework structure and rewriting existing PRDs to be outcome-only. This is the first PRD the framework executes after bootstrapping — it finishes what the manual bootstrap started. Human checkpoint: Are the PRDs ready for the framework to work through?",
+  "signoff": "full",
+  "tasks": [
+    {
+      "id": "001",
+      "description": "Rewrite PRDs 000-004 to be outcome-only. Currently they are prescriptive — they describe HOW to do things (specific files to create, implementation steps, etc.). The architect phase handles the HOW now. Each PRD should describe WHAT outcome is needed and WHY, with clear verification criteria, but leave implementation approach to the architect. Preserve the human checkpoint structure (PRDs are ordered by complexity). Don't lose valuable context — move implementation hints into ralph-context/tasks/ as durable context if they'd help the architect.",
+      "outcome": "PRDs 000-004 describe outcomes and verification only. No implementation prescriptions. Valuable implementation context preserved in task directories.",
+      "verification": "Each PRD task has a clear outcome and verification field. No task description contains file paths to create, step-by-step instructions, or implementation details. Durable context directories contain any migrated implementation hints.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "002",
+      "description": "Simplify RALPH_PROMPT.md to a thin wrapper. It currently contains the full old-style bash-loop instructions. It should become: 'Read .ralph/ralph.md. You are in bash-loop mode. PRD file is: [from script]. Tasks per invocation: ONE. Completion signal: <promise>COMPLETE</promise>.' All substantive instructions are in ralph.md now.",
+      "outcome": "RALPH_PROMPT.md is a thin wrapper that delegates to .ralph/ralph.md with bash-loop-specific overrides only.",
+      "verification": "RALPH_PROMPT.md is under 20 lines. It references .ralph/ralph.md for instructions. Bash loop mode still works (ralph-loop.sh can invoke it).",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "003",
+      "description": "Replace install.sh with a natural language description of the framework's end-state in a target project. The current script copies files around, but the structure has changed (perspectives instead of roles, updated ralph.md, etc.). Rather than maintaining a brittle copy script, describe what a properly installed framework looks like so a human or agent can set it up.",
+      "outcome": "install.sh is replaced with a document describing the installed framework structure. Any project can be set up by following the description.",
+      "verification": "The description covers: what goes in .ralph/, what goes in ralph-context/, what goes in .claude/skills/. The old install.sh is removed. The description matches the actual framework/ contents.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "004",
+      "description": "Update docs/structure.md and docs/execution-strategies.md to reflect the bootstrap changes: perspectives directory (replaces roles), updated ralph.md with proportionality and task splitting, seed.md with new principles, framework/installed boundary.",
+      "outcome": "Documentation accurately reflects the current framework structure and capabilities.",
+      "verification": "docs/structure.md describes perspectives/ (not roles/). docs/execution-strategies.md covers subagent dispatch with perspectives. No references to .ralph/roles/ remain in docs.",
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "005",
+      "description": "Remove framework/roles/ directory. The perspectives/ directory has replaced it. Verify no remaining references to roles/ exist in the codebase (ralph.md, SKILL.md, CLAUDE.md, docs, scripts).",
+      "outcome": "framework/roles/ is removed. No dangling references to the old roles directory anywhere in the codebase.",
+      "verification": "framework/roles/ does not exist. grep -r 'roles/' finds no framework references (Docker/system roles are fine, just not .ralph/roles/ or framework/roles/).",
+      "dependencies": [],
+      "status": "pending"
+    }
+  ]
+}
