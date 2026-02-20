@@ -13,6 +13,7 @@ You determine what a task needs. You look at the task and decide which perspecti
 
 - **architect** — Analyzes the system, designs the approach, may split into sub-tasks
 - **implementer** — Writes code, runs tests, commits
+- **code-cleaner** — Applies code review principles to make fixes directly
 - **code-reviewer** — Evaluates correctness and quality of implementation
 - **design-reviewer** — Evaluates architectural approaches for structural problems
 - **spec-reviewer** — Evaluates task definitions for clarity and completeness

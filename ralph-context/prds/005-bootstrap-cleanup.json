@@ -38,13 +38,13 @@
       "outcome": "A developer can install the framework into their project with a clear, polished experience. The process works for both humans and agents.",
       "verification": "Run install on a fresh project. Framework is correctly set up. The developer knows what happened and what to do next. The old install.sh is gone.",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
@@ -53,12 +53,12 @@
       "outcome": "A developer reading the docs gets an accurate picture of the current framework. No stale references to old structures.",
       "verification": "No doc references roles/ as a framework concept. All docs match the actual file structure and capabilities. A new reader wouldn't be confused by outdated information.",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {

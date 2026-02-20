@@ -127,7 +127,7 @@ copy_framework_dir() {
         was_new=true
     fi
 
-    # Walk source and copy each file
+    # Walk source and copy each file (exclude roles/ — stale artifact)
     while IFS= read -r -d '' file; do
         local rel="${file#$src/}"
         local dest_file="$dest/$rel"
@@ -141,7 +141,7 @@ copy_framework_dir() {
             cp "$file" "$dest_file"
             had_changes=true
         fi
-    done < <(find "$src" -type f -print0)
+    done < <(find "$src" -path "*/roles" -prune -o -type f -print0)
 
     if $was_new; then
         CREATED+=("$label")
@@ -224,7 +224,6 @@ GITIGNORE_ENTRIES=(
     "ralph-logs/"
 )
 
-gitignore_changed=false
 if [ ! -f "$TARGET_DIR/.gitignore" ]; then
     {
         echo "# Ralph framework"
@@ -233,7 +232,6 @@ if [ ! -f "$TARGET_DIR/.gitignore" ]; then
         done
     } > "$TARGET_DIR/.gitignore"
     CREATED+=(".gitignore")
-    gitignore_changed=true
 else
     missing_entries=()
     for entry in "${GITIGNORE_ENTRIES[@]}"; do
@@ -250,7 +248,6 @@ else
             done
         } >> "$TARGET_DIR/.gitignore"
         UPDATED+=(".gitignore (added ralph entries)")
-        gitignore_changed=true
     else
         UNCHANGED+=(".gitignore")
     fi
