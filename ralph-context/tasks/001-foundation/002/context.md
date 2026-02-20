@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-**Discovered:** The current install.sh copies old-style files (RALPH_PROMPT.md at repo root, etc.) that no longer match the framework structure. The framework has been reorganized into framework/ → .ralph/ with roles/, processes/, templates/ subdirectories, plus ralph-context/ and .ralph-tasks/ conventions.
+**Discovered:** The current install.sh copies old-style files (RALPH_PROMPT.md at repo root, etc.) that no longer match the framework structure. The framework has been reorganized into framework/ → .ralph/ with perspectives/, processes/, templates/ subdirectories, plus ralph-context/ and .ralph-tasks/ conventions.
 
 **Why it matters:** install.sh is how other projects adopt the framework. If it's broken, nobody can use ralph-docker. It's also how the self-hosting works (ralph-docker installs into itself).
 

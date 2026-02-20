@@ -9,7 +9,13 @@
       "outcome": "PRDs 000-004 describe outcomes and verification only. No implementation prescriptions. Valuable implementation context preserved in task directories.",
       "verification": "Each PRD task has a clear outcome and verification field. No task description contains file paths to create, step-by-step instructions, or implementation details. Durable context directories contain any migrated implementation hints.",
       "dependencies": [],
-      "status": "pending"
+      "status": "complete",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "complete"},
+        {"role": "implementer", "status": "complete"},
+        {"role": "code-cleaner", "status": "complete"}
+      ]
     },
     {
       "id": "002",
@@ -17,7 +23,14 @@
       "outcome": "Both execution modes use ralph.md as the single source of truth for how PRD tasks work. Mode-specific concerns (completion signals, tasks-per-invocation) are cleanly separated.",
       "verification": "Both modes work. No duplicated instructions between them. Changing a core concept in ralph.md affects both modes.",
       "dependencies": [],
-      "status": "pending"
+      "status": "complete",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "explorer", "status": "complete"},
+        {"role": "architect", "status": "complete"},
+        {"role": "implementer", "status": "complete"},
+        {"role": "code-cleaner", "status": "complete"}
+      ]
     },
     {
       "id": "003",
@@ -25,7 +38,14 @@
       "outcome": "A developer can install the framework into their project with a clear, polished experience. The process works for both humans and agents.",
       "verification": "Run install on a fresh project. Framework is correctly set up. The developer knows what happened and what to do next. The old install.sh is gone.",
       "dependencies": [],
-      "status": "pending"
+      "status": "complete",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "explorer", "status": "complete"},
+        {"role": "architect", "status": "complete"},
+        {"role": "implementer", "status": "complete"},
+        {"role": "code-cleaner", "status": "complete"}
+      ]
     },
     {
       "id": "004",
@@ -33,7 +53,13 @@
       "outcome": "A developer reading the docs gets an accurate picture of the current framework. No stale references to old structures.",
       "verification": "No doc references roles/ as a framework concept. All docs match the actual file structure and capabilities. A new reader wouldn't be confused by outdated information.",
       "dependencies": [],
-      "status": "pending"
+      "status": "complete",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "explorer", "status": "complete"},
+        {"role": "implementer", "status": "complete"},
+        {"role": "code-cleaner", "status": "complete"}
+      ]
     },
     {
       "id": "005",
@@ -41,7 +67,12 @@
       "outcome": "No traces of the old roles/ structure remain. The codebase consistently refers to perspectives.",
       "verification": "The old directory is gone. No references to .ralph/roles/ or framework/roles/ exist anywhere in the codebase (Docker/system roles are fine).",
       "dependencies": [],
-      "status": "pending"
+      "status": "complete",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "explorer", "status": "complete"},
+        {"role": "implementer", "status": "complete"}
+      ]
     }
   ]
 }
