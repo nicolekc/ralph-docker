@@ -9,12 +9,12 @@
       "outcome": "PRDs 000-004 describe outcomes and verification only. No implementation prescriptions. Valuable implementation context preserved in task directories.",
       "verification": "Each PRD task has a clear outcome and verification field. No task description contains file paths to create, step-by-step instructions, or implementation details. Durable context directories contain any migrated implementation hints.",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
@@ -28,7 +28,7 @@
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
         {"role": "architect", "status": "complete"},
-        {"role": "implementer", "status": "pending"},
+        {"role": "implementer", "status": "complete"},
         {"role": "code-cleaner", "status": "pending"}
       ]
     },
