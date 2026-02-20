@@ -7,14 +7,14 @@ Ralph can run in two modes. Both share `.ralph/ralph.md` as the single source of
 For interactive Claude sessions (Claude Max subscription). No bash wrapper needed.
 
 1. Start a Claude Code session in your project
-2. Run `/ralph prds/your-feature.json`
+2. Run `/ralph ralph-context/prds/your-feature.json`
 3. The `/ralph` skill points Ralph to `.ralph/ralph.md` (core instructions) plus the subagent-mode section within it
-4. Each architect/implementer/reviewer is a subagent with clean context
+4. Each perspective (planner, architect, implementer, code-cleaner, etc.) is a subagent with clean context
 5. Ralph coordinates, commits, and pushes when done
 
 **Advantages:** Works on subscription. Clean context per task. Interactive -- you can interrupt.
 
-**Setup:** Install the framework to your project (copies `.ralph/` and `.claude/skills/ralph/`).
+**Setup:** Install the framework to your project (`install.sh` copies `.ralph/`, `.claude/skills/`, and scaffolds `ralph-context/`).
 
 ## Bash Loop Mode (API / Docker)
 

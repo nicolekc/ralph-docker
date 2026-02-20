@@ -34,7 +34,7 @@ Read `.ralph/seed.md` before starting any task.
 
 ## Framework Design Anti-Patterns
 
-From analysis of OMC, Superpowers, and Gas Town (see `ralph-context/knowledge/frameworks-research.md`):
+From analysis of OMC, Superpowers, and Gas Town:
 
 - **Prescriptiveness trap**: More rules → more corner cases → more patches → complexity explosion
 - **Anti-rationalization tables**: Adversarial arms race. Trust and correct after, don't pre-empt.
@@ -58,11 +58,4 @@ Ralph reads the PRD, dispatches subagents to work through task pipelines, and pu
 
 ## Key Knowledge Files
 
-- `ralph-context/knowledge/novel-verification-methods.md` — Verification when existing tools don't cover something
-- `ralph-context/knowledge/principle-adherence-risks.md` — Known risks of principle drift
-- `ralph-context/knowledge/success-criteria-format.md` — How to write acceptance criteria
-- `ralph-context/knowledge/problem-statement-structure.md` — How to structure problem descriptions
-- `ralph-context/knowledge/draft-tasks-pattern.md` — The "draft" status and task flow
-- `ralph-context/knowledge/two-modes.md` — PRD auto-execution vs enhanced vibe coding
-- `ralph-context/knowledge/design-philosophy.md` — What the framework IS and ISN'T
-- `ralph-context/knowledge/frameworks-research.md` — Full OMC/Superpowers/Gas Town analysis
+Knowledge files live in `ralph-context/knowledge/` (one file per learning, append-only). Currently empty — learnings from earlier PRDs are in their respective `ralph-context/tasks/` directories.

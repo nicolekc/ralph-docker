@@ -70,4 +70,4 @@ If all tasks are properly sized with good acceptance criteria, simply output:
 - Be practical, not pedantic—small imperfections are fine
 - Focus on tasks that would actually cause problems during implementation
 - Consider whether the tasks flow logically given their dependencies
-- Check that `testsPassing: false` for incomplete tasks and `testsPassing: true` for done tasks
+- Check that `status` is appropriate for each task (e.g., `"pending"` for unstarted, `"in_progress"` for active, `"complete"` for done)
