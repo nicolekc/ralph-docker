@@ -10,8 +10,7 @@
       "verification": "",
       "dependencies": [],
       "status": "pending",
-      "pipeline": [],
-      "pipeline_completed": []
+      "pipeline": []
     }
   ]
 }
