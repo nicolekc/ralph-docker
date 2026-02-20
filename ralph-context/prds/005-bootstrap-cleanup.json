@@ -67,7 +67,7 @@
       "outcome": "No traces of the old roles/ structure remain. The codebase consistently refers to perspectives.",
       "verification": "The old directory is gone. No references to .ralph/roles/ or framework/roles/ exist anywhere in the codebase (Docker/system roles are fine).",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
