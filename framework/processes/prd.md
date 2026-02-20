@@ -19,7 +19,7 @@ The human wrote the task. The planner wrote the pipeline. You work the next pend
 
 ### Your Step
 
-When you pick up a task, find the first step with `"status": "pending"`, confirm it matches your role, and do the work. When done, set your step to `"complete"` and commit the PRD update.
+When you pick up a task, find the first step with `"status": "pending"`, confirm it matches your role, and do the work. When done, set your step to `"complete"`, commit the PRD update, and push.
 
 If your role isn't the next pending step, pick a different task.
 
@@ -78,6 +78,10 @@ A PRD may have a `signoff` field that limits how far pipelines are walked:
 - `"implementation"` — Walk up to and including implementer.
 - `"full"` (default) — Walk full pipelines.
 
-## One PR Per PRD
+## Branch and PR
 
-One branch per PRD. All tasks completed on that branch. One PR at the end.
+One branch per PRD: `ralph/<prd-name>`. One PR per PRD.
+
+Create the PR after the first completed pipeline step — don't wait until the end. The PR is a living view of progress. Each runner pushes after finishing their work so the PR stays current.
+
+The PR evolves with every push. The human can review the PRD file on the PR at any time to see pipeline progress, new tasks from splitting, and task states.

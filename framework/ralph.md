@@ -28,10 +28,8 @@ Dispatch subagents to work on the PRD. A subagent finds any available task, work
 
 Each subagent should read the PRD process so it knows how tasks work.
 
-## When Done
+## Branch and PR
 
-When all tasks are complete or blocked:
+Branch: `ralph/<prd-name>`. Create the PR after the first completed step — the PR is a living dashboard that evolves with each push.
 
-1. Push the branch.
-2. Create a PR.
-3. Stop.
+Every runner pushes after finishing their work. When all tasks are complete or blocked, stop.
