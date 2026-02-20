@@ -70,7 +70,7 @@
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
-        {"role": "explorer", "status": "pending"},
+        {"role": "explorer", "status": "complete"},
         {"role": "implementer", "status": "pending"}
       ]
     }
