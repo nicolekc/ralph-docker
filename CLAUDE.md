@@ -2,21 +2,9 @@
 
 This repo is the Ralph agent framework — composable tools for AI-assisted software development. It is also self-hosting: the framework is installed into itself for development.
 
-## Before Starting Any Task
+## Ralph Framework
 
-1. Load `.ralph/seed.md` — working principles that govern all work.
-2. Select the most appropriate perspective from `.ralph/perspectives/` and apply it to your thinking. Perspectives are pure thinking patterns — they don't prescribe output formats.
-3. If you're running as an orchestrator (via `/ralph`), follow `.ralph/ralph.md` instead.
-
-Available perspectives:
-- `planner.md` — Determines what pipeline of roles a task needs
-- `architect.md` — Structural analysis, tradeoff evaluation, approach design
-- `code-reviewer.md` — Implementation evaluation (correctness then quality)
-- `design-reviewer.md` — Design evaluation (structural problems early)
-- `spec-reviewer.md` — Specification evaluation (catch expensive problems before implementation)
-- `explorer.md` — Codebase tracing and understanding
-
-When working on a PRD task, also read `.ralph/processes/prd.md` for how tasks and pipelines work.
+Read `.ralph/seed.md` before starting any task.
 
 ## What This Repo Contains
 
