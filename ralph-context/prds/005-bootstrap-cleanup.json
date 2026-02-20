@@ -13,17 +13,17 @@
     },
     {
       "id": "002",
-      "description": "Simplify RALPH_PROMPT.md to a thin wrapper. It currently contains the full old-style bash-loop instructions. It should become: 'Read .ralph/ralph.md. You are in bash-loop mode. PRD file is: [from script]. Tasks per invocation: ONE. Completion signal: <promise>COMPLETE</promise>.' All substantive instructions are in ralph.md now.",
-      "outcome": "RALPH_PROMPT.md is a thin wrapper that delegates to .ralph/ralph.md with bash-loop-specific overrides only.",
-      "verification": "RALPH_PROMPT.md is under 20 lines. It references .ralph/ralph.md for instructions. Bash loop mode still works (ralph-loop.sh can invoke it).",
+      "description": "The bash-loop runner (RALPH_PROMPT.md + ralph-loop.sh) and the subagent runner (/ralph skill) both execute PRD tasks but currently have duplicated, divergent instructions. They should share the same core concepts from ralph.md, with only mode-specific differences separated out.",
+      "outcome": "Both execution modes use ralph.md as the single source of truth for how PRD tasks work. Mode-specific concerns (completion signals, tasks-per-invocation) are cleanly separated.",
+      "verification": "Both modes work. No duplicated instructions between them. Changing a core concept in ralph.md affects both modes.",
       "dependencies": [],
       "status": "pending"
     },
     {
       "id": "003",
-      "description": "Replace install.sh with a natural language description of the framework's end-state in a target project. The current script copies files around, but the structure has changed (perspectives instead of roles, updated ralph.md, etc.). Rather than maintaining a brittle copy script, describe what a properly installed framework looks like so a human or agent can set it up.",
-      "outcome": "install.sh is replaced with a document describing the installed framework structure. Any project can be set up by following the description.",
-      "verification": "The description covers: what goes in .ralph/, what goes in ralph-context/, what goes in .claude/skills/. The old install.sh is removed. The description matches the actual framework/ contents.",
+      "description": "Design and build a mature install process for adopting the framework into a new project. The current install.sh is a brittle file-copy script that's out of date. The install experience should be clean, easy for a human to use, and work well in an agentic context. Think about what a developer actually needs when they first adopt this — not just file placement, but understanding what was set up and what to do next.",
+      "outcome": "A developer can install the framework into their project with a clear, polished experience. The process works for both humans and agents.",
+      "verification": "Run install on a fresh project. Framework is correctly set up. The developer knows what happened and what to do next. The old install.sh is gone.",
       "dependencies": [],
       "status": "pending"
     },
