@@ -17,7 +17,7 @@ Product Planning (human, outcome-focused)
         → complete
 ```
 
-The ratio is 1:[1..N]:1 — one human-defined outcome, one-to-many architect-defined engineering tasks (proportional to actual complexity, NOT Parkinson's Law), one engineer per task. A button color change gets a trivial architect pass. A system redesign gets real research, maybe a sub-PRD.
+The ratio is 1:[1..N]:1 — one human-defined outcome, one-to-many architect-defined engineering tasks (proportional to actual complexity, NOT Parkinson's Law), one engineer per task. A button color change gets a trivial architect pass. A system redesign gets real research, maybe a sub-PRD. The architect is the pivot: the only step that can split tasks and create new folders. See "Task Cascade Infrastructure" below for how this interacts with the task-folder-per-task invariant.
 
 Workers NEVER plan ahead or do work they haven't been asked to do. They see "architecture is the next step available for task 4" and do that. They don't try to implement if implementation isn't their step.
 
@@ -194,9 +194,45 @@ Evolve `build-cycle.md` to support the full cascade:
 
 ### Task Cascade Infrastructure
 
-- **Task directories**: each role leaves a record of what it did and what's next. Single task log listing who worked and what context files they wrote (NOT code files — code search works normally). The context log is the breadcrumb.
-- **"Ready" concept**: tasks cascade through steps. When architecture is done, the implementation step becomes "ready" for pickup.
-- **Any step can be picked up at any point** — agents see what's next available and do it.
+**The invariant**: After the architect step, every step works in exactly one task folder. Context accumulates there. No ambiguity about where to read or write.
+
+**How the architect's 1:[1..N] split works with folders**:
+
+The architect is the pivot point — the only step that can create new tasks. Everything before the architect works at the PRD task level. Everything after works at the (possibly split) engineering task level.
+
+**When the architect splits** (1:N — e.g., task 003 becomes 003a, 003b, 003c):
+
+```
+ralph-context/tasks/<prd>/
+  003/                  # PRD-level task. Architect works HERE.
+    architect-analysis  # Holistic analysis: why it split, overall design, dependencies between sub-tasks
+  003a/                 # Sub-task a — self-contained engineering task
+    (architect seeds relevant context slice here)
+    (engineer, reviewer, QA all accumulate here)
+  003b/                 # Sub-task b — same pattern
+  003c/                 # Sub-task c — same pattern
+```
+
+Rules:
+- The architect's holistic analysis lives in the parent folder (003/). It's the record of WHY the split happened and how the pieces relate.
+- Each sub-task folder is seeded by the architect with everything the engineer needs. The engineer does NOT need to read the parent folder — the architect's job is to make each sub-task folder self-sufficient.
+- From the sub-task folder onward, the one-folder invariant holds: engineer, reviewer, QA all work in that folder. Context accumulates there.
+
+**When the architect doesn't split** (1:1 — task stays as-is):
+
+```
+ralph-context/tasks/<prd>/
+  003/                  # Architect works here. Engineer picks it up here.
+    (everything accumulates in this one folder)
+```
+
+No sub-folders, no nesting. The architect's output is in the same folder the engineer will use. Simple.
+
+**Context within a task folder**:
+- Single context log listing who worked and what context files they wrote (NOT code files — code search works normally). The context log is the breadcrumb.
+- Each step reads what's there, writes what the next step needs. No prescribed formats.
+
+**The "ready" concept**: Tasks cascade through steps. When architecture is done, the implementation step becomes "ready" for pickup. Any step can be picked up at any point — agents see what's next available and do it.
 
 ### Branch/PR Management
 
