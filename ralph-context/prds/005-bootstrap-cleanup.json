@@ -29,17 +29,17 @@
     },
     {
       "id": "004",
-      "description": "Update docs/structure.md and docs/execution-strategies.md to reflect the bootstrap changes: perspectives directory (replaces roles), updated ralph.md with proportionality and task splitting, seed.md with new principles, framework/installed boundary.",
-      "outcome": "Documentation accurately reflects the current framework structure and capabilities.",
-      "verification": "docs/structure.md describes perspectives/ (not roles/). docs/execution-strategies.md covers subagent dispatch with perspectives. No references to .ralph/roles/ remain in docs.",
+      "description": "All documentation in the repo should accurately describe how the framework actually works today. The bootstrap changed a lot — perspectives replaced roles, seed.md got new principles, ralph.md got subagent dispatch and task splitting, the framework/installed boundary was clarified. Audit all docs and fix anything that's stale or misleading.",
+      "outcome": "A developer reading the docs gets an accurate picture of the current framework. No stale references to old structures.",
+      "verification": "No doc references roles/ as a framework concept. All docs match the actual file structure and capabilities. A new reader wouldn't be confused by outdated information.",
       "dependencies": [],
       "status": "pending"
     },
     {
       "id": "005",
-      "description": "Remove framework/roles/ directory. The perspectives/ directory has replaced it. Verify no remaining references to roles/ exist in the codebase (ralph.md, SKILL.md, CLAUDE.md, docs, scripts).",
-      "outcome": "framework/roles/ is removed. No dangling references to the old roles directory anywhere in the codebase.",
-      "verification": "framework/roles/ does not exist. grep -r 'roles/' finds no framework references (Docker/system roles are fine, just not .ralph/roles/ or framework/roles/).",
+      "description": "The bootstrap replaced framework/roles/ with framework/perspectives/, but the old directory and references to it may still exist. Clean up all remnants of the old role-based structure across the entire codebase.",
+      "outcome": "No traces of the old roles/ structure remain. The codebase consistently refers to perspectives.",
+      "verification": "The old directory is gone. No references to .ralph/roles/ or framework/roles/ exist anywhere in the codebase (Docker/system roles are fine).",
       "dependencies": [],
       "status": "pending"
     }
