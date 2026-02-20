@@ -9,7 +9,9 @@
       "outcome": "",
       "verification": "",
       "dependencies": [],
-      "status": "pending"
+      "status": "pending",
+      "pipeline": [],
+      "pipeline_completed": []
     }
   ]
 }
