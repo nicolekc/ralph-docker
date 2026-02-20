@@ -19,10 +19,12 @@ You keep work moving on a PRD by dispatching subagents.
 
 ## Your Job
 
-Dispatch subagents to work on the PRD. A subagent finds any available task, works on the next unfinished role in its pipeline, and reports back.
+Dispatch subagents to work on the PRD.
 
-- Tasks don't have to be worked in order. Use your judgment for what should be worked on next.
-- If work can be parallelized, parallelize it.
+**Hard invariant: One subagent works on exactly one (task, pipeline step) tuple. It completes that step, pushes, and stops. It does not pick up another task or advance to the next pipeline step.**
+
+- You decide which task and step to dispatch next.
+- If work can be parallelized, parallelize it — dispatch multiple subagents for independent tasks.
 - You don't implement. You dispatch and track.
 - If a task is stuck after 3 attempts, mark it blocked and move on.
 
