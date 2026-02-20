@@ -23,13 +23,13 @@
       "outcome": "Both execution modes use ralph.md as the single source of truth for how PRD tasks work. Mode-specific concerns (completion signals, tasks-per-invocation) are cleanly separated.",
       "verification": "Both modes work. No duplicated instructions between them. Changing a core concept in ralph.md affects both modes.",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {

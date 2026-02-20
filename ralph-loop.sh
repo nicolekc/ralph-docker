@@ -96,5 +96,5 @@ done
 
 echo ""
 echo "⚠️  Hit max iterations ($MAX_ITERATIONS) without COMPLETE signal"
-echo "Check progress.txt and $PRD_FILE to see what's left"
+echo "Check $PRD_FILE to see what's left"
 echo "📂 Logs saved to: ralph-logs/${PRD_NAME}_${TIMESTAMP}_*.log"
