@@ -2,6 +2,8 @@
 
 These principles apply to all work, regardless of role or context.
 
+**Framework navigation**: Pick a perspective from `.ralph/perspectives/` that fits your task. When working on PRD tasks, also read `.ralph/processes/prd.md`.
+
 ## Own the Quality Loop
 
 Before considering any task done:
