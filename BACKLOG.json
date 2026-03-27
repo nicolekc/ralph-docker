@@ -85,6 +85,36 @@
       "why": "The Ask Anything POC couldn't use per-PRD branches because the working branch was a namespace within a repo we don't own. The override worked but was fragile — agents sometimes created branches anyway despite the CLAUDE.md instruction.",
       "source": "Orchestrator CLAUDE.md, Branch override section",
       "example_content": "Branch override: The Ralph process says 'one branch per PRD' but this project uses a single long-lived branch per repo. All PRD work lands on that branch. Do not create new branches per PRD."
+    },
+    {
+      "id": "B009",
+      "title": "Adversarial verification principle",
+      "type": "improvement",
+      "priority": "high",
+      "description": "Agents accept weak evidence that something works. When test infrastructure is broken or missing, they route around it with mocks or 'manual verification' notes instead of fixing the infrastructure. The qa-engineer perspective should embody adversarial self-verification, and seed.md's verification section needs to be stronger. If the tools to verify are broken, fixing the tools IS part of verification.",
+      "why": "Observed on Promptly: agent didn't know it needed embedded-postgres or that Playwright wasn't working. It produced 'verifications' that were assertions things were fine. The capability to dig deeper was there — the drive wasn't. qa-engineer.md currently focuses on user-perspective validation but doesn't encode the adversarial stance toward weak evidence.",
+      "source": "PR #6 review comment on PRD 000 task 001, 2026-02-20",
+      "example_content": "Refuse to be satisfied until you've genuinely tried to break it. If the test infrastructure itself is broken, fixing it is part of verification — not a separate task. Surface-level evidence ('tests pass' when tests are mocked, 'works' without actually running it) is not verification."
+    },
+    {
+      "id": "B010",
+      "title": "Replace install.sh with install process documentation",
+      "type": "unsolved_problem",
+      "priority": "high",
+      "description": "install.sh is a 307-line bash script for installing the framework. But agents don't need scripts — they need instructions about what the correct layout is and can do it themselves. The script is a crutch from when the framework was human-installed. Replace with documented process that agents (and humans) can follow. Also: the fact that PRD 001 task 002 said 'update install.sh' instead of questioning whether a script was the right approach is itself a principle-adherence failure worth understanding.",
+      "why": "PR #6 review: the task should have thought from a big enough picture to see that the outcome is an install *process*, not an install *script*. Agents read docs and execute steps — a bash script adds a layer of indirection that's harder to debug and doesn't teach the agent what the layout should be.",
+      "source": "PR #6 review comment on PRD 001 task 002, 2026-02-20",
+      "example_content": null
+    },
+    {
+      "id": "B011",
+      "title": "Agent migration of confusing content",
+      "type": "working_knowledge",
+      "priority": "med",
+      "description": "When agents clean up legacy artifacts or migrate content, they should not auto-migrate content that creates new tensions or confusion. If the content's purpose or placement is unclear, leave it for the human to decide rather than guessing wrong. The principle: agents should preserve, not interpret, ambiguous content during cleanup.",
+      "why": "PR #6 review on PRD 001 task 003: agent was told to 'preserve valuable content' during legacy cleanup, but the risk is that migrated content lands in a confusing location or creates contradictions with existing framework files. Better to surface the ambiguity than to resolve it incorrectly.",
+      "source": "PR #6 review comment on PRD 001 task 003, 2026-02-20",
+      "example_content": "During cleanup or migration: if content's purpose or correct location is unclear, flag it for the human rather than guessing. A wrong migration is harder to spot and fix than an explicit 'I wasn't sure where this belongs' note."
     }
   ]
 }
