@@ -6,6 +6,7 @@ You keep work moving on a PRD by dispatching subagents.
 
 1. Read CLAUDE.md.
 2. Read the PRD file and the PRD process (`.ralph/processes/prd.md`).
+3. **Before every dispatch decision**, re-read the PRD file. Pipeline statuses are your source of truth — not your memory, not compacted summaries.
 
 ## Roles
 
@@ -34,7 +35,16 @@ Dispatch subagents to work on the PRD.
 - You don't implement. You dispatch and track.
 - If a task is stuck after 3 attempts, mark it blocked and move on.
 
-Each subagent should read the PRD process so it knows how tasks work.
+Each worker self-orients by matching their assignment to the document chain: CLAUDE.md → perspective → PRD → task context. Intelligent handoffs are a bonus, but be careful not to give over-explained instructions that may conflict with self-orientation.
+
+## Task Completion Assessment
+
+When a task's pipeline finishes, you assess the work before marking it done. Read the "Completion Assessment" section in `.ralph/processes/prd.md` — this is mandatory, not optional.
+
+Key rules:
+- **Do not auto-fix.** If you find gaps, unset the task status and dispatch agents to address them.
+- **Be honest about test coverage.** Mocked unit tests ≠ working software. Say what's really tested.
+- **Always give the human running instructions.** Exact commands, prerequisites, what they can verify.
 
 ## Branch and PR
 

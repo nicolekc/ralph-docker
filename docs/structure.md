@@ -18,10 +18,13 @@ Installed from the framework repo. Contains perspectives, processes, the seed, a
     code-reviewer.md
     design-reviewer.md
     explorer.md
+    implementer.md
     planner.md
+    qa-engineer.md
     spec-reviewer.md
   processes/
     build-cycle.md
+    prd.md
   templates/
     prd.json               # PRD template
 ```

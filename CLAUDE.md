@@ -15,6 +15,7 @@ Read `.ralph/seed.md` before starting any task.
 - `docs/` — Framework design documentation
 - `.claude/skills/` — Claude Code skills (`/ralph`, `/discover`, `/refine`)
 - Docker/bash infrastructure — `Dockerfile`, `ralph-start.sh`, `ralph-loop.sh`, etc.
+- `BACKLOG.json` — Pre-PRD backlog: future improvements, unsolved problems, and working knowledge from real project use. Check before starting framework evolution work.
 
 ## Framework / Installed Boundary
 
