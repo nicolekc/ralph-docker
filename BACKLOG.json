@@ -115,6 +115,16 @@
       "why": "PR #6 review on PRD 001 task 003: agent was told to 'preserve valuable content' during legacy cleanup, but the risk is that migrated content lands in a confusing location or creates contradictions with existing framework files. Better to surface the ambiguity than to resolve it incorrectly.",
       "source": "PR #6 review comment on PRD 001 task 003, 2026-02-20",
       "example_content": "During cleanup or migration: if content's purpose or correct location is unclear, flag it for the human rather than guessing. A wrong migration is harder to spot and fix than an explicit 'I wasn't sure where this belongs' note."
+    },
+    {
+      "id": "B012",
+      "title": "GitHub PR comment interaction skill or tooling",
+      "type": "unsolved_problem",
+      "priority": "med",
+      "description": "Agents don't know how to interact with GitHub PR comments out of the box. The correct API for replying to PR review comments is `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies`, but Claude had to discover this through trial and error (the intuitive endpoint returned 404). This knowledge is lost after the session. Need either a skill, a reference doc, or CLAUDE.md guidance so agents can reliably read and respond to PR review comments without fumbling the API.",
+      "why": "During PR #6 review comment triage (2026-03-27), agent tried the wrong endpoint first, posted a stray 'test' reply to debug the format, then had to clean it up. The API knowledge isn't in training data reliably — gh's PR comment reply endpoint is non-obvious. Every future session that needs to respond to PR comments will rediscover this.",
+      "source": "PR #6 comment response session, 2026-03-27",
+      "example_content": "## Responding to PR review comments\n\nRead comments: `gh api repos/{owner}/{repo}/pulls/{pr}/comments`\nReply to a comment: `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies -f body='...'`\nDelete a comment: `gh api -X DELETE repos/{owner}/{repo}/pulls/comments/{comment_id}`\n\nNote: the reply endpoint includes the PR number. The delete endpoint does not."
     }
   ]
 }
