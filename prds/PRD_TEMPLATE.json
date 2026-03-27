@@ -1,18 +1,16 @@
 {
-  "sprint": "[Name]",
-  "created": "[YYYY-MM-DD]",
-  "overview": "[Brief description of what this sprint accomplishes]",
-  "note": "Task IDs are for reference only. Order is determined dynamically.",
+  "name": "",
+  "description": "",
+  "signoff": "full",
   "tasks": [
     {
       "id": "001",
-      "name": "[Task Name]",
-      "description": "[What needs to be done]",
-      "acceptanceCriteria": [
-        "Criterion 1",
-        "Criterion 2"
-      ],
-      "testsPassing": false
+      "description": "",
+      "outcome": "",
+      "verification": "",
+      "dependencies": [],
+      "status": "pending",
+      "pipeline": []
     }
   ]
 }

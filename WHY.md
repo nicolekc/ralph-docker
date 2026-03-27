@@ -58,7 +58,7 @@
 | | Tool | What it does | Without it |
 |---|---|---|---|
 | 🌱 | **The Seed** | Engineering standards that persist across every session | Each session reinvents its own, or has none |
-| 🎭 | **Roles** | Architect, reviewer, implementer — different *perspectives* on the same work | One voice writes and approves its own code |
+| 🎭 | **Perspectives** | Architect, reviewer, implementer — different lenses on the same work | One voice writes and approves its own code |
 | 📋 | **The PRD Format** | Tasks with outcomes and verification — "what done actually looks like" | "Done" = the code exists, not that it works |
 | 💾 | **The State System** | Context that accumulates across sessions — decisions, investigations, knowledge | Every session starts from zero |
 | 🧠 | **Knowledge Convention** | How learnings persist so the next session is smarter | Hard-won insights evaporate when the session ends |

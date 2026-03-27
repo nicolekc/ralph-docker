@@ -5,7 +5,7 @@
   "tasks": [
     {
       "id": "001",
-      "description": "Investigation: AGENTS.md pattern — right balance for per-directory knowledge. Research how different ralph/claude implementations handle AGENTS.md (per-directory hint files). Some are too liberal (write noise after every change), some too conservative (never write anything). Investigate: what triggers a write? what content is useful vs noise? how to prevent staleness? Produce findings in ralph-context/designs/ with a recommendation. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: AGENTS.md pattern — right balance for per-directory knowledge. Per-directory hint files can be powerful or noisy depending on when and what is written. This investigation should determine concrete recommendations for the framework's AGENTS.md convention. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A findings document with concrete recommendations for when and what to write to AGENTS.md files",
       "verification": "Document exists, covers the noise-vs-knowledge tradeoff, includes a concrete recommendation",
       "dependencies": [],
@@ -13,7 +13,7 @@
     },
     {
       "id": "002",
-      "description": "Investigation: principle adherence hardening. The design principles are written but there's a risk new sessions won't feel their weight (see principle-adherence-risks.md in this task's context folder). Investigate: can we test for principle adherence? Can we increase principle 'weight' without becoming prescriptive? Is there an experiment we can run (e.g., give a deliberately over-specified task and see if the AI pushes back)? Produce findings with specific recommendations. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: principle adherence hardening. The design principles are written but there's a risk new sessions won't internalize them strongly enough. This investigation should determine whether principle adherence can be tested or strengthened without becoming prescriptive. Produce findings with specific recommendations. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "Concrete recommendations for ensuring principle adherence — through testing, review checklists, seed improvements, or other means",
       "verification": "Document exists with actionable recommendations. At least one is implementable in a subsequent task.",
       "dependencies": [],
@@ -21,7 +21,7 @@
     },
     {
       "id": "003",
-      "description": "Investigation: human inbox mechanism. When ralph produces non-code deliverables (investigations, designs, architecture) that need human review, how does the human know where to look and what to review? Current 'needs_human_review' status is necessary but not sufficient. Research approaches: summary file, specific directory, PRD status integration. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: human inbox mechanism. When ralph produces non-code deliverables that need human review, the human needs a clear way to discover what's waiting for them. The current 'needs_human_review' status is necessary but not sufficient. This investigation should design a concrete surfacing mechanism. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A concrete design for how non-code deliverables surface to the human",
       "verification": "Document exists with a recommended approach. Simple enough to implement in one follow-up task.",
       "dependencies": [],
@@ -29,7 +29,7 @@
     },
     {
       "id": "004",
-      "description": "Investigation: parallelization principles. When ralph has independent tasks, it can dispatch them in parallel. But what are the right guardrails? When is parallelization safe vs risky? How do file conflicts get detected? What about shared test infrastructure? Research approaches and produce recommendations. This should be informed by real experience — if PRD 002 has been completed, reference what worked and what didn't. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: parallelization principles. Ralph can dispatch independent tasks in parallel, but the guardrails for safe parallelization haven't been defined. This investigation should produce guidelines for when parallelization is safe, how conflicts are detected, and when it should be avoided. Should be informed by real execution experience where available. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "Guidelines for when and how to parallelize task execution, with concrete guardrails",
       "verification": "Document exists with actionable guidelines. Covers at least: file conflict detection, shared resource handling, and when NOT to parallelize.",
       "dependencies": [],
@@ -37,7 +37,7 @@
     },
     {
       "id": "005",
-      "description": "Investigation: how should not-ready tasks be represented? Current approach is a 'draft' status on tasks. But alternatives exist: separate directory for future tasks, a separate 'backlog' PRD, a naming convention (prefix with _), or something else. The design should balance: (1) signaling 'not ready' clearly, (2) not adding unnecessary framework machinery, (3) being inspectable by humans. See draft-tasks-pattern.md in this task's context folder for initial thinking (not settled). NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: how should not-ready tasks be represented? The framework needs a clear convention for tasks that exist but aren't ready for execution. The design should balance clarity of the 'not ready' signal, minimal framework machinery, and human inspectability. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A recommendation for how to represent not-ready tasks, with rationale for the chosen approach",
       "verification": "Document exists with at least 3 options considered and a clear recommendation with tradeoffs.",
       "dependencies": [],
@@ -45,7 +45,7 @@
     },
     {
       "id": "006",
-      "description": "Investigation: human-blocking and task parking mechanism. When a running task hits a point where it CANNOT safely proceed without human input, how does it signal this? Design a filesystem-native pattern where: (1) the agent recognizes it's blocked and writes a structured artifact explaining what it needs, (2) the task is parked in a reviewable state, (3) ralph continues parallelizing other available tasks, (4) when the human responds (eventually via a web companion), work can resume. The filesystem design must be loosely-coupled (a web companion can discover and display these artifacts without knowing ralph internals) and tightly-cohesive (the blocking artifact contains everything needed to understand and respond). This is DISTINCT from 003/003 (human inbox for completed deliverables) — this is about runtime interruption during execution. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: human-blocking and task parking mechanism. When a running task cannot safely proceed without human input, it needs a way to signal this, park the work, and allow other tasks to continue. The design must be filesystem-native (no ralph-specific API), loosely-coupled (a web companion can discover pending questions without knowing ralph internals), and self-contained (the blocking artifact has everything needed to understand and respond). This is DISTINCT from 003/003 (human inbox for completed deliverables) — this is about runtime interruption during execution. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A design for task parking that supports: block signaling, structured 'what I need' artifacts, continuation of parallel work, and eventual web companion integration — all filesystem-native",
       "verification": "Document exists in ralph-context/designs/. Covers: artifact format, filesystem location convention, how ralph knows to skip parked tasks, how a web companion discovers pending questions, how work resumes after human responds. Design is loosely-coupled (no ralph-specific API required for the companion).",
       "dependencies": [],
@@ -53,7 +53,7 @@
     },
     {
       "id": "007",
-      "description": "Investigation: preserving architectural intent in task contexts. When a human states WHY something matters — not the requirement, but the reasoning and vision behind it — that context is often more valuable than the requirement itself. A future runner can satisfy every listed criterion and still miss the point if the original intent is lost. Investigate: does the framework already guide this? Where should it live? How do we get runners to recognize and preserve high-signal human reasoning without prescribing a rigid format? See this task's context folder for the originating story. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: preserving architectural intent in task contexts. When a human states WHY something matters — the reasoning and vision behind a requirement — that context is often more valuable than the requirement itself. A future agent can satisfy every listed criterion and still miss the point if the original intent is lost. This investigation should determine how the framework guides preservation of high-signal human reasoning without prescribing a rigid format. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A recommendation for how the framework should guide preservation of architectural intent and original human reasoning in task contexts — through existing mechanisms, new conventions, or role guidance",
       "verification": "Document exists. Audits existing framework files for where this is already addressed (or missed). Proposes at least one concrete integration point. Avoids creating a rigid template (that would defeat the purpose).",
       "dependencies": [],
@@ -61,7 +61,7 @@
     },
     {
       "id": "008",
-      "description": "Investigation: naming AND organization audit. The current names were chosen quickly and some are confusing or wrong. But beyond names, the ORGANIZATION may also be wrong — maybe prds should be top-level, maybe some things are nested too deep or grouped incorrectly. This isn't just 'rename directories' — it's 'is the directory tree the right shape?' Audit every named directory and concept in the framework, question whether the current nesting/grouping is correct, propose 2-3 coherent schemes (name + structure), and flag which changes would be breaking vs cosmetic. Scope includes: the framework root directory name, all subdirectories (prds, tasks, designs, knowledge, overrides, overrides/roles), the dotfile question (.ralph vs ralph-context vs something else), whether prds/ belongs inside the framework root or top-level, and any key concepts that have ambiguous names. See this task's context folder for the specific items flagged. NON-CODE DELIVERABLE — needs human review.",
+      "description": "Investigation: naming AND organization audit. The current directory names and structure were chosen quickly — some names are confusing and the organization itself may be wrong. This isn't just 'rename directories' — it's 'is the directory tree the right shape?' The investigation should audit every named directory and concept, question the current nesting and grouping, and propose coherent alternative schemes that cover both names and structure. NON-CODE DELIVERABLE — needs human review.",
       "outcome": "A naming and organization options document with 2-3 coherent schemes (covering both names and structure), rationale for each, a recommendation, and a migration impact assessment",
       "verification": "Document exists. Covers every directory in the framework root. Questions the current nesting (not just names). Each proposed scheme is internally consistent (not a mix-and-match). Flags breaking changes honestly. Includes a recommendation.",
       "dependencies": [],

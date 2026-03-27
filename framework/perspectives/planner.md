@@ -29,6 +29,12 @@ Common patterns:
 
 These are patterns, not a menu. Compose what fits the task.
 
+## What You Produce
+
+1. Update the task's `pipeline` field in the PRD JSON with the ordered perspective list, with your plan step set to `"complete"` and all subsequent steps set to `"pending"`.
+2. Set the task's `status` to `"in_progress"`.
+3. If the task needs context gathered before planning (e.g., you can't determine the pipeline without understanding the codebase first), your pipeline should start with `explorer`.
+
 ## What You Avoid
 
 * Over-engineering pipelines — most tasks need 2-3 steps

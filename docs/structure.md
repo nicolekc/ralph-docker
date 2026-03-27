@@ -24,7 +24,7 @@ Installed from the framework repo. Contains perspectives, processes, the seed, a
     spec-reviewer.md
   processes/
     build-cycle.md
-    prd.md
+    prd.md                 # Pipeline model and task lifecycle
   templates/
     prd.json               # PRD template
 ```

@@ -56,7 +56,7 @@ Framework files (perspectives, processes, templates) are **copied** from the fra
 
 Project-specific files (overrides, knowledge, work state) are **edited** in the project. They live in a separate directory.
 
-Overloads (e.g., project-specific additions to a role prompt) mirror the framework directory structure. If an overload needs to *subtract* from a framework file, that's a framework design failure — the framework file was too prescriptive.
+Overloads (e.g., project-specific additions to a perspective prompt) mirror the framework directory structure. If an overload needs to *subtract* from a framework file, that's a framework design failure — the framework file was too prescriptive.
 
 ## P7: Seed Spaces, Don't Over-Define
 
