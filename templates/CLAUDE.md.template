@@ -1,19 +1,14 @@
 # Project Context
 
+Read `.ralph/seed.md` before starting any task.
+
 ## Commands
-- `npm install` - Install dependencies
-- `npm run dev` - Start dev server
-- `npm test` - Run tests
-- `npm run build` - Production build
+<!-- Run /discover to populate this section -->
 
 ## Git Rules
 - NEVER push to main directly
 - Always work on feature branches
-- Make small, logical commits with clear messages
-
-## Testing Rules
-- ALL changes MUST have tests
-- Tests MUST pass before committing
+- Small, logical commits with clear messages
 
 ## Project Details
-[To be filled by project discovery - see README.md Step 3.4]
+<!-- Run /discover to populate this section -->

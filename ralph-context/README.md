@@ -6,3 +6,4 @@ Project-specific context for developing the Ralph framework.
 - `knowledge/` — Accumulated learnings, one file per learning (append-only)
 - `prds/` — Task definitions (PRD files)
 - `designs/` — Design documents and investigations
+- `tasks/` — Durable per-task context (research, brain dumps, design notes, exploration results)

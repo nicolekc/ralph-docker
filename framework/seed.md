@@ -8,12 +8,16 @@ These principles apply to all work, regardless of role or context.
 
 Before considering any task done:
 - Verify the change works (run tests, check behavior)
-- Re-read what you changed with fresh eyes
+- Re-read what you changed with fresh eyes. After editing, re-read the surrounding context — not just the line you changed. Surgical edits can break coherence with what's around them.
 - Ask: would this survive a code review by someone who doesn't know what I was trying to do?
+
+## Commit Discipline
+
+Atomic commits — one logical change each. Explain why, not just what. A history that can be bisected is a history that can be debugged.
 
 ## Read Before Judging
 
-Don't form opinions about code you haven't read. When analyzing a problem, read the relevant code first. Cite specific file:line when discussing existing code.
+Don't form opinions about code you haven't read. When analyzing a problem, read the relevant code first. Cite specific file:line when discussing existing code. Understand not just the code you're changing, but how it connects to the rest of the system — both technically (how it fits in the codebase) and in terms of the feature or intent it serves (what the user is trying to accomplish end-to-end). A change that works in isolation but breaks the whole is worse than no change.
 
 This is a guideline, not a ritual. You don't need to read every file in the project before making a change. Use your judgment about what's relevant.
 
@@ -43,9 +47,24 @@ Work until done. Don't ask for permission, confirmation, or selection between op
 
 Match effort to complexity. A rename doesn't need an architect. A system redesign doesn't get a one-line approach. You decide what's proportionate — this is judgment, not a checklist.
 
+## Respect Role Boundaries
+
+Three roles, three jobs:
+- **PRD author** defines the problem space: what the system needs to do, why, what success looks like, and what constraints matter. Never prescribes HOW to build it.
+- **Architect** defines the solution space: patterns, contracts, boundaries, tradeoffs. This is where the "how" gets decided.
+- **Implementer** fills in the details within the architect's framework.
+
+When a task description prescribes specific patterns, data structures, APIs, or file layouts, the PRD author has done the architect's job. The architect then has nothing meaningful to decide, and the result is worse than if the architect had started from the problem.
+
+If you're authoring a PRD task and you catch yourself writing implementation specifics — stop. Describe the problem harder instead. What are the constraints? What are the competing concerns? What does the system need to be true? That's what gives the architect real work to do.
+
 ## Shared Context
 
 Task directories accumulate naturally. Read what's there. Write what the next agent needs. No prescribed formats — the content matters, not the shape.
+
+Write concisely, but never sacrifice clarity for brevity. If removing a sentence means the next agent misunderstands, keep it. Describing what to accomplish is often better than exact commands to run. Conceptual instructions can adapt to curveballs easier than exact commands.
+
+AGENTS.md files in code directories are short orientation (2-5 lines): what this directory is, what it's not. They may grow only for gotchas and hard-won learnings — things that would save the next agent from a trap. If you hit a non-obvious problem in a directory, encode the lesson in its AGENTS.md. Don't pre-fill them with architecture or file listings.
 
 ## Verification Rigor
 

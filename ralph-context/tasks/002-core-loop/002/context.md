@@ -21,5 +21,5 @@
 
 - ralph-context/tasks/000-prd-quality/001/success-criteria-format.md — the who/what/how pattern for acceptance criteria
 - ralph-context/tasks/000-prd-quality/001/problem-statement-structure.md — 4-part problem description
-- framework/roles/spec-reviewer.md — the enhanced spec reviewer role
+- framework/perspectives/spec-reviewer.md — the enhanced spec reviewer perspective
 - framework/processes/build-cycle.md — step 0 is the spec review gate

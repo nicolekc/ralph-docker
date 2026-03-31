@@ -36,4 +36,4 @@ claude -p "Read $PROMPT_FILE for instructions. The PRD file is: $PRD_FILE" --dan
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ Single iteration complete"
-echo "Check git log and progress.txt to see what happened"
+echo "Check git log and $PRD_FILE to see what happened"
