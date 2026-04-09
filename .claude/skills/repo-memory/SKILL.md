@@ -1,6 +1,6 @@
 ---
 name: repo-memory
-description: Redirect Claude Code's memories to a project-local directory, with user confirmation before any write. TRIGGER when you detect information worth remembering across sessions — the user states their role or preferences, corrects or confirms a non-obvious approach, mentions project goals/bugs/deadlines/stakeholders, or references external systems (trackers, dashboards) — or if asked to record a memory. Also handles /repo-memory commands for listing, viewing, and auditing memories.
+description: Redirect Claude Code's memories to a project-local directory, with user confirmation before any write. TRIGGER when about to save or update an auto-memory file based on your trained auto-memory detection — e.g., the user states their role or preferences, corrects or confirms a non-obvious approach, mentions project goals/bugs/deadlines/stakeholders, or references external systems (trackers, dashboards) — or if asked to record a memory. Also handles /repo-memory commands for listing and auditing memories.
 ---
 
 # repo-memory
@@ -9,12 +9,14 @@ This skill redirects memories from the built-in location (usually `~/.claude/pro
 
 Instead of using the built-in location, read and save all memories from `REPO_MEM_DIR`.
 
-When you detect a memory to write, always ask the user to confirm unless user overrides tell you otherwise.
+When you detect a memory to write, always ask the user to confirm unless user overrides tell you otherwise. Same for deletes — always confirm, and give a specific reason for why the delete is proposed.
+
+If your system prompt doesn't include an auto-memory section with detection categories, read `references/detection.md` to get the categories you should be watching for.
 
 ## Routing
 
 - Auto-triggered save → follow Steps 1-2 below
-- `/repo-memory` and subcommands → read `references/view.md`
+- `/repo-memory` and subcommands → read `references/utility.md`
 - `/repo-memory audit` → read `references/audit.md`
 
 ## Step 1 — Install and drift check
@@ -27,7 +29,7 @@ Check:
 
 If anything needs attention — install incomplete, files in the built-in location, or `autoMemoryEnabled: false` — read `references/install.md` and run the install flow. It's idempotent and only proposes what's actually missing.
 
-If files appear in the built-in location *after* install was already done, that's drift: something wrote there bypassing the skill. The most likely cause is a change to your auto-memory system prompt. Call this out explicitly when proposing migration, so the user can inspect the system prompt and update the skill if needed.
+If files appear in the built-in location *after* install was already done, that's drift: something wrote there bypassing the skill. Check whether your auto-memory system prompt has changed — a change to the system prompt is the most likely cause, and if so the skill's redirect may no longer match it. Call this out explicitly when proposing migration.
 
 ## Step 2 — Save flow
 
@@ -40,3 +42,4 @@ Ask to save. On approval, write both. On denial, ask if they want to edit, save 
 - **Format-neutral.** This skill handles WHERE memories live and HOW writes are gated, not WHAT memories look like. Frontmatter fields, type names, and file naming come from the auto-memory system prompt.
 - **Path-configurable.** `REPO_MEM_DIR` is defined per-project in CLAUDE.md.
 - **Two-write awareness.** Saving a memory changes the topic file AND the index. Always show both.
+- **Confirm deletes.** Any delete operation (migration cleanup, audit cleanup) must be confirmed by the user with a specific reason for why the delete is proposed.
