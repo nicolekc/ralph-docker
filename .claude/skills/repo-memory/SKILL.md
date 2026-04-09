@@ -11,7 +11,7 @@ Instead of using the built-in location, read and save all memories from `REPO_ME
 
 When you detect a memory to write, always ask the user to confirm unless user overrides tell you otherwise. Same for deletes — always confirm, and give a specific reason for why the delete is proposed.
 
-If your system prompt doesn't include an auto-memory section with detection categories, read `references/detection.md` to get the categories you should be watching for.
+If your system prompt doesn't include an auto-memory section, read `references/detection.md` — it's a fallback spec covering both the detection categories and the memory format.
 
 ## Routing
 
