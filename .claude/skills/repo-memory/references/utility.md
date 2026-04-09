@@ -11,14 +11,4 @@ audit
 
 ## `/repo-memory list`
 
-List each memory in `REPO_MEM_DIR` in this format:
-
-```
-<name>
-  age:      <relative mtime>
-  location: <path>
-
-  <contents — full body if 5 lines or fewer, a one-sentence summary otherwise>
-```
-
-Group by type (from frontmatter).
+List each memory in `REPO_MEM_DIR` with its name, age, path, type, and contents (full body if short, a one-sentence summary otherwise). Group by type.

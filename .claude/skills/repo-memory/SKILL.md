@@ -29,7 +29,7 @@ Check:
 
 If anything needs attention — install incomplete, files in the built-in location, or `autoMemoryEnabled: false` — read `references/install.md` and run the install flow. It's idempotent and only proposes what's actually missing.
 
-If files appear in the built-in location *after* install was already done, that's drift: something wrote there bypassing the skill. Check whether your auto-memory system prompt has changed — a change to the system prompt is the most likely cause, and if so the skill's redirect may no longer match it. Call this out explicitly when proposing migration.
+If files appear in the built-in location *after* install was already done, that's drift: something wrote there bypassing the skill. A change to the auto-memory system prompt is the most likely cause. Call this out explicitly when proposing migration.
 
 ## Step 2 — Save flow
 
