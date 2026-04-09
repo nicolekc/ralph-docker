@@ -1,51 +1,42 @@
 ---
 name: repo-memory
-description: Override Claude Code's auto-memory location to a configurable directory inside the project repo, with a confirmation gate before any write. TRIGGER when about to save or update an auto-memory file based on your trained auto-memory detection (e.g., user states a preference, constraint, project fact, or feedback worth remembering across sessions). Also handles /repo-memory commands for viewing, listing, and auditing existing memories.
+description: Redirect Claude Code's memories to a project-local directory, with user confirmation before any write. TRIGGER when you detect information worth remembering across sessions — the user states their role or preferences, corrects or confirms a non-obvious approach, mentions project goals/bugs/deadlines/stakeholders, or references external systems (trackers, dashboards) — or if asked to record a memory. Also handles /repo-memory commands for listing, viewing, and auditing memories.
 ---
 
 # repo-memory
 
-Memories live in a project-repo directory (configured per-project as `REPO_MEM_DIR` in `CLAUDE.md`) instead of `~/.claude/projects/.../memory/`. Every write goes through a user confirmation gate.
+This skill redirects memories from the built-in location (usually `~/.claude/projects/.../memory/`) to project files. The new location is specified as `REPO_MEM_DIR` in project-level instructions such as `CLAUDE.md` (default: `.memory`).
 
-This skill handles WHERE memories live and HOW writes are gated. It does not specify WHAT memories look like — frontmatter, type names, file naming, and MEMORY.md structure all come from your system prompt's auto-memory section.
+Instead of using the built-in location, read and save all memories from `REPO_MEM_DIR`.
 
-## REPO_MEM_DIR
-
-`REPO_MEM_DIR` is the memory directory token. Resolve it by reading `CLAUDE.md`'s `## Memory` section for a line like ``REPO_MEM_DIR: `<path>` `` and extracting the backtick-quoted path. If the section or line is missing, install is incomplete.
+When you detect a memory to write, always ask the user to confirm unless user overrides tell you otherwise.
 
 ## Routing
 
-For `/repo-memory <command>` invocations, jump to "Manual commands" at the bottom. Otherwise this is an auto-triggered save — follow Steps 1-3 in order.
+- Auto-triggered save → follow Steps 1-2 below
+- `/repo-memory` and subcommands → read `references/view.md`
+- `/repo-memory audit` → read `references/audit.md`
 
-## Step 1 — Install check
+## Step 1 — Install and drift check
 
 Check:
-- `CLAUDE.md` has a `## Memory` section with a parseable `REPO_MEM_DIR:` line
+- `CLAUDE.md` has a `## Memory` section with a parseable ``REPO_MEM_DIR: `<path>` `` line
 - The resolved `REPO_MEM_DIR/MEMORY.md` exists
-- `~/.claude/projects/<project-id>/memory/` (default location — find the project-id by listing `~/.claude/projects/`) for any existing memory files
+- `~/.claude/projects/<project-id>/memory/` (the built-in location — find the project-id by listing `~/.claude/projects/`) for any files
 - `~/.claude/settings.json` and `.claude/settings.local.json` for `autoMemoryEnabled`
 
-If install is incomplete, read `references/install.md` and run the install flow before continuing. If `autoMemoryEnabled: false`, briefly warn the user that proactive memory detection won't fire (only manual saves work) and continue.
+If anything needs attention — install incomplete, files in the built-in location, or `autoMemoryEnabled: false` — read `references/install.md` and run the install flow. It's idempotent and only proposes what's actually missing.
 
-## Step 2 — Drift check
+If files appear in the built-in location *after* install was already done, that's drift: something wrote there bypassing the skill. The most likely cause is a change to your auto-memory system prompt. Call this out explicitly when proposing migration, so the user can inspect the system prompt and update the skill if needed.
 
-If `~/.claude/projects/<project-id>/memory/MEMORY.md` is newer than `REPO_MEM_DIR/MEMORY.md`, files were written outside this skill. List them and offer three options: migrate (move into REPO_MEM_DIR), update (show what changed in your auto-memory system prompt so the skill can be fixed), or ignore. After the user picks, resume the save.
+## Step 2 — Save flow
 
-## Step 3 — Save flow
+Show the proposed write before doing it. For a new memory, show the topic file as a code block and the `MEMORY.md` index update as a diff. For an update, show a diff of the topic file, plus any change to the index entry.
 
-Show the proposed write before doing it. For a new memory, show two changes: the topic file (full content as a code block) and the `MEMORY.md` index update (as a diff). For an update to an existing memory, show a diff of the topic file; if the index entry's description also changes, show that diff too. Ask to save. On approval, write. On denial, ask if they want to edit, save with changes, or skip.
-
-## Manual commands
-
-For `/repo-memory <command>`, resolve `REPO_MEM_DIR` first. If install is incomplete, warn briefly but continue — read-only commands work in degraded mode (they just have nothing to show).
-
-- `/repo-memory`, `/repo-memory list`, `/repo-memory show <name>` — read `references/view.md`
-- `/repo-memory audit` — read `references/audit.md`
+Ask to save. On approval, write both. On denial, ask if they want to edit, save with changes, or skip.
 
 ## Principles
 
-- **Format-neutral.** This skill never specifies frontmatter fields, type names, file naming, or MEMORY.md structure. Those come from the system prompt's auto-memory section.
-- **Path-configurable.** `REPO_MEM_DIR` is per-project, defined in CLAUDE.md.
-- **No marker files.** All state checks use the filesystem (file existence, mtimes, string matches in CLAUDE.md).
-- **Lazy install.** First save in a fresh repo prompts install. Read-only commands work in degraded mode.
+- **Format-neutral.** This skill handles WHERE memories live and HOW writes are gated, not WHAT memories look like. Frontmatter fields, type names, and file naming come from the auto-memory system prompt.
+- **Path-configurable.** `REPO_MEM_DIR` is defined per-project in CLAUDE.md.
 - **Two-write awareness.** Saving a memory changes the topic file AND the index. Always show both.
