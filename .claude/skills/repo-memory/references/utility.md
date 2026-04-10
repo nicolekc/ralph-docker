@@ -2,10 +2,10 @@
 
 ## `/repo-memory`
 
-Display the available subcommands with memory counts:
+Read `REPO_MEM_DIR/MEMORY.md` and count the memories. Display the available subcommands with the actual count, e.g.:
 
 ```
-list (3)
+list (3 memories)
 audit
 ```
 
