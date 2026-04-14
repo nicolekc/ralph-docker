@@ -9,8 +9,13 @@
       "outcome": "Base framework files read naturally for any domain. No code-specific terminology in the base layer. All code-mode content is preserved, just relocated into a separate layer.",
       "verification": "Read seed.md, planner.md, ralph.md, prd.md as if you're building a tax preparation pipeline. Nothing references code, tests, commits, or programming concepts. The base perspectives directory contains only domain-neutral roles.",
       "dependencies": [],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "pending"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "design-reviewer", "status": "pending"}
+      ]
     },
     {
       "id": "002",
