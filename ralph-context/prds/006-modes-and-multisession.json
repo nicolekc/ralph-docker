@@ -5,15 +5,15 @@
   "tasks": [
     {
       "id": "001",
-      "description": "Generalize the base framework. seed.md, planner.md, ralph.md, and prd.md contain code-specific language (TDD, commits, diffs, test infrastructure, code review, 'tests pass'). The base framework should be domain-neutral — principles that apply whether you're writing code, preparing taxes, or conducting research. Code-specific content needs to move out so a mode layer can own it. Perspectives that are inherently code-specific (implementer, code-cleaner, code-reviewer, explorer) also need to move out of the base. Perspectives that are already general (architect, planner, design-reviewer, spec-reviewer, qa-engineer) stay in the base but may need light edits to remove code-flavored language. The planner's 'Common patterns' section currently lists code pipelines — those patterns should come from the active mode, not be hardcoded. See ralph-context/tasks/006-modes-and-multisession/001/context.md for a file-by-file audit of what's code-specific vs general.",
-      "outcome": "Base framework files read naturally for any domain. No code-specific terminology in the base layer. All code-mode content is preserved, just relocated into a separate layer.",
-      "verification": "Read seed.md, planner.md, ralph.md, prd.md as if you're building a tax preparation pipeline. Nothing references code, tests, commits, or programming concepts. The base perspectives directory contains only domain-neutral roles.",
+      "description": "Generalize the base framework. All existing perspectives in `framework/perspectives/` (architect, planner, design-reviewer, spec-reviewer, qa-engineer, implementer, code-cleaner, code-reviewer, explorer) are code-mode content and should be left untouched — task 002 moves them wholesale into the code mode. The base needs a NEW set of perspective files, written from scratch, with genuinely domain-neutral names that the architect decides. If any current-base concept can't shed its code flavor, the code mode gets a `code-*` named version (e.g. `code-planner` if the base planner diverges). The mode directory layout is flat: `framework/modes/<mode>/` contains role files + a mode-process file alongside each other, no subdirectories. Base `prd.md` should reference the mode's process file for mode-specific process content (Green Builds, Code Cleaning, TDD specifics, etc.) — task 002 extracts that content into the code mode's process file. Prior work on this task already generalized base prose in seed.md, ralph.md, planner.md, prd.md, and build-cycle.md (commit aa7a43c). The architect should review those edits for consistency with the new base role names and flag any needed tweaks, but should not redo wholesale. Produce a manifest for task 002 that names every file move and every content extraction needed. See ralph-context/tasks/006-modes-and-multisession/001/context.md for original audit and prior design.md + design-review.md for history.",
+      "outcome": "Base framework has a coherent set of domain-neutral perspective files with names the architect chose. Existing code perspective files are untouched and ready for task 002 to move. Base prose reads naturally for any domain and references the mode's role set generically. A manifest tells task 002 exactly what to move and what to extract.",
+      "verification": "Base perspective files (the new ones) make sense for a non-code domain (tax prep, research, writing). Existing code perspective files are byte-identical to their pre-task state. Base prose (seed, ralph, planner, prd, build-cycle) contains no code-flavored terminology that isn't intentional metaphor. Manifest is precise enough that task 002's architect can plan file moves without re-deriving boundaries.",
       "dependencies": [],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
-        {"role": "architect", "status": "complete"},
-        {"role": "implementer", "status": "redo"},
+        {"role": "architect", "status": "redo"},
+        {"role": "implementer", "status": "pending"},
         {"role": "design-reviewer", "status": "pending"}
       ]
     },
