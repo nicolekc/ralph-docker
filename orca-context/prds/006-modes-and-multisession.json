@@ -80,13 +80,13 @@
       "outcome": "Typing 'Install this project: <orca-url>' in a fresh git repo installs Orca completely in under 30 seconds, end-to-end, inside Claude Code, with no shell commands. Running the same instruction in this self-hosted repo is a near-no-op that syncs framework→.orca/. `install.sh` is deleted. INSTALL.md is the single source of install truth. The settings prompt hook exists as a no-op placeholder ready for task 007.",
       "verification": "Fresh install in an empty git repo lays down `.orca/`, project skills, scaffolds, hooks, `.gitignore` entries, and a `CLAUDE.md` from template — with an accurate end-of-run report. Self-install on this repo updates `.orca/` from `framework/` cleanly. `install.sh` is gone and nothing in the repo still invokes it.",
       "dependencies": ["005"],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "explorer", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
