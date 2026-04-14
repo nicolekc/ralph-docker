@@ -32,8 +32,13 @@
       "outcome": "A user can launch a second Ralph session against the same project without disrupting the first. Each session has its own git working tree. The workflow is documented and easy.",
       "verification": "Start two sessions against the same project. Run different PRDs in each. Both complete without git conflicts or Docker session hijacking. The setup took under 2 minutes and no special knowledge.",
       "dependencies": [],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "pending"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "code-cleaner", "status": "pending"}
+      ]
     },
     {
       "id": "004",
