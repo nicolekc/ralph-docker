@@ -13,13 +13,15 @@ Never read the user's `.env`, credentials, or the contents of their existing `.c
 
 ## Step 1: Detect install state
 
-Run these checks in the project root (the git toplevel):
+Run these checks in the project root (the git toplevel) in order. **First match wins** — stop at the first bullet whose condition is true.
 
-- Does `framework/seed.md` AND `framework/ralph.md` exist locally? → **Self-install** (this is the Orca source repo itself). Go to Step 3a.
-- Does `.orca/` exist? → **Upgrade** state.
-- Does `.ralph/` OR `ralph-context/` OR `RALPH_PROMPT.md` exist (and `.orca/` does not)? → **Migrate** state.
-- Do both `.ralph/` and `.orca/` exist? → **Conflict**. STOP.
-- None of the above? → **Fresh** state.
+1. `framework/seed.md` AND `framework/ralph.md` both exist at the project root → **Self-install** (this is the Orca source repo itself; the `.orca/` next to `framework/` is its own installed copy). Go to Step 3a.
+2. Both `.ralph/` and `.orca/` exist → **Conflict**. STOP.
+3. `.orca/` exists (and `.ralph/` does not) → **Upgrade** state.
+4. `.ralph/` OR `ralph-context/` OR `RALPH_PROMPT.md` exists (and `.orca/` does not) → **Migrate** state.
+5. None of the above → **Fresh** state.
+
+The Self-install check comes first because the Orca source repo always has `.orca/` present (as its own installed copy); the `.orca/`-based checks would otherwise misroute it to Upgrade.
 
 Route on the detected state:
 
@@ -49,14 +51,9 @@ The user's repo has neither `.orca/` nor `.ralph/`. Proceed:
 
 ### Classification semantics
 
-Recap, applied to every file operation:
+Per MANIFEST.md's table. Key detail for the Step 5 report: for overwrite classifications (`framework` / `skill` / `hook`), compare source vs. target bytes before writing. If they match, write nothing and report **Unchanged**. If they differ, write and report **Updated**. Never report Updated for a no-op write.
 
-- `framework` / `skill` / `hook` — overwrite if target differs, skip if content is byte-identical, create if absent.
-- `once-only` — create if absent, never overwrite.
-- `scaffold` — directory + `.gitkeep` if dir absent, untouched otherwise.
-- `gitignore` — append-merge.
-
-Track each file as Created / Updated / Unchanged / Skipped for the Step 5 report. Use content comparison (read both sides, compare) to distinguish Updated from Unchanged — do NOT report a file as Updated if you wrote the same bytes.
+Track each file as Created / Updated / Unchanged / Skipped across all operations.
 
 ## Step 3: Orca source of truth
 
@@ -64,16 +61,14 @@ Track each file as Created / Updated / Unchanged / Skipped for the Step 5 report
 
 If you detected that the current repo IS the Orca source (Step 1 saw `framework/seed.md` + `framework/ralph.md` locally), the install is a `framework/` → `.orca/` sync inside this same repo. No remote clone.
 
-1. Treat the current working directory as the Orca source.
-2. Treat `.orca/` (which may or may not already exist) as the install target.
-3. Run the same Fresh steps 3–10 (Step 2), but:
-   - The user's "once-only" files (`CLAUDE.md`, `.claudeignore`) exist at the Orca repo's root. Because they exist, they will be left untouched — correct behavior.
-   - Skills are already present under `.claude/skills/` at the repo root — same source and target, so they'll report Unchanged.
-   - Scaffolds: `orca-context/` already exists with lots of real content; leave it entirely alone.
-   - `.gitignore` is the repo's own; no entries to append (list is empty).
-   - Write `.orca/.install-state.json` only if missing — do not overwrite an existing sentinel in self-install mode; the dev doesn't need the timestamp churn in git diffs.
-4. Skip the settings prompt (Step 4) in self-install mode. The dev already has their own `.claude/settings.json` and has opinions about it.
-5. Go to Step 5 (Report).
+1. Treat the current working directory as the Orca source and `.orca/` as the install target. Skip the source-acquisition substep (Step 2 substep 1) — no clone needed.
+2. Run Step 2 substeps 2–10 (read MANIFEST through write sentinel), with these self-install adjustments:
+   - Once-only files (`CLAUDE.md`, `.claudeignore`) already exist at the repo root, so they're left untouched — correct behavior.
+   - Skills under `.claude/skills/` have identical source and target paths, so they report Unchanged.
+   - Scaffolds: `orca-context/` already exists with real content; leave it alone.
+   - Write `.orca/.install-state.json` only if missing — do not overwrite an existing sentinel, to avoid timestamp churn in git diffs.
+3. Skip the settings prompt (Step 4). The dev already has their own `.claude/settings.json`.
+4. Go to Step 5 (Report).
 
 The effect: `Install this project: <orca-url>` run inside this Orca repo refreshes `.orca/` from `framework/`. This is the replacement for the deleted `install.sh` dev workflow.
 
@@ -134,7 +129,7 @@ Next steps:
   3. Run `/ralph orca-context/prds/001-your-feature.json`.
 ```
 
-Order within each group is stable: alphabetical by target path. A file never appears in more than one group. Be accurate — if you copied the same bytes over an identical file, it is Unchanged, not Updated.
+Order within each group is stable: alphabetical by target path. A file appears in exactly one group.
 
 ---
 
@@ -165,9 +160,6 @@ Consumers must tolerate unknown keys — later tasks may extend the schema.
 ## Implementation notes for the executing agent
 
 1. **You are an LLM, not a parser.** Read these steps as guidance, not pseudo-code. When the steps conflict with the user's actual state, trust your judgment and explain what you did in the report.
-2. **Git state awareness.** Before any write, run `git status --porcelain`. Fresh install tolerates uncommitted work but should not `git add` anything without asking. If the tree is wildly dirty (many modified files), mention it in the report but proceed.
-3. **Idempotency.** Running the install twice in a row must produce a second-run report where every file is Unchanged, except `.orca/.install-state.json`'s `last_installed_at` field, which updates.
-4. **Don't read secrets.** If you end up touching `.claude/settings.json`, do not echo its contents, even in the report. Report only which keys changed.
-5. **Parent directories.** Always create parent directories before writing a file.
-6. **Path resolution.** All relative paths in MANIFEST.md are relative to the Orca source root (the temp clone, or the current repo in self-install mode). All target paths are relative to the user's project root (`git rev-parse --show-toplevel`).
-7. **Atomicity is not required.** If you fail partway, the user can re-run the install; idempotency covers partial states.
+2. **Git state awareness.** Before any write, run `git status --porcelain`. Fresh install tolerates uncommitted work but should not `git add` anything without asking. If the tree is wildly dirty, mention it in the report but proceed.
+3. **Idempotency.** Running the install twice in a row must produce a second-run report where every file is Unchanged, except `.orca/.install-state.json`'s `last_installed_at`, which updates. If you fail partway, the user can re-run — idempotency covers partial states.
+4. **Path resolution.** Source paths in MANIFEST.md are relative to the Orca source root (the temp clone, or the current repo in self-install mode). Target paths are relative to the user's project root (`git rev-parse --show-toplevel`). Create parent directories before writing.

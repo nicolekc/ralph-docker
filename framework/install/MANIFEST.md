@@ -53,6 +53,8 @@ A file under `.orca/` is pruneable (in 006b) if its path matches one of these gl
 
 Files under `.orca/` that do not match any of these patterns (e.g., `.orca/.install-state.json`, future user-added subdirectories) are NOT pruneable — they are untouched.
 
+> 006b implementer: when you add new framework files to this manifest, check that a pruneable glob above covers each one. Current coverage exactly matches the framework files list; any new top-level `.orca/*.md` file (beyond seed/ralph) would need either an explicit glob entry or a top-level `.orca/*.md` glob — resist broadening it until a real need appears, so we don't prune user files by accident.
+
 ---
 
 ## Skills (`skill`)
@@ -123,29 +125,11 @@ Explicitly excluded from the install, for reference:
 - `framework/install/MANIFEST.md` (this file — consulted at install time, not copied)
 - `INSTALL.md` (the runbook Claude reads — not copied into user projects)
 - `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, `progress.txt`, this repo's `orca-context/`
-- Docker infrastructure: `Dockerfile`, `orca-start.sh`, `orca-attach.sh`, `orca-clone.sh`, `orca-reset.sh`, `orca-loop.sh`, `orca-once.sh`, `orca-reset.sh`, `ORCA_PROMPT.md`, `node_modules/`
+- Docker infrastructure: `Dockerfile`, `orca-*.sh` (`start`, `attach`, `clone`, `reset`, `loop`, `once`), `ORCA_PROMPT.md`, `node_modules/`
 - `framework/template.claude.settings.json` — task 007 moves this into `framework/templates/claude-settings.json` and wires the settings prompt; until then, the settings prompt is a no-op
 
 ---
 
 ## `.orca/.install-state.json` schema
 
-Written by the install itself (not copied from a template). Contains:
-
-```json
-{
-  "install_version": "006a",
-  "last_installed_at": "2026-04-14T12:00:00Z",
-  "settings_prompted_at": null,
-  "settings_destination": null
-}
-```
-
-Fields:
-
-- `install_version` (string): the Orca install version that last touched this project. Task 006a writes `"006a"`; 006b bumps it; each subsequent PRD that changes install behavior bumps it. Used by upgrade logic to know which migrations to run.
-- `last_installed_at` (string, ISO 8601 UTC): timestamp of the most recent install run.
-- `settings_prompted_at` (string | null, ISO 8601 UTC): set when the settings prompt has been offered. Upgrade reads this; if non-null, the prompt is skipped. Task 007 fills this in; 006a always writes `null`.
-- `settings_destination` (string | null): one of `"project"`, `"user"`, `"skipped"`, or `null`. Task 007 fills this in; 006a always writes `null`.
-
-Future fields may be added by later tasks; consumers must tolerate unknown keys.
+The sentinel's schema is documented in `INSTALL.md` under "`.orca/.install-state.json` schema". That's the canonical source — don't duplicate it here.
