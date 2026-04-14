@@ -66,12 +66,12 @@
       "outcome": "Repo uses 'orca' for infrastructure/machinery and 'ralph' only for the loop process and `/ralph` skill name. Self-hosting still works end-to-end after the rename. README, CLAUDE.md, and docs are updated to match.",
       "verification": "`grep -r ralph` returns only intentional hits: process prose, `/ralph` skill path, `ralph-loop.sh` references that are actually describing the loop process. All infra scripts, dotfile dirs, log dirs, prompt file, and Docker image tag use orca. The framework still installs cleanly into itself and a `/ralph` run of an existing PRD works.",
       "dependencies": ["001", "002", "003", "004"],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
