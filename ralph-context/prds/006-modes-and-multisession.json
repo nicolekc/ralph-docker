@@ -103,8 +103,12 @@
       "outcome": "The repo reads as a coherent 'Orca' project. README accurately describes what Orca is, how to install it, and how to use it. No docs reference paths or concepts that no longer exist. No ghost directories mentioned in guidance.",
       "verification": "Read the README end-to-end: every install step, path, and concept matches reality. `grep -r ralph` returns only intentional hits (process prose, `/ralph` skill path). No references to `.ralph-tasks/` anywhere in current docs. A newcomer following the README can install and use Orca without hitting stale instructions.",
       "dependencies": ["001", "002", "003", "004", "005", "006", "007"],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "code-cleaner", "status": "pending"}
+      ]
     }
   ]
 }
