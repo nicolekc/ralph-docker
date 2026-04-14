@@ -1,6 +1,6 @@
 # Execution Strategies
 
-Ralph can run in two modes. Both share `.orca/ralph.md` as the single source of truth for core instructions (startup, roles, execution invariants, branch/PR). Mode-specific behavior is handled by thin wrappers.
+Ralph can run in two execution modes (distinct from the PRD-level `mode` field, which picks a domain — see `framework/modes/`). Both share `.orca/ralph.md` as the single source of truth for core instructions (startup, roles, execution invariants, branch/PR). Execution-mode-specific behavior is handled by thin wrappers.
 
 ## Subagent Mode (Subscription Plan)
 
@@ -14,14 +14,14 @@ For interactive Claude sessions (Claude Max subscription). No bash wrapper neede
 
 **Advantages:** Works on subscription. Clean context per task. Interactive -- you can interrupt.
 
-**Setup:** Install the framework to your project — in Claude Code, type `Install this project: <orca-url>`. Claude reads `INSTALL.md` from the repo and executes the install (lays down `.orca/`, `.claude/skills/`, and scaffolds `orca-context/`).
+**Setup:** Install the framework to your project — in Claude Code, type `Install this project: <orca-url>`. Claude reads `INSTALL.md` from the repo and executes the install (lays down `.orca/`, `.claude/skills/`, scaffolds `orca-context/`, and offers recommended Claude Code settings).
 
 ## Bash Loop Mode (API / Docker)
 
 For headless execution in Docker containers. Uses `claude -p` (print mode).
 
-1. Enter the Docker container: `orca-start.sh /path/to/project`
-2. Run: `./orca-loop.sh prds/your-feature.json 20`
+1. Enter the Docker container: `./orca-start.sh /path/to/project`
+2. Run: `./orca-loop.sh orca-context/prds/your-feature.json 20`
 3. Each iteration reads `ORCA_PROMPT.md` (a thin wrapper that points to `.orca/ralph.md`) and completes one pipeline step
 4. Loop continues until all tasks done or max iterations reached
 
