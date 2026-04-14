@@ -95,12 +95,12 @@
       "outcome": "Running the install against a pre-rename `ralph-*` project migrates it cleanly to `orca-*` paths with a single migration commit and no lost user content. Running against an up-to-date `orca-*` project is a no-op. Running against a mixed repo (both `.ralph/` and `.orca/`) stops and asks for human intervention.",
       "verification": "Synthetic pre-rename test repo migrates cleanly. Up-to-date self-hosted repo is a no-op. Both-paths-present repo halts with a clear message. Stale-file pruning removes any `.orca/**` file not in MANIFEST.md (with a list-and-confirm step for unexpected files).",
       "dependencies": ["006a"],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
