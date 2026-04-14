@@ -38,6 +38,7 @@ Overwrite on upgrade. All paths under `.orca/` that match the shapes below but a
 | `framework/perspectives/spec-reviewer.md` | `.orca/perspectives/spec-reviewer.md` |
 | `framework/modes/code/MODE.md` | `.orca/modes/code/MODE.md` |
 | `framework/templates/prd.json` | `.orca/templates/prd.json` |
+| `framework/templates/claude-settings.json` | `.orca/templates/claude-settings.json` |
 
 ### Pruneable patterns
 
@@ -126,7 +127,6 @@ Explicitly excluded from the install, for reference:
 - `INSTALL.md` (the runbook Claude reads — not copied into user projects)
 - `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, `progress.txt`, this repo's `orca-context/`
 - Docker infrastructure: `Dockerfile`, `orca-*.sh` (`start`, `attach`, `clone`, `reset`, `loop`, `once`), `ORCA_PROMPT.md`, `node_modules/`
-- `framework/template.claude.settings.json` — task 007 moves this into `framework/templates/claude-settings.json` and wires the settings prompt; until then, the settings prompt is a no-op
 
 ---
 

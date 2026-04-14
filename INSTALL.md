@@ -84,24 +84,86 @@ If this is a Fresh install (not self-install), acquire the Orca source:
 
 If the user passed a local path instead of a URL (e.g., `Install this project: .` or `Install this project: /abs/path/to/orca`), treat that path as the Orca source directly — no clone needed, no cleanup needed.
 
-## Step 4: Settings prompt (hook point — task 007 fills this in)
+## Step 4: Settings prompt
 
-This is a no-op in the current install. Task 007 implements the body.
+Offer the user a set of recommended Claude Code settings. Never mandatory, never silent. Skipped at this step's entry check if the sentinel shows it's already been offered.
 
-When task 007 lands, this step will:
+**Skip check.** If `.orca/.install-state.json` exists and its `settings_prompted_at` is non-null, skip this entire step — the prompt has already been offered on a prior install. Continue to Step 5.
 
-1. Read the settings template from `.orca/templates/claude-settings.json` (task 007 moves it into place).
-2. Show the user each key with a one-line explanation.
-3. Ask: apply to the project (`.claude/settings.json`) or the user (`~/.claude/settings.json`)?
-4. Ask: apply or skip?
-5. If applying, deep-merge into the chosen destination, preserving existing keys and merging `env` per-key. Never clobber a user-set value.
-6. Record the outcome in `.orca/.install-state.json`:
-   - `settings_prompted_at` ← current UTC timestamp
-   - `settings_destination` ← `"project"`, `"user"`, or `"skipped"`
+Otherwise, run the six substeps below.
 
-For task 006a: do nothing in this step except leave `settings_prompted_at` and `settings_destination` as `null` in the sentinel file. On upgrade, if the sentinel shows a non-null `settings_prompted_at`, skip this step — the prompt has already been offered.
+### Substep 4.1: Read the template
 
-Never read raw secrets from `.claude/settings.json` back to the user or the report.
+Read `.orca/templates/claude-settings.json` (you just wrote it in Step 2 from the framework source). Parse it as JSON. If the file is missing or malformed, record `settings_destination = "skipped"` and `settings_prompted_at = <now>` and continue to Step 5 — don't block the install on a broken template.
+
+### Substep 4.2: Present the recommendations
+
+Show the user the template's contents alongside a one-line explanation of each key. Use the explanations below; if the template has a key not listed here, describe it from the template itself in one neutral line.
+
+Canonical keys in the current template:
+
+- `alwaysThinkingEnabled: true` — always lets Claude Code reason before responding, instead of only thinking when the harness heuristically picks it.
+- `effortLevel: "high"` — Claude budgets more effort per turn; trades speed for quality on non-trivial tasks.
+- `env.CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING: "1"` — disables the adaptive thinking cap, so the explicit `MAX_THINKING_TOKENS` below governs instead.
+- `env.MAX_THINKING_TOKENS: "64000"` — raises the per-turn thinking budget; complements `effortLevel: "high"`.
+- `env.CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY: "30"` — lets Claude Code parallelize more tool calls per turn. Useful for Ralph-style multi-file reads/greps.
+- `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW: "200000"` — defers auto-compaction until the context is much fuller, preserving more history during long Ralph runs.
+
+Present each key, its recommended value, and the one-liner. Do not read back whatever the user already has in their existing `.claude/settings.json` — the contents may be sensitive.
+
+### Substep 4.3: Ask for the destination
+
+Ask the user where to apply these settings, with exactly two choices:
+
+- **Project-level** → merge into `.claude/settings.json` at the project root. Affects only this project.
+- **User-level** → merge into `~/.claude/settings.json`. Affects all Claude Code sessions on this machine.
+
+Wait for the user's pick.
+
+### Substep 4.4: Ask apply vs skip
+
+Ask the user whether to apply the merge or skip it. "Skip" leaves both files completely untouched. The user can re-run the install later — but see the Skip check above: by default, the prompt won't offer again. If they want to be offered again later they can null out `settings_prompted_at` in the sentinel by hand.
+
+Wait for the user's answer.
+
+### Substep 4.5: Apply (deep-merge) or skip
+
+**If the user chose Skip:** do not read, write, or create the destination file. Jump to Substep 4.6 with `settings_destination = "skipped"`.
+
+**If the user chose Apply:**
+
+1. Resolve the destination path: `.claude/settings.json` (project) or `~/.claude/settings.json` (user). Expand `~`.
+2. If the destination file does not exist, create its parent directory and write the template contents verbatim as the new file. Skip to step 5 of this substep.
+3. If the destination file exists, read it and parse as JSON. If the parse fails, stop the merge, leave the file untouched, report the parse error, and treat this as a skip (set `settings_destination = "skipped"` and continue).
+4. **Deep-merge** the template into the existing JSON with these rules — the existing value always wins on any key the user has already set:
+   - For each key in the template:
+     - If the key is absent in the destination, add it with the template's value.
+     - If the key is present and both values are JSON objects, recurse into the object with the same rules.
+     - If the key is present and the types differ or the value is a scalar/array, **keep the destination's value** — do not overwrite.
+   - Never delete a key that's in the destination but not the template.
+   - For the `env` object specifically, merge per-key: add missing env vars, leave existing env vars alone.
+5. Write the merged JSON back to the destination with stable key ordering and 2-space indentation. Preserve a trailing newline.
+6. Verify: re-read the file and confirm every key the user had before is still present with its original value. If anything you added matches a value the user already had (no-op write), that's fine.
+
+Never echo secret-looking values (tokens, keys, API credentials) from the existing file back to the user or into the final report. If during the merge you encounter keys that look secret and they already exist, leave them and move on — don't include them in any diff output.
+
+### Substep 4.6: Update the sentinel
+
+Read `.orca/.install-state.json`, set:
+
+- `settings_prompted_at` ← current UTC ISO 8601 timestamp
+- `settings_destination` ← `"project"`, `"user"`, or `"skipped"` per the user's choice
+
+Write the sentinel back. Preserve any other keys already present — consumers must tolerate unknown keys, and this install only owns its schema fields.
+
+Continue to Step 5.
+
+### Summary of invariants
+
+- The prompt is offered at most once per install lifetime (idempotent via the sentinel).
+- Skip leaves no trace on disk except the sentinel update.
+- Apply never clobbers any key the user has already set.
+- The step never reads back the contents of the user's existing `.claude/settings.json` to the user or into the report.
 
 ## Step 5: Report
 
