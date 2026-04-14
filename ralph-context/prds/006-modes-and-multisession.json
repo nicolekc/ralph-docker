@@ -1,6 +1,6 @@
 {
   "name": "Pluggable Modes and Multi-Session",
-  "description": "Two capabilities: (1) Extract code-specific content from the base framework into a pluggable 'mode' layer, so the framework can serve non-coding domains (research, tax prep, etc.) by adding new modes without modifying the base. A PRD declares which mode it uses. (2) Make it easy to run multiple Ralph sessions against the same project concurrently. These are related: modes make the framework general-purpose, multi-session lets you run more of it.",
+  "description": "Three capabilities: (1) Extract code-specific content from the base framework into a pluggable 'mode' layer, so the framework can serve non-coding domains (research, tax prep, etc.) by adding new modes without modifying the base. A PRD declares which mode it uses. (2) Make it easy to run multiple Ralph sessions against the same project concurrently. (3) A non-blocking question mechanism so agents can ask the human for input without stalling the whole PRD. These are related: modes make the framework general-purpose, multi-session lets you run more of it, and questions let agents collaborate with humans on ambiguous work.",
   "signoff": "architecture",
   "tasks": [
     {
@@ -26,6 +26,15 @@
       "description": "Multi-session support. Currently, `ralph-start.sh` from a second terminal intercepts the existing Docker session (`docker start -ai` reattaches). And two `ralph-loop.sh` instances on the same worktree cause git conflicts. Users need 2+ concurrent Ralph sessions against the same project — e.g., parallel PRDs. The Docker terminal problem is trivially solved with `docker exec`. The git isolation problem needs worktrees or clones so each session has its own working tree. The parallel-agents research doc (ralph-context/designs/parallel-agents-research.md) has prior analysis — full clones recommended for Docker, worktrees for local. The solution should be simple enough to explain in one paragraph.",
       "outcome": "A user can launch a second Ralph session against the same project without disrupting the first. Each session has its own git working tree. The workflow is documented and easy.",
       "verification": "Start two sessions against the same project. Run different PRDs in each. Both complete without git conflicts or Docker session hijacking. The setup took under 2 minutes and no special knowledge.",
+      "dependencies": [],
+      "status": "pending",
+      "pipeline": []
+    },
+    {
+      "id": "004",
+      "description": "Non-blocking question mechanism. When a subagent hits genuine ambiguity about intent or requirements that it can't resolve from context, it should be able to ask the human — without blocking other tasks. The question should be written to the task's context directory so it persists. Ralph should park that task and keep dispatching everything else. When Ralph runs out of dispatchable work (everything is complete, blocked, or waiting on answers), it surfaces all accumulated questions to the human in batch. The human answers, Ralph writes answers to task context, and re-dispatches those tasks. This must be opt-in per PRD — sometimes the human wants fully autonomous execution with no questions. A PRD that disallows questions means agents must make their best judgment call or block.",
+      "outcome": "Agents can ask questions that don't stall the pipeline. Questions accumulate while other work continues. The human answers in batch when Ralph has nothing else to dispatch. PRDs control whether questions are allowed.",
+      "verification": "Run a PRD with questions enabled. One task asks a question. Other tasks continue to completion. Ralph surfaces the question only after exhausting other work. Answer it, task resumes. Run a PRD with questions disabled. Agent that would have asked instead makes a judgment call and continues.",
       "dependencies": [],
       "status": "pending",
       "pipeline": []
