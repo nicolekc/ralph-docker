@@ -23,8 +23,13 @@
       "outcome": "A 'code' mode exists with all code-specific content. Ralph loads mode files based on the PRD's mode field. The planner composes pipelines from base + mode roles. The PRD template has a 'mode' field. Creating a new mode is just adding files — no other changes needed.",
       "verification": "An existing code PRD with mode 'code' produces identical behavior to today. A PRD with no mode works with only base roles. Someone could create a 'research' mode by following the code mode's pattern without reading any docs beyond the mode directory itself.",
       "dependencies": ["001"],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "pending"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "design-reviewer", "status": "pending"}
+      ]
     },
     {
       "id": "003",
