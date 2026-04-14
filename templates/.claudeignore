@@ -34,12 +34,6 @@ pnpm-lock.yaml
 /coverage/
 /.nyc_output/
 
-# === RALPH LOGS ===
-# These COULD help Claude debug issues from previous iterations,
-# but they're large and not always present (gitignored).
-# Uncomment to exclude:
-# /ralph-logs/
-
 # === OS FILES ===
 .DS_Store
 Thumbs.db

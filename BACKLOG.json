@@ -41,9 +41,9 @@
       "title": "Architect Test principle in seed.md",
       "type": "improvement",
       "priority": "high",
-      "description": "Add the PRD authoring principle ('you are NOT the architect — define the problem space richly') to seed.md as a working principle. Currently only in PRD_REFINE.md which is a review-time check, but the principle governs all task writing.",
+      "description": "Add the PRD authoring principle ('you are NOT the architect — define the problem space richly') to seed.md as a working principle. Currently only in framework/processes/prd-refine.md which is a review-time check, but the principle governs all task writing.",
       "why": "Agents writing PRD tasks without this principle consistently over-prescribed implementation details (specific classes, data structures, file layouts), leaving architects with nothing to decide. The principle needs to be internalized before writing, not just caught during review.",
-      "source": "Orchestrator CLAUDE.md, PRD Authoring section; ralph-context/prds/PRD_REFINE.md",
+      "source": "Orchestrator CLAUDE.md, PRD Authoring section; framework/processes/prd-refine.md",
       "example_content": "When writing PRD tasks, you are NOT the architect. Your job is to define the problem space richly enough that the architect has real decisions to make. Never prescribe patterns, classes, data structures, file layouts, or communication protocols in task descriptions.\n\nTest every task you write: Would an architect reading this have genuine architectural decisions to make? If not, you've either under-visioned (too thin) or over-prescribed (did their job)."
     },
     {
@@ -125,6 +125,26 @@
       "why": "During PR #6 review comment triage (2026-03-27), agent tried the wrong endpoint first, posted a stray 'test' reply to debug the format, then had to clean it up. The API knowledge isn't in training data reliably — gh's PR comment reply endpoint is non-obvious. Every future session that needs to respond to PR comments will rediscover this.",
       "source": "PR #6 comment response session, 2026-03-27",
       "example_content": "## Responding to PR review comments\n\nRead comments: `gh api repos/{owner}/{repo}/pulls/{pr}/comments`\nReply to a comment: `gh api repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies -f body='...'`\nDelete a comment: `gh api -X DELETE repos/{owner}/{repo}/pulls/comments/{comment_id}`\n\nNote: the reply endpoint includes the PR number. The delete endpoint does not."
+    },
+    {
+      "id": "B013",
+      "title": "/refine must assess and record task dependencies every run",
+      "type": "improvement",
+      "priority": "high",
+      "description": "The /refine skill should treat `dependencies` as a first-class, always-checked field on every task. Each run must (a) reason about which other tasks touch the same files/concepts and could conflict under parallel execution, (b) flag tasks whose declared deps are missing real file-conflict or content-order dependencies, and (c) propose fixes. Today framework/processes/prd-refine.md covers sizing, acceptance criteria, and the Architect Test but under-weights dependency correctness.",
+      "why": "On PRD 006 (2026-04-14), two /refine passes missed that tasks 001 and 004 both edit ralph.md (file conflict) and that task 005's rename would collide with content edits in 001/002/003/004. The gap was only caught at /ralph dispatch time when the orchestrator paused to ask about parallelism. If /refine had produced correct deps, no stop would have been needed — Ralph could have proceeded autonomously. Missing deps are dangerous because they silently allow parallel agents to stomp each other's work.",
+      "source": "PRD 006 execution session, 2026-04-14",
+      "example_content": "Add to framework/processes/prd-refine.md: For each task, explicitly enumerate which other tasks touch the same files, directories, or concepts. Declared `dependencies` must cover not just logical ordering (A needs B's output) but also conflict avoidance (A and B edit the same file and can't run in parallel). If two tasks edit the same file and have no dependency between them, that's a FIX, not a KEEP."
+    },
+    {
+      "id": "B014",
+      "title": "/ralph needs explicit stop-mode semantics (no silent stops)",
+      "type": "unsolved_problem",
+      "priority": "high",
+      "description": "/ralph should not stop to confirm after planning unless the PRD specifies human approval is needed (e.g., plan-level signoff). Silent stops are dangerous: the user may walk away assuming execution is in progress when Ralph is actually waiting indefinitely. However, genuine CRITICAL conditions (like discovering a parallelism-safety gap in declared dependencies) SHOULD stop execution — but as an explicit, documented mode, not an ad-hoc judgment call. The user must be told up-front what conditions can trigger a stop so they know when to check back.\n\nRequirements: (1) Default behavior is to run to completion without confirmation. (2) PRD `signoff` controls planning/architecture/implementation gates. (3) A separate, explicit set of CRITICAL stop conditions (e.g., 'declared deps permit parallel edits of the same file', 'pipeline would redo completed work', 'PRD's own self-consistency check failed') is documented in the /ralph skill, and when one fires, Ralph surfaces it loudly and waits. (4) When /ralph starts, it announces which stop modes are active so the user knows the rules. (5) Ideally, if Ralph has the capability to self-repair the triggering condition (e.g., fix missing deps itself), it does so rather than stopping — stops are a last resort.",
+      "why": "On PRD 006 (2026-04-14) Ralph stopped after planning because it noticed declared deps didn't protect same-file edits across parallel tasks. That stop was valuable — it caught a real safety issue. But it happened as a judgment call, not an announced mode. The user noted: 'If I had walked away thinking there was no chance it would stop, I might not have caught this for hours.' Both behaviors must coexist: don't stop for routine confirmation, DO stop for genuine safety issues, and make the difference explicit so the user can trust the contract. Also: the triggering condition here (missing deps) should have been fixed by Ralph directly rather than bouncing to the user — if the system knows enough to detect the problem, it often knows enough to fix it.",
+      "source": "PRD 006 execution session, 2026-04-14",
+      "example_content": null
     }
   ]
 }
