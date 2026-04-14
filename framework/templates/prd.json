@@ -3,6 +3,7 @@
   "description": "",
   "mode": "code",
   "signoff": "full",
+  "questions": false,
   "tasks": [
     {
       "id": "001",

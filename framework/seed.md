@@ -43,6 +43,10 @@ Three similar lines of code is better than a premature abstraction.
 
 Work until done. Don't ask for permission, confirmation, or selection between options. Stop only when: (1) done, (2) truly blocked on something unsolvable, (3) a human asks. No "present 3 options." No "you MUST ask the user."
 
+## Questions (when enabled)
+
+Some PRDs allow you to ask a clarifying question instead of guessing when you hit genuine ambiguity — intent, requirements, or a judgment call that really needs the human. When the dispatch prompt tells you questions are enabled, use them sparingly: only when you've actually tried to resolve the ambiguity from context and can't, and only when the cost of guessing wrong is larger than the cost of waiting. If questions aren't enabled, make the best call you can or mark the task blocked after 3 attempts. This is not a substitute for autonomy — it's a valve for real ambiguity, not a way to offload judgment.
+
 ## Proportionality
 
 Match effort to complexity. A rename doesn't need an architect. A system redesign doesn't get a one-line approach. You decide what's proportionate — this is judgment, not a checklist.

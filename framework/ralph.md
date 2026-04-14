@@ -24,6 +24,16 @@ These invariants apply regardless of execution mode:
 
 Each worker self-orients by matching their assignment to the document chain: CLAUDE.md → perspective → PRD → task context. Intelligent handoffs are a bonus, but be careful not to give over-explained instructions that may conflict with self-orientation.
 
+## Questions (when enabled)
+
+A PRD may declare `"questions": true` at the top level. When present and true, include a short paragraph in every dispatch prompt telling the subagent that if it hits genuine ambiguity it cannot resolve from context, it may write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md` (next free 3-digit index), set its pipeline step status to `needs_input`, push, and return. When the flag is absent or false, do not inject that paragraph — the agent does not learn the capability exists.
+
+`needs_input` is a step status alongside `pending`, `in_progress`, and `complete`. It means the step is waiting on a human answer. Treat it as not-dispatchable, like `complete`, for the purpose of "is there dispatchable work?" — but unlike `blocked` it will become dispatchable again. It is a pause, not a failure: **do not count a `needs_input` step toward the 3-attempt limit.** A task cannot be marked `complete` while any of its steps are `needs_input`.
+
+Surfacing: on every dispatch decision, if no step is dispatchable and at least one step somewhere is `needs_input`, read every unanswered `questions/NNN.md` file (a question is unanswered iff the file has no `## Answer` section) and present them to the human in one batch, each preceded by a `── Task <id> / <role> ──` header. Content goes through verbatim — do not summarize. Ask the human to answer inline. When the human replies, append the answer to each question file under a `---\n## Answer\n` divider (verbatim), flip the matching pipeline steps from `needs_input` back to `pending`, commit as one unit, and resume dispatching. Partial answers are fine — unanswered files stay `needs_input` for the next surfacing round.
+
+Recognize `needs_input` as a step status regardless of the flag, so stale states from a prior session or a flipped flag drain cleanly.
+
 ## Task Completion Assessment
 
 When a task's pipeline finishes, you assess the work before marking it done. Read the "Completion Assessment" section in `.ralph/processes/prd.md` — this is mandatory, not optional.

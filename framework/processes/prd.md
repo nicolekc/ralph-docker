@@ -25,6 +25,13 @@ When you pick up a task, find the first step with `"status": "pending"`, confirm
 
 If your role isn't the next pending step, pick a different task.
 
+### Step Statuses
+
+- **pending** — not started, next in line.
+- **in_progress** — currently being worked.
+- **complete** — done.
+- **needs_input** — set by the worker when it hits ambiguity it can't resolve from context and the PRD enables questions (see "Questions" below). The step is parked until a human answers; then Ralph flips it back to `pending`. Does not count toward the 3-attempt limit. A task cannot be `complete` while any of its steps are `needs_input`.
+
 ### Planning
 
 Every task starts with planning. The planner reads the task and decides which roles need to process it, in what order. The planner writes the full pipeline array with all subsequent steps as `"pending"` and the plan step as `"complete"`.
@@ -71,6 +78,29 @@ The key: verification thinking flows DOWN the pipeline, getting more concrete at
 Each task gets a folder at `ralph-context/tasks/<prd-name>/<task-id>/`. **Before starting your step, read what prior roles left there.** Write what the next role needs. No prescribed format.
 
 The most important handoff: the architect's design notes inform the implementer's approach — including verification thinking embedded in the architecture. If you're the implementer and there's no context folder, you're either the first role or something went wrong — check the pipeline.
+
+## Questions
+
+The PRD may declare `"questions": true` at the top level to enable a non-blocking question mechanism. Default is off (omitted or `false`); when off, the mechanism is invisible to agents.
+
+When enabled and you — as the working agent — hit genuine ambiguity about intent or requirements that you cannot resolve from context:
+
+- Write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index (`001`, `002`, …). One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete recommended default the human can accept with a one-word answer.
+- Set your pipeline step's status to `needs_input`, commit, and push. Do not complete the step.
+
+Ralph parks `needs_input` steps and keeps dispatching everything else. When no other work is dispatchable, Ralph surfaces every unanswered question to the human in one batch. The human's answer is appended to the same file under a divider:
+
+```markdown
+---
+
+## Answer
+
+<human's response>
+```
+
+A question file is "answered" iff it contains an `## Answer` section. Ralph flips answered steps back to `pending` and re-dispatches. On resume, read `questions/` in your task folder before starting — the file you wrote now has the answer below your question.
+
+Use this sparingly: only when you've actually tried to resolve from context, and only when the cost of guessing wrong exceeds the cost of waiting. If questions are not enabled, make your best call or mark the task blocked after 3 attempts.
 
 ## Modifying the PRD
 
