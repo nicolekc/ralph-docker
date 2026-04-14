@@ -50,7 +50,7 @@
       "description": "Non-blocking question mechanism. When a subagent hits genuine ambiguity about intent or requirements that it can't resolve from context, it should be able to ask the human — without blocking other tasks. The question should be written to the task's context directory so it persists. Ralph should park that task and keep dispatching everything else. When Ralph runs out of dispatchable work (everything is complete, blocked, or waiting on answers), it surfaces all accumulated questions to the human in batch. The human answers, Ralph writes answers to task context, and re-dispatches those tasks. This must be opt-in per PRD — sometimes the human wants fully autonomous execution with no questions. A PRD that disallows questions means agents must make their best judgment call or block. See ralph-context/tasks/006-modes-and-multisession/004/context.md for mechanism brainstorming and open questions.",
       "outcome": "Agents can ask questions that don't stall the pipeline. Questions accumulate while other work continues. The human answers in batch when Ralph has nothing else to dispatch. PRDs control whether questions are allowed.",
       "verification": "Run a PRD with questions enabled. One task asks a question. Other tasks continue to completion. Ralph surfaces the question only after exhausting other work. Answer it, task resumes. Run a PRD with questions disabled. Agent that would have asked instead makes a judgment call and continues.",
-      "dependencies": [],
+      "dependencies": ["002"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
@@ -64,7 +64,7 @@
       "description": "Rename the project from 'ralph-docker' to 'orca'. The `/ralph` skill name and prose references to the ralph loop/process stay. Everything else that's infrastructure/machinery-flavored becomes 'orca': `ralph-context/` → `orca-context/`, `.ralph/` → `.orca/`, infra scripts `ralph-{start,loop,once,reset,clone}.sh` → `orca-*.sh`, `RALPH_PROMPT.md` → `ORCA_PROMPT.md`, Docker image tag `ralph-claude` → `orca-claude`. Also delete `.ralph-tasks/` entirely (ghost directory — nothing in `framework/` or `.claude/skills/` references it; everything writes to `ralph-context/tasks/`). Handle `ralph-logs/` based on whether bash-loop mode survives. This repo is self-hosted so it's also its own first upgrade case. See ralph-context/tasks/006-modes-and-multisession/005/context.md for the full inventory.",
       "outcome": "Repo uses 'orca' for infrastructure/machinery and 'ralph' only for the loop process and `/ralph` skill name. Self-hosting still works end-to-end after the rename. README, CLAUDE.md, and docs are updated to match.",
       "verification": "`grep -r ralph` returns only intentional hits: process prose, `/ralph` skill path, `ralph-loop.sh` references that are actually describing the loop process. All infra scripts, dotfile dirs, log dirs, prompt file, and Docker image tag use orca. The framework still installs cleanly into itself and a `/ralph` run of an existing PRD works.",
-      "dependencies": [],
+      "dependencies": ["001", "002", "003", "004"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
@@ -93,7 +93,7 @@
       "description": "Move the Claude Code settings template to a well-organized spot in `framework/` (currently parked at `framework/template.claude.settings.json`, should probably join `framework/templates/prd.json`). Wire the install skill to offer the recommendation, let the user pick destination (project vs user level) and whether to apply, and honor the choice. Not mandatory, never silent.",
       "outcome": "Settings template lives in a sensible location under `framework/`. Install skill offers the settings with context, user picks destination + apply/skip, outcome matches their choice.",
       "verification": "Install offers settings, user sees what they're accepting, declining leaves no trace, accepting lands them where the user chose without clobbering existing values.",
-      "dependencies": [],
+      "dependencies": ["006"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
