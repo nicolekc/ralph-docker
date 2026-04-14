@@ -75,26 +75,40 @@
       ]
     },
     {
-      "id": "006",
-      "description": "Make Orca easy to install into any project. Vision: from a fresh or existing project, the user tells Claude 'install Orca from <github URL>' and a skill fetches the framework and lays down all files, configs, and scaffolds — no manual steps, no separate installer script run. Re-running the install is safe: it upgrades the framework files, leaves user content alone, and migrates pre-rename installs (projects with `.ralph/`, `ralph-context/`, etc.) to the new orca-* paths. Includes git hook wiring, `.gitignore` additions, applying the recommended Claude settings template (see task 007), and `orca-context/` scaffolding. This task is on the larger side — architect should consider splitting during pipeline composition if the chosen mechanism expands scope (e.g., fresh install as one task, upgrade + rename migration as a follow-up). See orca-context/tasks/006-modes-and-multisession/006/context.md for mechanism options, upgrade/migration strategy, and open questions.",
-      "outcome": "A user can install Orca into any git repo via a single instruction inside Claude Code, using current (April 2026) skill-install patterns. Re-running safely upgrades framework files. Re-running against a pre-rename `ralph-*` project migrates it to `orca-*` without losing user content. The existing `install.sh` is deleted.",
-      "verification": "Install into a fresh empty git repo — all framework files, skills, settings, scaffolds, hooks, and gitignore entries are in place. Install into a pre-existing `ralph-*` installation — it migrates cleanly to `orca-*` with no lost user content. Install into an already-up-to-date project — it's a no-op with a clear report. The whole install takes under 30 seconds and requires no shell commands from the user.",
+      "id": "006a",
+      "description": "Install mechanism + fresh install + self-install. The user types 'Install this project: <orca-url>' in Claude Code and Claude reads a root-level `INSTALL.md` runbook that executes the install. Scope of 006a: (1) author `INSTALL.md` as an agent-executable runbook at the repo root; (2) add `framework/install/MANIFEST.md` enumerating the canonical file set with classification per row (framework / skill / once-only / scaffold / hook); (3) implement the Fresh branch of the install state machine (no `.orca/`, no `.ralph/`); (4) implement self-install mode so running `Install this project: <url>` inside this self-hosted repo syncs `framework/` → `.orca/` (replaces what `install.sh` does today for the dev workflow); (5) define the `.orca/.install-state.json` sentinel schema and a no-op hook point in INSTALL.md Step 5 for task 007's settings prompt; (6) delete `install.sh`. Upgrade / Migrate branches ship in 006b. Architect's design in orca-context/tasks/006-modes-and-multisession/006/design.md covers both 006a and 006b — the implementer reads §1, §3 (Fresh only), §4, §5, §6, §9.",
+      "outcome": "Typing 'Install this project: <orca-url>' in a fresh git repo installs Orca completely in under 30 seconds, end-to-end, inside Claude Code, with no shell commands. Running the same instruction in this self-hosted repo is a near-no-op that syncs framework→.orca/. `install.sh` is deleted. INSTALL.md is the single source of install truth. The settings prompt hook exists as a no-op placeholder ready for task 007.",
+      "verification": "Fresh install in an empty git repo lays down `.orca/`, project skills, scaffolds, hooks, `.gitignore` entries, and a `CLAUDE.md` from template — with an accurate end-of-run report. Self-install on this repo updates `.orca/` from `framework/` cleanly. `install.sh` is gone and nothing in the repo still invokes it.",
       "dependencies": ["005"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
-        {"role": "explorer", "status": "pending"},
-        {"role": "architect", "status": "pending"},
+        {"role": "explorer", "status": "complete"},
+        {"role": "architect", "status": "complete"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "code-cleaner", "status": "pending"}
+      ]
+    },
+    {
+      "id": "006b",
+      "description": "Extend INSTALL.md with Upgrade, Migrate, and Conflict branches of the install state machine. Scope of 006b: (1) detection logic at the top of INSTALL.md that routes among Fresh / Upgrade / Migrate / Conflict based on presence of `.orca/` and `.ralph/`; (2) Upgrade path that refreshes framework files under `.orca/` and prunes stale files using MANIFEST.md; (3) Migrate path that performs `git mv .ralph → .orca` and `git mv ralph-context → orca-context`, deletes the `.ralph-tasks/` ghost, and rewrites in-file path references in CLAUDE.md / .claude/settings.json / orca-context/**, committing the migration as a single commit; (4) dirty-tree refusal during Migrate (ask user to commit/stash first); (5) Conflict case (both `.ralph/` and `.orca/` present) — stop with a clear error, don't auto-resolve. Architect's design covers both 006a and 006b; the 006b implementer reads §3 (Upgrade / Migrate / Conflict branches), §4 (pruning), §7, §9.",
+      "outcome": "Running the install against a pre-rename `ralph-*` project migrates it cleanly to `orca-*` paths with a single migration commit and no lost user content. Running against an up-to-date `orca-*` project is a no-op. Running against a mixed repo (both `.ralph/` and `.orca/`) stops and asks for human intervention.",
+      "verification": "Synthetic pre-rename test repo migrates cleanly. Up-to-date self-hosted repo is a no-op. Both-paths-present repo halts with a clear message. Stale-file pruning removes any `.orca/**` file not in MANIFEST.md (with a list-and-confirm step for unexpected files).",
+      "dependencies": ["006a"],
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "pending"},
         {"role": "code-cleaner", "status": "pending"}
       ]
     },
     {
       "id": "007",
-      "description": "Move the Claude Code settings template to a well-organized spot in `framework/` (currently parked at `framework/template.claude.settings.json`, should probably join `framework/templates/prd.json`). Wire the install skill to offer the recommendation, let the user pick destination (project vs user level) and whether to apply, and honor the choice. Not mandatory, never silent.",
+      "description": "Move the Claude Code settings template to a well-organized spot in `framework/` (currently parked at `framework/template.claude.settings.json`, should probably join `framework/templates/prd.json`). Wire the install skill to offer the recommendation, let the user pick destination (project vs user level) and whether to apply, and honor the choice. Not mandatory, never silent. The hook point and sentinel schema (`.orca/.install-state.json`) are already in INSTALL.md from task 006a — task 007 fills in the prompt body (settings explanations), the destination question, the apply/skip question, and the deep-merge implementation.",
       "outcome": "Settings template lives in a sensible location under `framework/`. Install skill offers the settings with context, user picks destination + apply/skip, outcome matches their choice.",
       "verification": "Install offers settings, user sees what they're accepting, declining leaves no trace, accepting lands them where the user chose without clobbering existing values.",
-      "dependencies": ["006"],
+      "dependencies": ["006a"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
@@ -107,7 +121,7 @@
       "description": "Final cleanup after the rename (005), the new install flow (006), and settings move (007) have landed. Sweep the repo for any remaining stale references, ghost concepts, or documentation that contradicts the new state: README.md gets a full rewrite to match the Orca identity and current install story; CLAUDE.md updated for renamed paths and removed concepts (`.ralph-tasks/`, maybe `ralph-logs/`); `docs/structure.md` and other docs updated; stale references in `ralph-context/tasks/` (old PRD context files) flagged or left alone based on their historical value. Also remove anything else the preceding tasks didn't already clean up.",
       "outcome": "The repo reads as a coherent 'Orca' project. README accurately describes what Orca is, how to install it, and how to use it. No docs reference paths or concepts that no longer exist. No ghost directories mentioned in guidance.",
       "verification": "Read the README end-to-end: every install step, path, and concept matches reality. `grep -r ralph` returns only intentional hits (process prose, `/ralph` skill path). No references to `.ralph-tasks/` anywhere in current docs. A newcomer following the README can install and use Orca without hitting stale instructions.",
-      "dependencies": ["001", "002", "003", "004", "005", "006", "007"],
+      "dependencies": ["001", "002", "003", "004", "005", "006a", "006b", "007"],
       "status": "in_progress",
       "pipeline": [
         {"role": "plan", "status": "complete"},
