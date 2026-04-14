@@ -8,10 +8,13 @@ See [WHY.md](WHY.md) for the motivation and design philosophy.
 
 ### Install into your project
 
-```bash
-git clone https://github.com/nicolekc/ralph-docker.git ~/orca
-~/orca/install.sh ~/projects/my-app
+Open Claude Code in your project and type:
+
 ```
+Install this project: https://github.com/nicolekc/ralph-docker
+```
+
+Claude fetches the repo's `INSTALL.md` and executes it — no shell commands required. See `INSTALL.md` at the repo root for the full runbook.
 
 > Note: the GitHub repo is still named `ralph-docker` at the moment — the infrastructure has been renamed `orca` in-repo and the clone URL will follow in a later change.
 
@@ -125,7 +128,7 @@ For interactive Claude Code sessions. Run `/ralph <prd-path>`. Ralph dispatches 
 
 ### Bash Loop Mode (Docker)
 
-For headless execution. Install with `--bash-loop` flag, then run inside a Docker container:
+For headless execution. Run inside a Docker container from this repo (bash-loop files are not shipped into user projects by the install flow; they live in this repo for self-hosting):
 
 ```bash
 ./orca-loop.sh orca-context/prds/001-feature.json 20
@@ -188,7 +191,8 @@ This repo is **self-hosting** — the framework is installed into itself for dev
 | `.orca/seed.md` | Working style principles — read before any task |
 | `.orca/ralph.md` | Orchestrator instructions |
 | `.orca/processes/prd.md` | Pipeline model and task lifecycle |
-| `install.sh` | Installs the framework into a target project |
+| `INSTALL.md` | Agent-executable install runbook. Claude Code reads this when a user types `Install this project: <url>`. |
+| `framework/install/MANIFEST.md` | Canonical enumeration of files the install places, with per-row classification. |
 | `ORCA_PROMPT.md` | Bash-loop mode instructions (thin wrapper around ralph.md) |
 
 ## Design Principles

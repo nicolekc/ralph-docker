@@ -14,7 +14,7 @@ For interactive Claude sessions (Claude Max subscription). No bash wrapper neede
 
 **Advantages:** Works on subscription. Clean context per task. Interactive -- you can interrupt.
 
-**Setup:** Install the framework to your project (`install.sh` copies `.orca/`, `.claude/skills/`, and scaffolds `orca-context/`).
+**Setup:** Install the framework to your project — in Claude Code, type `Install this project: <orca-url>`. Claude reads `INSTALL.md` from the repo and executes the install (lays down `.orca/`, `.claude/skills/`, and scaffolds `orca-context/`).
 
 ## Bash Loop Mode (API / Docker)
 
