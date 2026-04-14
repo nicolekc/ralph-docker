@@ -84,100 +84,12 @@ Removed from base `planner.md`. Source text:
 
 These are the patterns the base planner now points to via: "If the active mode provides suggested pipeline patterns, read them". Task 002's implementer decides the file name and location.
 
-## 6. Code-mode addenda for base perspectives that survived in the base
-
-These three perspective files stay in the base (architect, qa-engineer, spec-reviewer), but their code-flavored phrasing was carved out during task 001's redo pass. Task 002 places this content as a code-mode addendum to each perspective — either appended at load time, merged into the existing code-mode perspective files, or stored as `framework/modes/code/perspectives/<name>.addendum.md` (layout is task 002's choice).
-
-### 6a. Architect addendum (carved from `framework/perspectives/architect.md`)
-
-The base now reads:
-> Read before judging:
-> * Never form opinions about material you haven't read — cite sources precisely
-
-The code mode sharpens "material" / "sources precisely" back to:
-> * Never form opinions about code you haven't read — cite file:line
-
-The base verification block now reads:
-> Verification — think like a Staff Engineer writing a design doc:
-> * What boundaries need checking?
-> * Where can things go wrong?
-> * What would give confidence this actually works, not just that it looks right?
-> * Can the current verification machinery exercise this artifact? If not, what's missing? Flag gaps explicitly — the implementer cannot prove the work without a way to exercise it.
->
-> Your verification thinking informs the implementer's approach — they turn your strategy into concrete checks. You don't prescribe the specific checks or the machinery they run on. You think holistically about what needs to be verifiable and flag when the project's current capabilities can't cover it.
-
-The code mode sharpens to (original prior text):
-> Verification — think like a Staff Engineer writing a design doc:
-> * What systems/layers need testing? (unit, integration, e2e?)
-> * Key boundaries where things can go wrong?
-> * What would give confidence this actually works vs just compiles?
-> * Can the current test infrastructure exercise this code? If not, what's missing? Flag infrastructure gaps explicitly — the implementer cannot practice TDD if there is no way to run tests for the code they are writing.
->
-> Your verification thinking informs the implementer's TDD approach — they turn your strategy into concrete tests. You don't prescribe specific test cases or test frameworks. You think holistically about what needs to be testable and flag when the project's current capabilities can't cover it.
-
-The base "What You Avoid" first bullet now reads:
-> * Producing the artifact yourself (pseudocode for tricky flows is fine)
-
-The code mode restores:
-> * Writing implementation code (pseudocode for tricky algorithms is fine)
-
-The base "When a Task Over-Prescribes" bullet now reads:
-> * Do your own independent analysis — read the relevant material, understand constraints, evaluate approaches
-
-The code mode restores:
-> * Do your own independent analysis — read code, understand constraints, evaluate approaches
-
-### 6b. QA-engineer addendum (carved from `framework/perspectives/qa-engineer.md`)
-
-The base "How You Think" bullet now reads:
-> * Exercise the artifact as a user would — actual usage paths, not the same checks the implementer ran
-
-The code mode sharpens to (original prior text):
-> * Run the system as a user would — actual usage paths, not programmatic tests
-
-The base "Gap You Fill" section now reads:
-> The implementer's verification proves the artifact does what the implementer intended. You prove it does what the human intended. These are often different.
->
-> * Pre-defined checks follow defined paths — real usage is messier
-> * The implementer verified the system they built — you verify the system that was asked for
-> * If something feels wrong to use even though every check passes, that's a real finding
-
-The code mode sharpens to (original prior text):
-> Automated tests prove the code does what the programmer intended. You prove it does what the human intended. These are often different.
->
-> * Programmatic tests follow defined paths — real usage is messier
-> * The implementer tested the system they built — you test the system that was asked for
-> * If something feels wrong to use even though tests pass, that's a real finding
-
-The base "What You Avoid" bullet now reads:
-> * Re-reviewing the artifact's internal quality — that's a different role's job
-
-The code mode sharpens to (original prior text):
-> * Re-reviewing code quality — that's the code-cleaner's job
-
-### 6c. Spec-reviewer addendum (carved from `framework/perspectives/spec-reviewer.md`)
-
-The base "Success criteria quality" item now reads:
-> Each criterion should read like a concrete check — who does something, what happens, how you observe it.
-
-The code mode sharpens to (original prior text):
-> Each criterion should read like a test assertion — who does something, what happens, how you observe it.
-
-The base "Verifiability" item now reads:
-> Can the result be verified? If there's no way to confirm the task was done correctly, the spec is incomplete.
-
-The code mode sharpens to (original prior text):
-> Can the result be tested? If there's no way to verify the task was done correctly, the spec is incomplete.
-
-The base "Boundaries" section dropped the line `- Code quality is the code reviewer's job` entirely. The code mode restores it (or renames whatever the code mode's quality role is called):
-> - Code quality is the code reviewer's job
-
-## 7. Out of scope for task 002 (flagged for awareness)
+## 6. Out of scope for task 002 (flagged for awareness)
 
 - `framework/template.claude.settings.json` — task 007 handles.
 - `framework/templates/prd.json` — structurally domain-neutral. If it contains code-specific example content, leave it; that's a separate cleanup.
 
-## 8. Physical file-move summary (for task 002)
+## 7. Physical file-move summary (for task 002)
 
 Move (unchanged) from base to code mode:
 - `framework/perspectives/implementer.md`
@@ -186,6 +98,6 @@ Move (unchanged) from base to code mode:
 - `framework/perspectives/explorer.md`
 - `framework/processes/build-cycle.md`
 
-Add new files to the code mode containing the content in sections 3, 4, 5, and 6 above.
+Add new files to the code mode containing the content in sections 3, 4, and 5 above.
 
 After task 002's moves land, `framework/perspectives/` contains only: `architect.md`, `planner.md`, `design-reviewer.md`, `spec-reviewer.md`, `qa-engineer.md`. And `framework/processes/` contains only `prd.md`.
