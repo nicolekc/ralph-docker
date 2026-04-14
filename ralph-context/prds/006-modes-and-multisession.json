@@ -74,8 +74,14 @@
       "outcome": "A user can install Orca into any git repo via a single instruction inside Claude Code, using current (April 2026) skill-install patterns. Re-running safely upgrades framework files. Re-running against a pre-rename `ralph-*` project migrates it to `orca-*` without losing user content. The existing `install.sh` is deleted.",
       "verification": "Install into a fresh empty git repo — all framework files, skills, settings, scaffolds, hooks, and gitignore entries are in place. Install into a pre-existing `ralph-*` installation — it migrates cleanly to `orca-*` with no lost user content. Install into an already-up-to-date project — it's a no-op with a clear report. The whole install takes under 30 seconds and requires no shell commands from the user.",
       "dependencies": ["005"],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "explorer", "status": "pending"},
+        {"role": "architect", "status": "pending"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "code-cleaner", "status": "pending"}
+      ]
     },
     {
       "id": "007",
