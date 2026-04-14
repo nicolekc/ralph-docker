@@ -24,12 +24,12 @@
       "outcome": "`framework/modes/code/MODE.md` exists and contains all code-specific content extracted from base. `framework/processes/build-cycle.md` is gone (content folded in). `framework/templates/prd.json` has a `mode` field. A code PRD with `mode: \"code\"` produces identical behavior to before this PRD started. A PRD with no mode runs using base-only.",
       "verification": "An existing code PRD with `mode: \"code\"` runs through its pipeline and produces the same results it would have pre-PRD. A PRD with no mode field picks only base roles in its pipeline composition. Someone can create a 'research' mode by adding one file (`framework/modes/research/MODE.md`) without touching any other framework file. No content listed in task 001's §5 manifest is lost.",
       "dependencies": ["001"],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "design-reviewer", "status": "pending"}
+        {"role": "design-reviewer", "status": "complete"}
       ]
     },
     {
