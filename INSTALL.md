@@ -67,7 +67,7 @@ If you detected that the current repo IS the Orca source (Step 1 saw `framework/
    - Skills under `.claude/skills/` have identical source and target paths, so they report Unchanged.
    - Scaffolds: `orca-context/` already exists with real content; leave it alone.
    - Write `.orca/.install-state.json` only if missing — do not overwrite an existing sentinel, to avoid timestamp churn in git diffs.
-3. Skip the settings prompt (Step 4). The dev already has their own `.claude/settings.json`.
+3. Skip the settings prompt (Step 4). Self-install must never touch the dev's own `.claude/settings.json`.
 4. Go to Step 5 (Report).
 
 The effect: `Install this project: <orca-url>` run inside this Orca repo refreshes `.orca/` from `framework/`. This is the replacement for the deleted `install.sh` dev workflow.
@@ -86,7 +86,7 @@ If the user passed a local path instead of a URL (e.g., `Install this project: .
 
 ## Step 4: Settings prompt
 
-Offer the user a set of recommended Claude Code settings. Never mandatory, never silent. Skipped at this step's entry check if the sentinel shows it's already been offered.
+Offer the user a set of recommended Claude Code settings. Never mandatory, never silent.
 
 **Skip check.** If `.orca/.install-state.json` exists and its `settings_prompted_at` is non-null, skip this entire step — the prompt has already been offered on a prior install. Continue to Step 5.
 
@@ -94,13 +94,13 @@ Otherwise, run the six substeps below.
 
 ### Substep 4.1: Read the template
 
-Read `.orca/templates/claude-settings.json` (you just wrote it in Step 2 from the framework source). Parse it as JSON. If the file is missing or malformed, record `settings_destination = "skipped"` and `settings_prompted_at = <now>` and continue to Step 5 — don't block the install on a broken template.
+Read `.orca/templates/claude-settings.json` and parse it as JSON. If the file is missing or malformed, record `settings_destination = "skipped"` and `settings_prompted_at = <now>` and continue to Step 5 — don't block the install on a broken template.
 
 ### Substep 4.2: Present the recommendations
 
 Show the user the template's contents alongside a one-line explanation of each key. Use the explanations below; if the template has a key not listed here, describe it from the template itself in one neutral line.
 
-Canonical keys in the current template:
+Canonical keys in the current template (keep this list in sync with `framework/templates/claude-settings.json` when keys are added or renamed):
 
 - `alwaysThinkingEnabled: true` — always lets Claude Code reason before responding, instead of only thinking when the harness heuristically picks it.
 - `effortLevel: "high"` — Claude budgets more effort per turn; trades speed for quality on non-trivial tasks.
@@ -122,7 +122,7 @@ Wait for the user's pick.
 
 ### Substep 4.4: Ask apply vs skip
 
-Ask the user whether to apply the merge or skip it. "Skip" leaves both files completely untouched. The user can re-run the install later — but see the Skip check above: by default, the prompt won't offer again. If they want to be offered again later they can null out `settings_prompted_at` in the sentinel by hand.
+Ask the user whether to apply the merge or skip it. "Skip" leaves both files completely untouched. Either way the sentinel records that the prompt was offered, so it won't offer again — to be re-prompted, the user nulls out `settings_prompted_at` in the sentinel by hand.
 
 Wait for the user's answer.
 
@@ -135,13 +135,10 @@ Wait for the user's answer.
 1. Resolve the destination path: `.claude/settings.json` (project) or `~/.claude/settings.json` (user). Expand `~`.
 2. If the destination file does not exist, create its parent directory and write the template contents verbatim as the new file. Skip to step 5 of this substep.
 3. If the destination file exists, read it and parse as JSON. If the parse fails, stop the merge, leave the file untouched, report the parse error, and treat this as a skip (set `settings_destination = "skipped"` and continue).
-4. **Deep-merge** the template into the existing JSON with these rules — the existing value always wins on any key the user has already set:
-   - For each key in the template:
-     - If the key is absent in the destination, add it with the template's value.
-     - If the key is present and both values are JSON objects, recurse into the object with the same rules.
-     - If the key is present and the types differ or the value is a scalar/array, **keep the destination's value** — do not overwrite.
-   - Never delete a key that's in the destination but not the template.
-   - For the `env` object specifically, merge per-key: add missing env vars, leave existing env vars alone.
+4. **Deep-merge** the template into the existing JSON. The destination always wins on any key the user already set — never clobber, never delete. Per template key:
+   - Absent in destination → add with template's value.
+   - Present and both values are JSON objects → recurse with the same rules (this is how `env` picks up missing vars without touching existing ones).
+   - Present and anything else (scalar, array, or type mismatch — e.g., destination has `foo: [...]` and template has `foo: {...}`) → **keep the destination's value**, do not overwrite.
 5. Write the merged JSON back to the destination with stable key ordering and 2-space indentation. Preserve a trailing newline.
 6. Verify: re-read the file and confirm every key the user had before is still present with its original value. If anything you added matches a value the user already had (no-op write), that's fine.
 
@@ -157,13 +154,6 @@ Read `.orca/.install-state.json`, set:
 Write the sentinel back. Preserve any other keys already present — consumers must tolerate unknown keys, and this install only owns its schema fields.
 
 Continue to Step 5.
-
-### Summary of invariants
-
-- The prompt is offered at most once per install lifetime (idempotent via the sentinel).
-- Skip leaves no trace on disk except the sentinel update.
-- Apply never clobbers any key the user has already set.
-- The step never reads back the contents of the user's existing `.claude/settings.json` to the user or into the report.
 
 ## Step 5: Report
 
