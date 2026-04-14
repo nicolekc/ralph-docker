@@ -26,6 +26,7 @@ Installed by `INSTALL.md`. Contains perspectives, processes, the seed, templates
     spec-reviewer.md
   processes/
     prd.md                 # Pipeline model and task lifecycle
+    prd-refine.md          # Refinement criteria (read by /refine skill)
   modes/
     code/
       MODE.md              # Code-mode PRD process + perspective registry

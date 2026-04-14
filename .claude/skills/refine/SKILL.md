@@ -12,10 +12,10 @@ Review the PRD file provided as an argument.
 ## How to Review
 
 1. Read the PRD file
-2. Read `prds/PRD_REFINE.md` — this is the source of truth for all refinement criteria
-3. Apply every check in PRD_REFINE.md to every task in the PRD
+2. Read `.orca/processes/prd-refine.md` — this is the source of truth for all refinement criteria
+3. Apply every check in `prd-refine.md` to every task in the PRD
 
-The key checks (see PRD_REFINE.md for full detail):
+The key checks (see `prd-refine.md` for full detail):
 - **The Architect Test** — would an architect have real decisions to make? Is the task under-visioned or over-prescribed?
 - **Right-sized** — completable in one session, clear done state, explicit dependencies
 - **Acceptance criteria** — test purpose not implementation, exercisable not just assertable

@@ -12,7 +12,6 @@ Read `.orca/seed.md` before starting any task.
 - `docs/` — Framework design documentation
 - `.claude/skills/` — Claude Code skills (`/ralph`, `/discover`, `/refine`, `/repo-memory`)
 - `templates/` — Once-only install scaffolds (`CLAUDE.md.template`, `.claudeignore`, `.git-hooks/`)
-- `prds/PRD_REFINE.md` — Source of truth for `/refine` criteria (read by the skill)
 - Docker / bash infrastructure — `Dockerfile`, `orca-start.sh`, `orca-loop.sh`, `orca-once.sh`, `orca-reset.sh`, `orca-clone.sh`, `orca-attach.sh`, `ORCA_PROMPT.md` (bash-loop entry). None of these ship into installed projects.
 - `INSTALL.md` — Agent-executable install runbook (read by Claude Code on `Install this project: <url>`)
 - `framework/install/MANIFEST.md` — Canonical file-by-file install inventory
@@ -27,7 +26,7 @@ Files that SHIP into target projects (the install copies these):
 - Once-only scaffolds from `templates/` — `CLAUDE.md.template` → `CLAUDE.md`, `.claudeignore`, `.git-hooks/pre-push`
 - Empty `orca-context/` scaffold dirs
 
-Files that STAY in this repo (never shipped): `docs/`, top-level `CLAUDE.md`, this repo's `orca-context/`, `BACKLOG.json`, `README.md`, `WHY.md`, `prds/`, Docker / bash scripts, `ORCA_PROMPT.md`, `Dockerfile`, `framework/install/MANIFEST.md`, `INSTALL.md`.
+Files that STAY in this repo (never shipped): `docs/`, top-level `CLAUDE.md`, this repo's `orca-context/`, `BACKLOG.json`, `README.md`, `WHY.md`, Docker / bash scripts, `ORCA_PROMPT.md`, `Dockerfile`, `framework/install/MANIFEST.md`, `INSTALL.md`.
 
 See `framework/install/MANIFEST.md` for the exact per-row classification.
 

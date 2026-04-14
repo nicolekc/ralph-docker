@@ -1,5 +1,7 @@
 # Task 006 — Easy Install: Brainstorming
 
+> Historical: references pre-rename paths (`.ralph/`, `ralph-context/`). Captured before PRD 006 task 005 renamed the project to Orca.
+
 Architect decides the actual mechanism. Capturing the vision + one real constraint.
 
 ## Vision

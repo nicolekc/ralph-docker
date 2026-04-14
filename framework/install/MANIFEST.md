@@ -26,6 +26,7 @@ Overwrite on upgrade. All paths under `.orca/` that match the shapes below but a
 | `framework/seed.md` | `.orca/seed.md` |
 | `framework/ralph.md` | `.orca/ralph.md` |
 | `framework/processes/prd.md` | `.orca/processes/prd.md` |
+| `framework/processes/prd-refine.md` | `.orca/processes/prd-refine.md` |
 | `framework/perspectives/architect.md` | `.orca/perspectives/architect.md` |
 | `framework/perspectives/code-cleaner.md` | `.orca/perspectives/code-cleaner.md` |
 | `framework/perspectives/code-reviewer.md` | `.orca/perspectives/code-reviewer.md` |
@@ -125,7 +126,7 @@ Explicitly excluded from the install, for reference:
 - `framework/` itself (the user gets `.orca/`, a derived copy)
 - `framework/install/MANIFEST.md` (this file — consulted at install time, not copied)
 - `INSTALL.md` (the runbook Claude reads — not copied into user projects)
-- `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, this repo's `orca-context/`, this repo's `prds/` (the /refine skill reads `prds/PRD_REFINE.md` only when run from the source repo)
+- `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, this repo's `orca-context/`
 - Docker infrastructure: `Dockerfile`, `orca-*.sh` (`start`, `attach`, `clone`, `reset`, `loop`, `once`), `ORCA_PROMPT.md`, `node_modules/`
 
 ---

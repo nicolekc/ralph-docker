@@ -41,9 +41,9 @@
       "title": "Architect Test principle in seed.md",
       "type": "improvement",
       "priority": "high",
-      "description": "Add the PRD authoring principle ('you are NOT the architect — define the problem space richly') to seed.md as a working principle. Currently only in PRD_REFINE.md which is a review-time check, but the principle governs all task writing.",
+      "description": "Add the PRD authoring principle ('you are NOT the architect — define the problem space richly') to seed.md as a working principle. Currently only in framework/processes/prd-refine.md which is a review-time check, but the principle governs all task writing.",
       "why": "Agents writing PRD tasks without this principle consistently over-prescribed implementation details (specific classes, data structures, file layouts), leaving architects with nothing to decide. The principle needs to be internalized before writing, not just caught during review.",
-      "source": "Orchestrator CLAUDE.md, PRD Authoring section; prds/PRD_REFINE.md",
+      "source": "Orchestrator CLAUDE.md, PRD Authoring section; framework/processes/prd-refine.md",
       "example_content": "When writing PRD tasks, you are NOT the architect. Your job is to define the problem space richly enough that the architect has real decisions to make. Never prescribe patterns, classes, data structures, file layouts, or communication protocols in task descriptions.\n\nTest every task you write: Would an architect reading this have genuine architectural decisions to make? If not, you've either under-visioned (too thin) or over-prescribed (did their job)."
     },
     {
@@ -131,10 +131,10 @@
       "title": "/refine must assess and record task dependencies every run",
       "type": "improvement",
       "priority": "high",
-      "description": "The /refine skill should treat `dependencies` as a first-class, always-checked field on every task. Each run must (a) reason about which other tasks touch the same files/concepts and could conflict under parallel execution, (b) flag tasks whose declared deps are missing real file-conflict or content-order dependencies, and (c) propose fixes. Today PRD_REFINE.md covers sizing, acceptance criteria, and the Architect Test but under-weights dependency correctness.",
+      "description": "The /refine skill should treat `dependencies` as a first-class, always-checked field on every task. Each run must (a) reason about which other tasks touch the same files/concepts and could conflict under parallel execution, (b) flag tasks whose declared deps are missing real file-conflict or content-order dependencies, and (c) propose fixes. Today framework/processes/prd-refine.md covers sizing, acceptance criteria, and the Architect Test but under-weights dependency correctness.",
       "why": "On PRD 006 (2026-04-14), two /refine passes missed that tasks 001 and 004 both edit ralph.md (file conflict) and that task 005's rename would collide with content edits in 001/002/003/004. The gap was only caught at /ralph dispatch time when the orchestrator paused to ask about parallelism. If /refine had produced correct deps, no stop would have been needed — Ralph could have proceeded autonomously. Missing deps are dangerous because they silently allow parallel agents to stomp each other's work.",
       "source": "PRD 006 execution session, 2026-04-14",
-      "example_content": "Add to PRD_REFINE.md: For each task, explicitly enumerate which other tasks touch the same files, directories, or concepts. Declared `dependencies` must cover not just logical ordering (A needs B's output) but also conflict avoidance (A and B edit the same file and can't run in parallel). If two tasks edit the same file and have no dependency between them, that's a FIX, not a KEEP."
+      "example_content": "Add to framework/processes/prd-refine.md: For each task, explicitly enumerate which other tasks touch the same files, directories, or concepts. Declared `dependencies` must cover not just logical ordering (A needs B's output) but also conflict avoidance (A and B edit the same file and can't run in parallel). If two tasks edit the same file and have no dependency between them, that's a FIX, not a KEEP."
     },
     {
       "id": "B014",
