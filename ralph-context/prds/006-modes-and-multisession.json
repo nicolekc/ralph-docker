@@ -9,12 +9,12 @@
       "outcome": "Base has a minimum-viable set of new perspective files with architect-chosen neutral names. Existing perspective files are byte-identical and their names unchanged — they are the code-mode perspectives. Base prose is lean but not hollowed: over-generalizations from aa7a43c are rolled back; true specifics have moved. A short manifest tells task 002 what content lands in modes/code/MODE.md.",
       "verification": "Base perspective files make sense for a non-code domain without being contrived. Existing perspective files are byte-identical to their pre-task state (git diff against aa7a43c is empty for those). Base prose retains the punch and concreteness of the pre-aa7a43c version where the content was truly general. Role discovery path is explicit. Manifest is precise enough that task 002's architect can plan content moves without re-deriving boundaries.",
       "dependencies": [],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "design-reviewer", "status": "pending"}
+        {"role": "design-reviewer", "status": "complete"}
       ]
     },
     {

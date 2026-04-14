@@ -1,81 +1,51 @@
-# Task 001 — Design Review
+# Task 001 — Design Review (v3)
 
 ## Summary
 
-**Fail — fixes needed (implementer redo).** The four files explicitly listed in the architect's design (`seed.md`, `ralph.md`, `perspectives/planner.md`, `processes/prd.md`) are cleanly generalized and the extraction manifest covers their carved content well. But the PRD task description (and the architect's own roster on design.md line 32) named **five** base perspectives that "stay in the base but may need light edits to remove code-flavored language": architect, planner, design-reviewer, spec-reviewer, qa-engineer. The implementer only edited `planner.md`. The other four base perspective files were never read against the code-terminology bar, and three of them (`architect.md`, `qa-engineer.md`, `spec-reviewer.md`) contain explicit code-mode language that breaks the tax-prep read-through. The manifest also has no entry for what gets carved out of these files, so task 002 will not know to pick it up.
-
-The fix is bounded: edit three perspective files, add one section to the manifest. No design rework needed.
+**Pass.** All design §4 rollbacks applied verbatim. `drafter.md` reads naturally across writing / tax / research domains with no code vocabulary leak. `planner.md` enumerates `planner` + `drafter` and explains mode layering. `prd.md` mode pointer is one sentence, correctly placed, correct path. The eight untouched perspective files and `build-cycle.md` are byte-identical to aa7a43c. Implementer's sole flagged deviation (Architect→Drafter in Respect Role Boundaries) is sound and should stand.
 
 ## Strengths
 
-- The four in-scope files read cleanly for a non-code domain. Tax-prep, research, writing — all work. The neutral vocabulary (artifact / verification / recording changes) lands well.
-- `seed.md` rewrites are tight and preserve voice. "A trail that can be followed backward is a trail that can be debugged" keeps the original aphoristic feel.
-- `ralph.md` Roles section collapses cleanly to a one-paragraph principle pointing at base + mode directories — exactly the right shape for the task 002 loader to land on top of.
-- `planner.md` Common patterns replacement is well-judged: directs to the active mode without the base needing to know mode internals.
-- Manifest entries for the four edited files are precise — source text quoted verbatim, original location named, intent for the code mode explained. Task 002's architect can pick up sections 3, 4, and 5 without re-deriving the boundary.
-- The architect's catch on `framework/processes/build-cycle.md` (audit missed it) propagated correctly into manifest §2.
-- Self-host caveat is correctly flagged — `.ralph/` is stale, end-to-end verification waits for task 002. Implementer didn't waste time chasing untestable behavior.
-- Cross-reference integrity holds. No dangling pointers in the four edited files.
+- **Rollback fidelity is high.** Spot-checked all eleven seed.md rollbacks (lines 10, 12, 14, 16, 20, 22, 32, 40, 69, 71), the ralph.md rollback (line 33), and all seven prd.md rollbacks (lines 61, 67, 103, 105, 112, 113, 114). Every pre-aa7a43c phrase from design §4 is back: "run tests, check behavior," "code review," "Commit Discipline," "Atomic commits," "bisected," "file:line," "every file in the project," "refactor surrounding code," "Three similar lines of code," "build the thing, run the thing," "test framework isn't functioning," "Mocked unit tests ≠ working software," "API keys," "ANTHROPIC_API_KEY." Punch restored.
+- **Non-preserved lines correctly held back.** Design §4 explicitly flagged that prd.md line 63's "tests pass"/"actually works" phrasing should NOT be restored (code-mode sharpening goes to MODE.md); the implementer kept the neutral "looks right"/"actually works" wording. Same with Green Builds and Code Cleaning sections — not restored, correctly deferred to task 002.
+- **`drafter.md` reads cleanly.** Voice matches other perspective files (Read / How You Think / What You Produce / What You Avoid / When a Task Over-Prescribes), terse, no hedging. Grepped for `test`, `TDD`, `build`, `compile`, `codebase`, `bisect`, `API`, `file:line` — none present. "Executor" works as a neutral term across domains. Sketch-verification framing works for essay outlines, tax strategies, and research plans alike without naming any of them.
+- **Mode pointer placement is surgical.** One sentence at `framework/processes/prd.md:5`, directly after the "Any agent working on a PRD task follows these rules" preamble, before Pipeline Model. Correct target path `.ralph/modes/<mode>/MODE.md`.
+- **Planner role list is explicit.** `framework/perspectives/planner.md:14-20` names both base roles, explains that modes add more roles, tells the planner to read `MODE.md` when a mode is active, and covers the no-mode case. No directory scanning implied.
+- **Untouched invariant confirmed.** `git diff aa7a43c..HEAD -- framework/perspectives/{architect,qa-engineer,design-reviewer,spec-reviewer,implementer,code-cleaner,code-reviewer,explorer}.md framework/processes/build-cycle.md` returns empty.
+
+## Deviation Assessment
+
+**Architect→Drafter rename in seed.md Respect Role Boundaries (lines 52-59)**: sound, should stand.
+
+- Design §4 and §6 instructed leaving the section untouched, reasoning that "Architect" is broadly legible as an abstract noun.
+- Implementer's counter: in the v3 two-role base world, `architect` is exclusively a code-mode filename. Design §1's name rationale explicitly rejected "architect" as a base role name *because it's the existing code-mode file*. Canonicalizing "Architect" as the base "defines the solution space" role in base seed.md while simultaneously saying no such base role exists creates internal inconsistency: a non-code planner reading base seed would then look for `perspectives/architect.md` and find a code-flavored file.
+- The rename makes base self-consistent: base seed cites only roles that exist in base (`PRD author`, `Drafter`, `Implementer` — though `Implementer` here is a generic English noun for "whoever executes," which works across domains).
+- Judgment: the design's own §1 reasoning takes precedence over §4's "leave as-is" instruction on this specific section. The implementer spotted and resolved a design contradiction correctly.
 
 ## Issues
 
-### 1. Base perspective files were not edited (HIGH)
+None at blocking severity. Minor observations:
 
-The PRD task description states: "Perspectives that are already general (architect, planner, design-reviewer, spec-reviewer, qa-engineer) stay in the base but may need light edits to remove code-flavored language." The architect's design.md echoed this roster on line 32. The implementer only edited `planner.md` and never swept the other four.
+1. **[info]** `framework/seed.md:55` now says `**Drafter** defines the solution space: patterns, contracts, boundaries, tradeoffs.` The words "patterns, contracts, APIs" are code-leaning but retained from the original prose. Matches the rollback principle (code-flavored examples within a universal claim). Not a fix — flagging for awareness; "patterns, contracts, boundaries, tradeoffs" reads fine for a tax drafter too.
 
-Three of those four contain explicit code-mode language that fails the tax-prep read-through:
+2. **[info]** `framework/processes/prd.md:63` still says "**Implementer** (or whatever the active mode calls the execution role)". This is design-intended (task 002 may move to MODE.md); the parenthetical is a graceful base-level bridge. No action needed.
 
-**`framework/perspectives/architect.md`:**
-- Line 10: "Never form opinions about code you haven't read — cite file:line"
-- Line 39: "What systems/layers need testing? (unit, integration, e2e?)"
-- Line 41: "What would give confidence this actually works vs just compiles?"
-- Line 42: "Can the current test infrastructure exercise this code? If not, what's missing? Flag infrastructure gaps explicitly — the implementer cannot practice TDD if there is no way to run tests for the code they are writing."
-- Line 44: "Your verification thinking informs the implementer's TDD approach — they turn your strategy into concrete tests. You don't prescribe specific test cases or test frameworks."
-- Line 48: "Writing implementation code (pseudocode for tricky algorithms is fine)"
+3. **[info]** `framework/perspectives/planner.md:26` retains "exploration/investigation role the active mode provides" — implementer left this per design's judgment-call allowance. Reads fine in context.
 
-A tax-prep architect reading this is told to think about TDD, test frameworks, and "compiles" vs "works". This is not light leakage — it is the same class of code-mode content the implementer correctly removed from `prd.md`'s Verification Cascade.
+## Manifest Completeness
 
-**`framework/perspectives/qa-engineer.md`:**
-- Line 11: "Run the system as a user would — actual usage paths, not programmatic tests"
-- Line 20: "Automated tests prove the code does what the programmer intended. You prove it does what the human intended."
-- Line 22: "Programmatic tests follow defined paths — real usage is messier"
-- Line 24: "If something feels wrong to use even though tests pass, that's a real finding"
-- Line 29: "Re-reviewing code quality — that's the code-cleaner's job"
+Spot-checked §5 manifest against actual rollbacks — every content block removed from base has a destination:
 
-**`framework/perspectives/spec-reviewer.md`:**
-- Line 11: "Each criterion should read like a test assertion"
-- Line 15: "Can the result be tested?"
-- Line 26: "Code quality is the code reviewer's job"
+- Green Builds → MODE.md (not restored to base: correct).
+- Code Cleaning → MODE.md (not restored to base: correct).
+- TDD sharpening of Implementer/QA Engineer → MODE.md (base kept neutral "Operationalizes... concrete checks" and "looks right"/"actually works": correct).
+- AGENTS.md paragraph → MODE.md (not restored to base: correct).
+- Code-mode pipeline patterns from old planner.md → MODE.md (new planner doesn't list them: correct).
+- build-cycle.md → folded into MODE.md by task 002 (byte-identical now: correct).
+- Atomic commits: base restored the phrasing; MODE.md can skip or sharpen. Manifest acknowledges this.
 
-`design-reviewer.md` is clean — no code-specific terms found.
-
-These three files need the same generalization treatment the four in-scope files received. The "Boundaries" / "What You Avoid" sections that reference `code-cleaner` and `code reviewer` are particularly important to fix because they assume base-layer roles that won't exist outside the code mode.
-
-### 2. Manifest missing perspective-extraction entries (HIGH, blocks task 002)
-
-The extraction manifest has no section covering what gets carved out of `architect.md`, `qa-engineer.md`, and `spec-reviewer.md`. Once those files are generalized (per issue #1), the carved code-mode language needs to live somewhere — a code-mode addendum to each base perspective, or merged into the existing code-mode perspective files. Task 002's implementer needs to know this content was moved out and where to put it. Without manifest entries, this content is at risk of being silently dropped.
-
-The fix is to add a section 6 (or extend section 3) listing each carved block by source file:line, source text, and intended code-mode placement.
-
-### 3. Verification scope was too narrow (MEDIUM)
-
-The implementer's verification.md grep sweep was scoped only to the four edited files. The PRD-stated bar is that the *base layer* (not just those four files) reads naturally for any domain. The grep should have covered all files that remain in the base after this task — i.e., all base perspective files plus seed/ralph/prd. Re-running the grep at the wider scope would have caught issue #1 immediately.
-
-This is a process gap, not just a missed file. Calling it out so the redo iteration uses the right scope.
-
-### 4. Minor: `prd.md:22` "commit the PRD update" (LOW, acceptable)
-
-Verification flagged this as acceptable git-machinery language. I agree — the multi-agent coordination layer needs git, and "commit" here refers to the literal git operation that all modes share. Leave as-is. Noting only so the redo doesn't accidentally over-correct it.
+Sufficient for task 002 to land without re-deriving boundaries.
 
 ## Recommendation
 
-**Redo at the implementer step.** Specifically:
-
-1. Generalize `framework/perspectives/architect.md`, `qa-engineer.md`, `spec-reviewer.md` using the same vocabulary discipline (artifact / verification / recording) and the same "what survives in the base" judgment that the four in-scope files received. Particular attention to:
-   - architect.md's verification section (lines 38-44) — the TDD/test-framework specifics belong in the code mode; the base keeps "what boundaries need checking, what would give confidence."
-   - qa-engineer.md's "The Gap You Fill" section — generalize "automated tests" / "programmatic tests" / "code" to the verification-vs-actually-works framing already used in `prd.md`.
-   - spec-reviewer.md's Boundaries section — drop the `code reviewer` / `code-cleaner` references; replace with whatever the active mode's quality role is (or just omit, since spec-reviewer's own boundaries are clear enough without naming downstream roles).
-2. Add a manifest section covering the content carved from these three files, with source text and intended code-mode placement (likely as code-mode addenda or merges into existing code-mode perspectives).
-3. Re-run the grep sweep at the wider base-layer scope (all files that remain in the base after this task, not just the four originally listed).
-
-The four already-edited files do not need re-work. The architect's design and the implementer's manifest mechanics are sound — this is a scope-of-execution fix, not a design-rework fix.
+**Complete task 001.** Mark `design-reviewer` step and task 001 top-level status to `"complete"`. Task 002 has a clean handoff.
