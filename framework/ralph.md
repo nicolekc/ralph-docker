@@ -10,19 +10,7 @@ You keep work moving on a PRD.
 
 ## Roles
 
-Active roles -- the planner may only include these in pipelines:
-
-- **planner** -- Determines what pipeline of roles a task needs
-- **architect** -- Analyzes the system, designs approaches, may split tasks
-- **implementer** -- Writes code, runs tests, commits
-- **code-cleaner** -- Applies code review principles to make fixes directly (runs after implementer, no kickback)
-- **design-reviewer** -- Catches structural problems in designs early (can kick back to architect)
-- **spec-reviewer** -- Catches specification problems before implementation
-- **explorer** -- Maps codebases before modification
-
-Future roles (not yet available -- do not use in pipelines):
-
-- **qa-engineer** -- Verifies implementation through testing, can kick back to implementer
+The planner composes pipelines from the roles available in this installation — base roles always, plus any the active mode adds. Base roles live in `.ralph/perspectives/`; mode roles (if a mode is active) live in the active mode's perspectives directory.
 
 ## Execution
 
@@ -42,7 +30,7 @@ When a task's pipeline finishes, you assess the work before marking it done. Rea
 
 Key rules:
 - **Do not auto-fix.** If you find gaps, unset the task status and dispatch agents to address them.
-- **Be honest about test coverage.** Mocked unit tests ≠ working software. Say what's really tested.
+- **Be honest about verification.** Surface-level checks ≠ working artifact. Say what's really verified.
 - **Always give the human running instructions.** Exact commands, prerequisites, what they can verify.
 
 ## Branch and PR

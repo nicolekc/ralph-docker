@@ -11,7 +11,7 @@ Every task has a `pipeline` — an ordered array of steps. Each step has a `role
   {"role": "plan", "status": "complete"},
   {"role": "architect", "status": "complete"},
   {"role": "implementer", "status": "in_progress"},
-  {"role": "code-cleaner", "status": "pending"}
+  {"role": "qa-engineer", "status": "pending"}
 ]
 ```
 
@@ -56,13 +56,13 @@ Each role thinks about verification at its level of abstraction and **writes it 
 
 **Planner** — Decides if the task needs QA review. High-level or high-risk tasks should include `qa-engineer` in the pipeline.
 
-**Architect** — Includes verification strategy in the architecture: what systems and boundaries need testing, what would give confidence this works. Does not specify exact test cases — that's the implementer's job.
+**Architect** — Includes verification strategy in the architecture: what boundaries need checking, what would give confidence this works. Does not specify exact checks — that's the implementer's job.
 
-**Implementer** — Practices TDD. Writes tests that verify outcomes before writing implementation code.
+**Implementer** (or whatever the active mode calls the execution role) — Operationalizes the architect's verification strategy: designs the concrete checks that prove outcomes before producing the artifact.
 
-**QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "tests pass" and "it actually works" is large.
+**QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "looks right" and "actually works" is large.
 
-The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's test design. The implementer's tests are the concrete realization of the architect's strategy.
+The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's approach. The implementer's verification work is the concrete realization of the architect's strategy.
 
 ## Durable Context
 
@@ -83,14 +83,6 @@ You may not:
 - Modify completed tasks.
 - Change another task's pipeline.
 
-## Green Builds
-
-Every task that changes code must leave all tests passing. Red builds are broken windows — they multiply quickly. Don't assume a failing test isn't yours. If tests fail when you're done, fix them before marking your step complete.
-
-## Code Cleaning
-
-The code-cleaner applies fixes directly — it doesn't kick back to the implementer. It commits corrections for correctness issues, simplifies unnecessary complexity, and aligns with project patterns. One pass, no rounds.
-
 ## Signoff Gates
 
 A PRD may have a `signoff` field that limits how far pipelines are walked:
@@ -106,18 +98,18 @@ When a task's pipeline finishes (all steps complete), the orchestrator **assesse
 
 ### What to assess
 
-1. **Test coverage honesty** — Are the tests testing real behavior, or just mocking everything? Unit tests with fully mocked dependencies prove the code compiles, not that it works. Note the gap clearly.
-2. **Functionality gaps** — Does the implementation actually fulfill the task outcome and verification criteria? Read the task description again and compare to what was built.
-3. **Runnability** — Can the human actually run and test what was built? What commands, what prerequisites (API keys, data, services)?
+1. **Verification honesty** — Do the checks exercise real behavior, or just go through the motions? Surface-level verification proves the artifact exists, not that it works. Note the gap clearly.
+2. **Functionality gaps** — Does the work actually fulfill the task outcome and verification criteria? Read the task description again and compare to what was built.
+3. **Runnability** — Can the human actually exercise what was produced? What steps, what prerequisites (required inputs, credentials, services)?
 
 ### What to produce
 
 After the last pipeline step completes, the orchestrator writes a **handoff summary** to the human:
 
 - **What was built** — Brief, concrete list of what's new or changed.
-- **How to test it** — Exact commands, URLs, or steps. Include prerequisites (e.g., "requires ANTHROPIC_API_KEY"). If setup instructions changed, say so.
-- **Known gaps** — What ISN'T tested, what might not work, what requires real API keys to validate. Be honest, not optimistic.
-- **Confidence level** — "Works end-to-end" vs. "unit tests pass but never run against real APIs" vs. "scaffolding only."
+- **How to exercise it** — Exact steps. Include prerequisites (required inputs, credentials, services). If setup instructions changed, say so.
+- **Known gaps** — What ISN'T verified, what might not work, what requires real-world inputs to validate. Be honest, not optimistic.
+- **Confidence level** — "Works end-to-end" vs. "passes in isolation but never run against real inputs" vs. "scaffolding only."
 
 ### If gaps are found
 
