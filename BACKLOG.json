@@ -43,7 +43,7 @@
       "priority": "high",
       "description": "Add the PRD authoring principle ('you are NOT the architect — define the problem space richly') to seed.md as a working principle. Currently only in PRD_REFINE.md which is a review-time check, but the principle governs all task writing.",
       "why": "Agents writing PRD tasks without this principle consistently over-prescribed implementation details (specific classes, data structures, file layouts), leaving architects with nothing to decide. The principle needs to be internalized before writing, not just caught during review.",
-      "source": "Orchestrator CLAUDE.md, PRD Authoring section; ralph-context/prds/PRD_REFINE.md",
+      "source": "Orchestrator CLAUDE.md, PRD Authoring section; prds/PRD_REFINE.md",
       "example_content": "When writing PRD tasks, you are NOT the architect. Your job is to define the problem space richly enough that the architect has real decisions to make. Never prescribe patterns, classes, data structures, file layouts, or communication protocols in task descriptions.\n\nTest every task you write: Would an architect reading this have genuine architectural decisions to make? If not, you've either under-visioned (too thin) or over-prescribed (did their job)."
     },
     {

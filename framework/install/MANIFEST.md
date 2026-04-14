@@ -125,7 +125,7 @@ Explicitly excluded from the install, for reference:
 - `framework/` itself (the user gets `.orca/`, a derived copy)
 - `framework/install/MANIFEST.md` (this file — consulted at install time, not copied)
 - `INSTALL.md` (the runbook Claude reads — not copied into user projects)
-- `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, `progress.txt`, this repo's `orca-context/`
+- `docs/`, top-level `CLAUDE.md`, `BACKLOG.json`, `README.md`, `WHY.md`, this repo's `orca-context/`, this repo's `prds/` (the /refine skill reads `prds/PRD_REFINE.md` only when run from the source repo)
 - Docker infrastructure: `Dockerfile`, `orca-*.sh` (`start`, `attach`, `clone`, `reset`, `loop`, `once`), `ORCA_PROMPT.md`, `node_modules/`
 
 ---
