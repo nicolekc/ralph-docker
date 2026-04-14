@@ -2,7 +2,7 @@
 
 These principles apply to all work, regardless of role or context.
 
-**Framework navigation**: Pick a perspective from `.ralph/perspectives/` that fits your task. When working on PRD tasks, also read `.ralph/processes/prd.md`.
+**Framework navigation**: Pick a perspective from `.orca/perspectives/` that fits your task. When working on PRD tasks, also read `.orca/processes/prd.md`.
 
 ## Own the Quality Loop
 
@@ -43,6 +43,10 @@ Three similar lines of code is better than a premature abstraction.
 
 Work until done. Don't ask for permission, confirmation, or selection between options. Stop only when: (1) done, (2) truly blocked on something unsolvable, (3) a human asks. No "present 3 options." No "you MUST ask the user."
 
+## Questions (when enabled)
+
+Some PRDs allow you to ask a clarifying question instead of guessing when you hit genuine ambiguity — intent, requirements, or a judgment call that really needs the human. When the dispatch prompt tells you questions are enabled, use them sparingly: only when you've tried to resolve the ambiguity from context and can't, and only when the cost of guessing wrong is larger than the cost of waiting. If questions aren't enabled, make the best call you can or mark the task blocked after 3 attempts.
+
 ## Proportionality
 
 Match effort to complexity. A rename doesn't need an architect. A system redesign doesn't get a one-line approach. You decide what's proportionate — this is judgment, not a checklist.
@@ -51,20 +55,18 @@ Match effort to complexity. A rename doesn't need an architect. A system redesig
 
 Three roles, three jobs:
 - **PRD author** defines the problem space: what the system needs to do, why, what success looks like, and what constraints matter. Never prescribes HOW to build it.
-- **Architect** defines the solution space: patterns, contracts, boundaries, tradeoffs. This is where the "how" gets decided.
-- **Implementer** fills in the details within the architect's framework.
+- **Drafter** defines the solution space: patterns, contracts, boundaries, tradeoffs. This is where the "how" gets decided.
+- **Implementer** fills in the details within the drafter's framework.
 
-When a task description prescribes specific patterns, data structures, APIs, or file layouts, the PRD author has done the architect's job. The architect then has nothing meaningful to decide, and the result is worse than if the architect had started from the problem.
+When a task description prescribes specific patterns, data structures, APIs, or file layouts, the PRD author has done the drafter's job. The drafter then has nothing meaningful to decide, and the result is worse than if the drafter had started from the problem.
 
-If you're authoring a PRD task and you catch yourself writing implementation specifics — stop. Describe the problem harder instead. What are the constraints? What are the competing concerns? What does the system need to be true? That's what gives the architect real work to do.
+If you're authoring a PRD task and you catch yourself writing implementation specifics — stop. Describe the problem harder instead. What are the constraints? What are the competing concerns? What does the system need to be true? That's what gives the drafter real work to do.
 
 ## Shared Context
 
 Task directories accumulate naturally. Read what's there. Write what the next agent needs. No prescribed formats — the content matters, not the shape.
 
 Write concisely, but never sacrifice clarity for brevity. If removing a sentence means the next agent misunderstands, keep it. Describing what to accomplish is often better than exact commands to run. Conceptual instructions can adapt to curveballs easier than exact commands.
-
-AGENTS.md files in code directories are short orientation (2-5 lines): what this directory is, what it's not. They may grow only for gotchas and hard-won learnings — things that would save the next agent from a trap. If you hit a non-obvious problem in a directory, encode the lesson in its AGENTS.md. Don't pre-fill them with architecture or file listings.
 
 ## Verification Rigor
 

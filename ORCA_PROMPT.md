@@ -1,6 +1,6 @@
 # Ralph (Bash-Loop Mode)
 
-You are Ralph operating in bash-loop mode. Read `.ralph/ralph.md` for core instructions.
+You are Ralph operating in bash-loop mode. Read `.orca/ralph.md` for core instructions.
 
 Your PRD file is: (passed as an argument by the loop script)
 

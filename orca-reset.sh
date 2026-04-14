@@ -1,18 +1,18 @@
 #!/bin/bash
-# ralph-reset.sh - Remove a Ralph container to start fresh
-# Usage: ralph-reset.sh <container-name>
-# 
-# SAFE: This only removes the container, NOT your project files:
-#   - ralph-start.sh projects: Files are on your Mac (mounted)
-#   - ralph-clone.sh projects: Files are in Docker volume (preserved)
+# orca-reset.sh - Remove an Orca container to start fresh
+# Usage: orca-reset.sh <container-name>
 #
-# To also delete the volume (rare): docker volume rm ralph-vol-<repo-name>
+# SAFE: This only removes the container, NOT your project files:
+#   - orca-start.sh projects: Files are on your Mac (mounted)
+#   - orca-clone.sh projects: Files are in Docker volume (preserved)
+#
+# To also delete the volume (rare): docker volume rm orca-vol-<repo-name>
 
 if [ -z "$1" ]; then
-    echo "Usage: ralph-reset.sh <container-name>"
+    echo "Usage: orca-reset.sh <container-name>"
     echo ""
     echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
+    docker ps -a --format '{{.Names}}' | grep "^orca-" || echo "  (none found)"
     exit 1
 fi
 
@@ -23,7 +23,7 @@ if ! docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
     echo "❌ Container '$CONTAINER_NAME' not found"
     echo ""
     echo "Your containers:"
-    docker ps -a --format '{{.Names}}' | grep "^ralph-" || echo "  (none found)"
+    docker ps -a --format '{{.Names}}' | grep "^orca-" || echo "  (none found)"
     exit 1
 fi
 
@@ -35,7 +35,7 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker rm -f "$CONTAINER_NAME"
     echo "✅ Container removed"
-    echo "   Run ralph-start.sh or ralph-clone.sh to recreate"
+    echo "   Run orca-start.sh or orca-clone.sh to recreate"
 else
     echo "Cancelled"
 fi

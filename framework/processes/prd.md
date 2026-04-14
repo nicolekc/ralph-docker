@@ -2,7 +2,7 @@
 
 Any agent working on a PRD task follows these rules.
 
-If the PRD declares a `mode` field, also read `.ralph/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
+If the PRD declares a `mode` field, also read `.orca/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
 
 ## Pipeline Model
 
@@ -57,7 +57,7 @@ When splitting:
 - Add sub-tasks to the PRD: `003` becomes `003a`, `003b`, `003c`.
 - Mark the parent `"status": "split"`.
 - Each child starts with an empty pipeline — it enters from planning like any other task.
-- Create a folder per sub-task in `ralph-context/tasks/<prd-name>/` with enough context that the sub-task is self-sufficient.
+- Create a folder per sub-task in `orca-context/tasks/<prd-name>/` with enough context that the sub-task is self-sufficient.
 
 ## Verification Cascade
 
@@ -75,7 +75,7 @@ The key: verification thinking flows DOWN the pipeline, getting more concrete at
 
 ## Durable Context
 
-Each task gets a folder at `ralph-context/tasks/<prd-name>/<task-id>/`. **Before starting your step, read what prior roles left there.** Write what the next role needs. No prescribed format.
+Each task gets a folder at `orca-context/tasks/<prd-name>/<task-id>/`. **Before starting your step, read what prior roles left there.** Write what the next role needs. No prescribed format.
 
 The most important handoff: the architect's design notes inform the implementer's approach — including verification thinking embedded in the architecture. If you're the implementer and there's no context folder, you're either the first role or something went wrong — check the pipeline.
 
@@ -85,7 +85,7 @@ The PRD may declare `"questions": true` at the top level to enable a non-blockin
 
 When enabled and you hit genuine ambiguity about intent or requirements that you cannot resolve from context:
 
-- Write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index. One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete default the human can accept with a one-word answer.
+- Write a freeform markdown file at `orca-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index. One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete default the human can accept with a one-word answer.
 - Set your pipeline step's status to `needs_input`, commit, and push. Do not complete the step.
 
 Ralph parks the step and keeps dispatching other work. When nothing else is dispatchable, it surfaces all unanswered questions to the human in one batch and appends each answer to its file under a divider:

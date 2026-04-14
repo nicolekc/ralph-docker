@@ -1,6 +1,6 @@
 #!/bin/bash
-# ralph-start.sh - Start Ralph container with local project mounted
-# Usage: ralph-start.sh [--fresh] /path/to/project [container-name]
+# orca-start.sh - Start Orca container with local project mounted
+# Usage: orca-start.sh [--fresh] /path/to/project [container-name]
 #   --fresh    Remove existing container and create new one
 #
 # Note: node_modules uses a separate Docker volume because Mac and Linux
@@ -29,9 +29,9 @@ FOLDER_NAME=$(basename "$PROJECT_PATH")
 if [ -z "$FOLDER_NAME" ] || [ "$FOLDER_NAME" = "/" ]; then
     FOLDER_NAME="project"
 fi
-CONTAINER_NAME="${2:-ralph-$FOLDER_NAME}"
+CONTAINER_NAME="${2:-orca-$FOLDER_NAME}"
 
-echo "🚀 Ralph Container: $CONTAINER_NAME"
+echo "🚀 Orca Container: $CONTAINER_NAME"
 echo "📁 Project: $PROJECT_PATH"
 
 # Handle --fresh: remove existing container
@@ -58,7 +58,7 @@ else
         --cpus="4" \
         -v "$PROJECT_PATH:/workspace" \
         -v "${CONTAINER_NAME}_node_modules:/workspace/node_modules" \
-        ralph-claude:latest \
+        orca-claude:latest \
         bash
     # Docker run options explained:
     #   --name              Container name (for resuming later)

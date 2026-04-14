@@ -1,6 +1,6 @@
 #!/bin/bash
-# ralph-clone.sh - Start Ralph with repo cloned into Docker volume
-# Usage: ralph-clone.sh <github-repo-url> [--session <name>]
+# orca-clone.sh - Start Orca with repo cloned into Docker volume
+# Usage: orca-clone.sh <github-repo-url> [--session <name>]
 #
 # --session <name>   Run a parallel session against the same repo.
 #                    Each session gets its own container and Docker volume
@@ -23,7 +23,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         -h|--help)
-            echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
+            echo "Usage: orca-clone.sh <github-repo-url> [--session <name>]"
             exit 0
             ;;
         *)
@@ -31,7 +31,7 @@ while [ $# -gt 0 ]; do
                 REPO_URL="$1"
             else
                 echo "❌ Unexpected argument: $1"
-                echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
+                echo "Usage: orca-clone.sh <github-repo-url> [--session <name>]"
                 exit 1
             fi
             shift
@@ -40,9 +40,9 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$REPO_URL" ]; then
-    echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
-    echo "Example: ralph-clone.sh https://github.com/user/repo.git"
-    echo "Example: ralph-clone.sh https://github.com/user/repo.git --session prdb"
+    echo "Usage: orca-clone.sh <github-repo-url> [--session <name>]"
+    echo "Example: orca-clone.sh https://github.com/user/repo.git"
+    echo "Example: orca-clone.sh https://github.com/user/repo.git --session prdb"
     exit 1
 fi
 
@@ -50,14 +50,14 @@ fi
 REPO_NAME=$(basename "$REPO_URL" .git)
 
 if [ -n "$SESSION" ]; then
-    CONTAINER_NAME="ralph-${REPO_NAME}-${SESSION}"
-    VOLUME_NAME="ralph-vol-${REPO_NAME}-${SESSION}"
+    CONTAINER_NAME="orca-${REPO_NAME}-${SESSION}"
+    VOLUME_NAME="orca-vol-${REPO_NAME}-${SESSION}"
 else
-    CONTAINER_NAME="ralph-${REPO_NAME}"
-    VOLUME_NAME="ralph-vol-${REPO_NAME}"
+    CONTAINER_NAME="orca-${REPO_NAME}"
+    VOLUME_NAME="orca-vol-${REPO_NAME}"
 fi
 
-echo "🚀 Ralph Container: $CONTAINER_NAME"
+echo "🚀 Orca Container: $CONTAINER_NAME"
 echo "📦 Volume: $VOLUME_NAME"
 
 # Create Docker volume if it doesn't exist (persists data between container recreations)
@@ -91,7 +91,7 @@ else
         -e "GIT_COMMITTER_NAME=claude-bot" \
         -e "GIT_COMMITTER_EMAIL=claude-bot@users.noreply.github.com" \
         -e "REPO_URL=$REPO_URL" \
-        ralph-claude:latest \
+        orca-claude:latest \
         bash -c '
             if [ ! -d ".git" ]; then
                 echo "📥 Cloning repository..."

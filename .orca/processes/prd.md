@@ -2,6 +2,8 @@
 
 Any agent working on a PRD task follows these rules.
 
+If the PRD declares a `mode` field, also read `.orca/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
+
 ## Pipeline Model
 
 Every task has a `pipeline` — an ordered array of steps. Each step has a `role` and a `status`. The pipeline is populated by the **planner** role as the first thing that happens to any task.
@@ -11,7 +13,7 @@ Every task has a `pipeline` — an ordered array of steps. Each step has a `role
   {"role": "plan", "status": "complete"},
   {"role": "architect", "status": "complete"},
   {"role": "implementer", "status": "in_progress"},
-  {"role": "code-cleaner", "status": "pending"}
+  {"role": "qa-engineer", "status": "pending"}
 ]
 ```
 
@@ -22,6 +24,13 @@ The human wrote the task. The planner wrote the pipeline. You work the next pend
 When you pick up a task, find the first step with `"status": "pending"`, confirm it matches your role, and do the work. When done, set your step to `"complete"`, commit the PRD update, and push.
 
 If your role isn't the next pending step, pick a different task.
+
+### Step Statuses
+
+- **pending** — not started, next in line.
+- **in_progress** — currently being worked.
+- **complete** — done.
+- **needs_input** — set by the worker when it hits ambiguity it can't resolve from context and the PRD enables questions (see "Questions" below). The step is parked until a human answers; then Ralph flips it back to `pending`. Does not count toward the 3-attempt limit. A task cannot be `complete` while any of its steps are `needs_input`.
 
 ### Planning
 
@@ -48,7 +57,7 @@ When splitting:
 - Add sub-tasks to the PRD: `003` becomes `003a`, `003b`, `003c`.
 - Mark the parent `"status": "split"`.
 - Each child starts with an empty pipeline — it enters from planning like any other task.
-- Create a folder per sub-task in `ralph-context/tasks/<prd-name>/` with enough context that the sub-task is self-sufficient.
+- Create a folder per sub-task in `orca-context/tasks/<prd-name>/` with enough context that the sub-task is self-sufficient.
 
 ## Verification Cascade
 
@@ -58,17 +67,40 @@ Each role thinks about verification at its level of abstraction and **writes it 
 
 **Architect** — Includes verification strategy in the architecture: what systems and boundaries need testing, what would give confidence this works. Does not specify exact test cases — that's the implementer's job.
 
-**Implementer** — Practices TDD. Writes tests that verify outcomes before writing implementation code.
+**Implementer** (or whatever the active mode calls the execution role) — Operationalizes the architect's verification strategy: designs the concrete checks that prove outcomes before producing the artifact.
 
-**QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "tests pass" and "it actually works" is large.
+**QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "looks right" and "actually works" is large.
 
 The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's test design. The implementer's tests are the concrete realization of the architect's strategy.
 
 ## Durable Context
 
-Each task gets a folder at `ralph-context/tasks/<prd-name>/<task-id>/`. **Before starting your step, read what prior roles left there.** Write what the next role needs. No prescribed format.
+Each task gets a folder at `orca-context/tasks/<prd-name>/<task-id>/`. **Before starting your step, read what prior roles left there.** Write what the next role needs. No prescribed format.
 
 The most important handoff: the architect's design notes inform the implementer's approach — including verification thinking embedded in the architecture. If you're the implementer and there's no context folder, you're either the first role or something went wrong — check the pipeline.
+
+## Questions
+
+The PRD may declare `"questions": true` at the top level to enable a non-blocking question mechanism. Default is off.
+
+When enabled and you hit genuine ambiguity about intent or requirements that you cannot resolve from context:
+
+- Write a freeform markdown file at `orca-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index. One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete default the human can accept with a one-word answer.
+- Set your pipeline step's status to `needs_input`, commit, and push. Do not complete the step.
+
+Ralph parks the step and keeps dispatching other work. When nothing else is dispatchable, it surfaces all unanswered questions to the human in one batch and appends each answer to its file under a divider:
+
+```markdown
+---
+
+## Answer
+
+<human's response>
+```
+
+Your step is flipped back to `pending` and re-dispatched. On resume, read `questions/` — the file you wrote now has the answer.
+
+Use this sparingly: only when you've tried to resolve from context and the cost of guessing wrong exceeds the cost of waiting.
 
 ## Modifying the PRD
 
@@ -82,14 +114,6 @@ You may not:
 - Delete tasks.
 - Modify completed tasks.
 - Change another task's pipeline.
-
-## Green Builds
-
-Every task that changes code must leave all tests passing. Red builds are broken windows — they multiply quickly. Don't assume a failing test isn't yours. If tests fail when you're done, fix them before marking your step complete.
-
-## Code Cleaning
-
-The code-cleaner applies fixes directly — it doesn't kick back to the implementer. It commits corrections for correctness issues, simplifies unnecessary complexity, and aligns with project patterns. One pass, no rounds.
 
 ## Signoff Gates
 
@@ -106,8 +130,8 @@ When a task's pipeline finishes (all steps complete), the orchestrator **assesse
 
 ### What to assess
 
-1. **Test coverage honesty** — Are the tests testing real behavior, or just mocking everything? Unit tests with fully mocked dependencies prove the code compiles, not that it works. Note the gap clearly.
-2. **Functionality gaps** — Does the implementation actually fulfill the task outcome and verification criteria? Read the task description again and compare to what was built.
+1. **Verification honesty** — Are the tests testing real behavior, or just mocking everything? Unit tests with fully mocked dependencies prove the code compiles, not that it works. Note the gap clearly.
+2. **Functionality gaps** — Does the work actually fulfill the task outcome and verification criteria? Read the task description again and compare to what was built.
 3. **Runnability** — Can the human actually run and test what was built? What commands, what prerequisites (API keys, data, services)?
 
 ### What to produce

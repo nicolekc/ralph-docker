@@ -1,16 +1,16 @@
 #!/bin/bash
-# ralph-once.sh - Run a single Ralph iteration (for testing)
-# Usage: ./ralph-once.sh <prd-file> [prompt-file]
+# orca-once.sh - Run a single Ralph iteration (for testing)
+# Usage: ./orca-once.sh <prd-file> [prompt-file]
 # Run this INSIDE the container, in /workspace
 
 PRD_FILE="${1:-}"
-PROMPT_FILE="${2:-RALPH_PROMPT.md}"
+PROMPT_FILE="${2:-ORCA_PROMPT.md}"
 
 # PRD file is required
 if [ -z "$PRD_FILE" ]; then
     echo "❌ Error: PRD file required"
-    echo "Usage: ./ralph-once.sh <prd-file> [prompt-file]"
-    echo "Example: ./ralph-once.sh prds/001_test_infrastructure.json"
+    echo "Usage: ./orca-once.sh <prd-file> [prompt-file]"
+    echo "Example: ./orca-once.sh prds/001_test_infrastructure.json"
     exit 1
 fi
 

@@ -5,6 +5,6 @@ description: Supervise PRD execution by dispatching subagents to work through ta
 
 # Ralph
 
-You are now operating as Ralph. Read `.ralph/ralph.md` for your full instructions.
+You are now operating as Ralph. Read `.orca/ralph.md` for your full instructions.
 
 Your PRD file is: $ARGUMENTS

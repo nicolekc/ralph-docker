@@ -5,24 +5,12 @@ You keep work moving on a PRD.
 ## Startup
 
 1. Read CLAUDE.md.
-2. Read the PRD file and the PRD process (`.ralph/processes/prd.md`).
+2. Read the PRD file and the PRD process (`.orca/processes/prd.md`).
 3. **Before every dispatch decision**, re-read the PRD file. Pipeline statuses are your source of truth — not your memory, not compacted summaries.
 
 ## Roles
 
-Active roles -- the planner may only include these in pipelines:
-
-- **planner** -- Determines what pipeline of roles a task needs
-- **architect** -- Analyzes the system, designs approaches, may split tasks
-- **implementer** -- Writes code, runs tests, commits
-- **code-cleaner** -- Applies code review principles to make fixes directly (runs after implementer, no kickback)
-- **design-reviewer** -- Catches structural problems in designs early (can kick back to architect)
-- **spec-reviewer** -- Catches specification problems before implementation
-- **explorer** -- Maps codebases before modification
-
-Future roles (not yet available -- do not use in pipelines):
-
-- **qa-engineer** -- Verifies implementation through testing, can kick back to implementer
+The planner composes pipelines from the roles available in this installation — base roles always, plus any the active mode adds. Base roles live in `.orca/perspectives/`; mode roles (if a mode is active) live in the active mode's perspectives directory.
 
 ## Execution
 
@@ -36,9 +24,17 @@ These invariants apply regardless of execution mode:
 
 Each worker self-orients by matching their assignment to the document chain: CLAUDE.md → perspective → PRD → task context. Intelligent handoffs are a bonus, but be careful not to give over-explained instructions that may conflict with self-orientation.
 
+## Questions (when enabled)
+
+A PRD may declare `"questions": true` at the top level. When true, include a short paragraph in every dispatch prompt telling the subagent that if it hits genuine ambiguity it cannot resolve from context, it may write a freeform markdown file at `orca-context/tasks/<prd-name>/<task-id>/questions/NNN.md` (next free 3-digit index), set its pipeline step status to `needs_input`, push, and return. When the flag is absent or false, do not inject that paragraph.
+
+`needs_input` is a step status (see `.orca/processes/prd.md`). Treat it as not-dispatchable for the purpose of "is there dispatchable work?", but unlike `blocked` it will become dispatchable again. **It does not count toward the 3-attempt limit.**
+
+When no step is dispatchable and at least one step is `needs_input`, read every unanswered `questions/NNN.md` file (unanswered = no `## Answer` section) and present them to the human in one batch, verbatim, with a header identifying task and role. When the human replies, append each answer to its file under a `---\n## Answer\n` divider, flip the matching steps from `needs_input` back to `pending`, commit, and resume. Partial answers are fine — unanswered files stay `needs_input` for the next round.
+
 ## Task Completion Assessment
 
-When a task's pipeline finishes, you assess the work before marking it done. Read the "Completion Assessment" section in `.ralph/processes/prd.md` — this is mandatory, not optional.
+When a task's pipeline finishes, you assess the work before marking it done. Read the "Completion Assessment" section in `.orca/processes/prd.md` — this is mandatory, not optional.
 
 Key rules:
 - **Do not auto-fix.** If you find gaps, unset the task status and dispatch agents to address them.

@@ -155,9 +155,9 @@ copy_framework_dir() {
 echo "Installing Ralph framework to $TARGET_DIR..."
 echo ""
 
-# --- 1. Framework core: framework/ -> .ralph/ ---
+# --- 1. Framework core: framework/ -> .orca/ ---
 
-copy_framework_dir "$RALPH_DIR/framework" "$TARGET_DIR/.ralph" ".ralph/ (framework core)"
+copy_framework_dir "$RALPH_DIR/framework" "$TARGET_DIR/.orca" ".orca/ (framework core)"
 
 # --- 2. Skills ---
 
@@ -176,16 +176,16 @@ copy_framework_file \
     "$TARGET_DIR/.claude/skills/refine/SKILL.md" \
     ".claude/skills/refine/ (PRD refinement)"
 
-# --- 3. ralph-context/ scaffold ---
+# --- 3. orca-context/ scaffold ---
 
-if [ ! -d "$TARGET_DIR/ralph-context" ]; then
+if [ ! -d "$TARGET_DIR/orca-context" ]; then
     for subdir in overrides knowledge prds designs tasks; do
-        mkdir -p "$TARGET_DIR/ralph-context/$subdir"
-        touch "$TARGET_DIR/ralph-context/$subdir/.gitkeep"
+        mkdir -p "$TARGET_DIR/orca-context/$subdir"
+        touch "$TARGET_DIR/orca-context/$subdir/.gitkeep"
     done
-    CREATED+=("ralph-context/ (project context)")
+    CREATED+=("orca-context/ (project context)")
 else
-    UNCHANGED+=("ralph-context/")
+    UNCHANGED+=("orca-context/")
 fi
 
 # --- 4. CLAUDE.md (user file -- create only) ---
@@ -219,9 +219,6 @@ fi
 # --- 7. .gitignore additions ---
 
 GITIGNORE_ENTRIES=(
-    ".ralph-tasks/*/debug-*"
-    ".ralph-tasks/*/scratch-*"
-    "ralph-logs/"
 )
 
 if [ ! -f "$TARGET_DIR/.gitignore" ]; then
@@ -257,21 +254,21 @@ fi
 
 if $BASH_LOOP; then
     copy_framework_file \
-        "$RALPH_DIR/RALPH_PROMPT.md" \
-        "$TARGET_DIR/RALPH_PROMPT.md" \
-        "RALPH_PROMPT.md (bash-loop mode)"
+        "$RALPH_DIR/ORCA_PROMPT.md" \
+        "$TARGET_DIR/ORCA_PROMPT.md" \
+        "ORCA_PROMPT.md (bash-loop mode)"
 
     copy_framework_file \
-        "$RALPH_DIR/ralph-loop.sh" \
-        "$TARGET_DIR/ralph-loop.sh" \
-        "ralph-loop.sh (bash-loop mode)"
+        "$RALPH_DIR/orca-loop.sh" \
+        "$TARGET_DIR/orca-loop.sh" \
+        "orca-loop.sh (bash-loop mode)"
 
     copy_framework_file \
-        "$RALPH_DIR/ralph-once.sh" \
-        "$TARGET_DIR/ralph-once.sh" \
-        "ralph-once.sh (bash-loop mode)"
+        "$RALPH_DIR/orca-once.sh" \
+        "$TARGET_DIR/orca-once.sh" \
+        "orca-once.sh (bash-loop mode)"
 
-    chmod +x "$TARGET_DIR/ralph-loop.sh" "$TARGET_DIR/ralph-once.sh"
+    chmod +x "$TARGET_DIR/orca-loop.sh" "$TARGET_DIR/orca-once.sh"
 fi
 
 # --- Summary ---

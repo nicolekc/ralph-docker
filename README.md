@@ -9,14 +9,16 @@ See [WHY.md](WHY.md) for the motivation and design philosophy.
 ### Install into your project
 
 ```bash
-git clone https://github.com/nicolekc/ralph-docker.git ~/ralph
-~/ralph/install.sh ~/projects/my-app
+git clone https://github.com/nicolekc/ralph-docker.git ~/orca
+~/orca/install.sh ~/projects/my-app
 ```
 
+> Note: the GitHub repo is still named `ralph-docker` at the moment — the infrastructure has been renamed `orca` in-repo and the clone URL will follow in a later change.
+
 This installs:
-- `.ralph/` — Framework core (perspectives, processes, seed, templates)
+- `.orca/` — Framework core (perspectives, processes, seed, templates)
 - `.claude/skills/` — `/ralph`, `/discover`, `/refine` skills
-- `ralph-context/` — Scaffold for project-specific context
+- `orca-context/` — Scaffold for project-specific context
 - `CLAUDE.md` — Project context file (populate with `/discover`)
 - `.claudeignore`, `.git-hooks/pre-push`, `.gitignore` additions
 
@@ -36,15 +38,15 @@ Write a PRD or have Claude help you create one:
 
 ```
 Create a PRD for [describe your feature].
-Save it to ralph-context/prds/001-feature-name.json
+Save it to orca-context/prds/001-feature-name.json
 ```
 
-Refine it with `/refine ralph-context/prds/001-feature-name.json`.
+Refine it with `/refine orca-context/prds/001-feature-name.json`.
 
 ### Run Ralph
 
 ```
-/ralph ralph-context/prds/001-feature-name.json
+/ralph orca-context/prds/001-feature-name.json
 ```
 
 Ralph reads the PRD, dispatches subagents to work through task pipelines, and pushes when done. Each task flows through a pipeline of perspectives (planner, architect, implementer, code-cleaner, etc.) — each one a subagent with clean context.
@@ -74,7 +76,7 @@ The planner decides which perspectives a task needs. The orchestrator walks the 
 
 ### Perspectives
 
-Different lenses on the same work. Each perspective reads `.ralph/perspectives/<name>.md` for its instructions:
+Different lenses on the same work. Each perspective reads `.orca/perspectives/<name>.md` for its instructions:
 
 | Perspective | What it does |
 |-------------|--------------|
@@ -109,11 +111,11 @@ PRDs define tasks with outcomes and verification — not step-by-step instructio
 }
 ```
 
-See `.ralph/templates/prd.json` for the template.
+See `.orca/templates/prd.json` for the template.
 
 ### Durable Context
 
-Each task can accumulate context in `ralph-context/tasks/<prd-name>/<task-id>/`. Research notes, design decisions, investigation results — anything the next perspective needs. This is how knowledge persists across the pipeline.
+Each task can accumulate context in `orca-context/tasks/<prd-name>/<task-id>/`. Research notes, design decisions, investigation results — anything the next perspective needs. This is how knowledge persists across the pipeline.
 
 ## Execution Modes
 
@@ -126,43 +128,45 @@ For interactive Claude Code sessions. Run `/ralph <prd-path>`. Ralph dispatches 
 For headless execution. Install with `--bash-loop` flag, then run inside a Docker container:
 
 ```bash
-./ralph-loop.sh ralph-context/prds/001-feature.json 20
+./orca-loop.sh orca-context/prds/001-feature.json 20
 ```
 
-Each iteration reads `RALPH_PROMPT.md` (a thin wrapper around `.ralph/ralph.md`) and completes one pipeline step.
+Each iteration reads `ORCA_PROMPT.md` (a thin wrapper around `.orca/ralph.md`) and completes one pipeline step.
 
 ## Running multiple sessions
 
 You can run two or more Ralph sessions against the same project in parallel — e.g. one PRD per session. Each session needs its own working tree and its own container so they don't collide on git or hijack each other's terminal.
 
-**Bind-mount mode (`ralph-start.sh`):** create a git worktree, then point the launcher at it.
+**Bind-mount mode (`orca-start.sh`):** create a git worktree, then point the launcher at it.
 
 ```bash
 # Terminal A — session on the primary working tree
-./ralph-start.sh ~/code/myproj              # container: ralph-myproj
+./orca-start.sh ~/code/myproj              # container: orca-myproj
 
 # Terminal B — second session on a worktree
 cd ~/code/myproj
 git worktree add ../myproj-prdb ralph/prd-b
-./ralph-start.sh ~/code/myproj-prdb          # container: ralph-myproj-prdb
+./orca-start.sh ~/code/myproj-prdb          # container: orca-myproj-prdb
 ```
 
 The container name is derived from the folder basename, so two different worktrees give you two different containers automatically.
 
-**Volume mode (`ralph-clone.sh`):** use `--session` to get a separate clone.
+**Volume mode (`orca-clone.sh`):** use `--session` to get a separate clone.
 
 ```bash
-./ralph-clone.sh https://github.com/me/proj.git                 # container: ralph-proj
-./ralph-clone.sh https://github.com/me/proj.git --session prdb  # container: ralph-proj-prdb
+./orca-clone.sh https://github.com/me/proj.git                 # container: orca-proj
+./orca-clone.sh https://github.com/me/proj.git --session prdb  # container: orca-proj-prdb
 ```
 
-**Extra terminal on an existing session:** use `ralph-attach.sh` (runs `docker exec -it`). This does not start a new Ralph session — it's just another shell on the same container, handy for tailing logs.
+**Extra terminal on an existing session:** use `orca-attach.sh` (runs `docker exec -it`). This does not start a new Ralph session — it's just another shell on the same container, handy for tailing logs.
 
 ```bash
-./ralph-attach.sh ralph-myproj
+./orca-attach.sh orca-myproj
 ```
 
-Re-invoking `ralph-start.sh` or `ralph-clone.sh` against an already-running session also opens a new shell via `docker exec` instead of hijacking the original TTY.
+Re-invoking `orca-start.sh` or `orca-clone.sh` against an already-running session also opens a new shell via `docker exec` instead of hijacking the original TTY.
+
+**Migrating from `ralph-*` names:** If you previously used this framework when its infrastructure was called `ralph-docker`, your existing `ralph-<name>` Docker containers and `ralph-vol-*` volumes keep working but are now orphaned (new runs create `orca-*` names). Run `docker ps -a --filter name=ralph-` and `docker volume ls | grep ralph-vol-` to find them; remove with `docker rm -f` and `docker volume rm` when you're done with the last ralph-era session. Rebuild the image once: `docker build -t orca-claude:latest .`.
 
 ## Repository Structure
 
@@ -171,9 +175,8 @@ This repo is **self-hosting** — the framework is installed into itself for dev
 | Directory | Purpose |
 |-----------|---------|
 | `framework/` | **Source** of framework files. All edits go here. |
-| `.ralph/` | **Installed copy** of `framework/`. Never edit directly. |
-| `ralph-context/` | Project-specific context (overrides, knowledge, PRDs, designs, tasks) |
-| `.ralph-tasks/` | Ephemeral agent workspaces (disposable after merge) |
+| `.orca/` | **Installed copy** of `framework/`. Never edit directly. |
+| `orca-context/` | Project-specific context (overrides, knowledge, PRDs, designs, tasks) |
 | `docs/` | Framework design documentation |
 | `.claude/skills/` | Claude Code skills (`/ralph`, `/discover`, `/refine`) |
 | `templates/` | Install templates (CLAUDE.md.template, .claudeignore, .git-hooks) |
@@ -182,11 +185,11 @@ This repo is **self-hosting** — the framework is installed into itself for dev
 
 | File | Purpose |
 |------|---------|
-| `.ralph/seed.md` | Working style principles — read before any task |
-| `.ralph/ralph.md` | Orchestrator instructions |
-| `.ralph/processes/prd.md` | Pipeline model and task lifecycle |
+| `.orca/seed.md` | Working style principles — read before any task |
+| `.orca/ralph.md` | Orchestrator instructions |
+| `.orca/processes/prd.md` | Pipeline model and task lifecycle |
 | `install.sh` | Installs the framework into a target project |
-| `RALPH_PROMPT.md` | Bash-loop mode instructions (thin wrapper around ralph.md) |
+| `ORCA_PROMPT.md` | Bash-loop mode instructions (thin wrapper around ralph.md) |
 
 ## Design Principles
 
