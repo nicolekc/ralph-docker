@@ -77,8 +77,8 @@ For every overwrite classification (`framework` / `skill` / `hook`), compare sou
 7. **Scaffolds**: if any scaffold directory from MANIFEST is missing, create it with `.gitkeep`. Never touch existing content under `orca-context/`.
 8. **Ensure `.gitignore` entries** (same append-merge as Step 2 substep 9).
 9. **Prune stale `.orca/` files** (Step 2b-prune).
-10. **Update the sentinel**: read `.orca/.install-state.json`, set `install_version = "006b"` and `last_installed_at = <now>`, preserve all other keys (including `settings_prompted_at` and `settings_destination`). See the schema section for backward-compat read rules.
-11. Go to Step 4 (which skips if `settings_prompted_at` is already non-null — Upgrade never re-offers the prompt).
+10. **Update the sentinel**: read `.orca/.install-state.json`, set `install_version = "006b"` and `last_installed_at = <now>`, preserve all other keys (including `settings_offered_at` and `settings_destination`). See the schema section for backward-compat read rules.
+11. Go to Step 4 (which skips if `settings_offered_at` is already non-null — Upgrade never re-offers the prompt).
 
 In self-install mode, steps 6, 7, 8, 10, and 11 are adjusted — see Step 3a.
 
@@ -165,13 +165,13 @@ If the user passed a local path (e.g., `Install this project: .` or `/abs/path/t
 
 Offer the user a set of recommended Claude Code settings. Never mandatory, never silent.
 
-**Skip check.** If `.orca/.install-state.json` exists and its `settings_prompted_at` is non-null, skip this entire step — the prompt has already been offered on a prior install. Continue to Step 5.
+**Skip check.** If `.orca/.install-state.json` exists and its `settings_offered_at` is non-null, skip this entire step — the prompt has already been offered on a prior install. Continue to Step 5.
 
 Otherwise, run the six substeps below.
 
 ### Substep 4.1: Read the template
 
-Read `.orca/templates/claude-settings.json` and parse it as JSON. If the file is missing or malformed, record `settings_destination = "skipped"` and `settings_prompted_at = <now>` and continue to Step 5 — don't block the install on a broken template.
+Read `.orca/templates/claude-settings.json` and parse it as JSON. If the file is missing or malformed, record `settings_destination = "skipped"` and `settings_offered_at = <now>` and continue to Step 5 — don't block the install on a broken template.
 
 ### Substep 4.2: Present the recommendations
 
@@ -199,7 +199,7 @@ Wait for the user's pick.
 
 ### Substep 4.4: Ask apply vs skip
 
-Ask the user whether to apply the merge or skip it. "Skip" leaves both files completely untouched. Either way the sentinel records that the prompt was offered, so it won't offer again — to be re-prompted, the user nulls out `settings_prompted_at` in the sentinel by hand.
+Ask the user whether to apply the merge or skip it. "Skip" leaves both files completely untouched. Either way the sentinel records that the prompt was offered, so it won't offer again — to be re-prompted, the user nulls out `settings_offered_at` in the sentinel by hand.
 
 Wait for the user's answer.
 
@@ -225,7 +225,7 @@ Never echo secret-looking values (tokens, keys, API credentials) from the existi
 
 Read `.orca/.install-state.json`, set:
 
-- `settings_prompted_at` ← current UTC ISO 8601 timestamp
+- `settings_offered_at` ← current UTC ISO 8601 timestamp
 - `settings_destination` ← `"project"`, `"user"`, or `"skipped"` per the user's choice
 
 Write the sentinel back. Preserve any other keys already present — consumers must tolerate unknown keys, and this install only owns its schema fields.
@@ -282,7 +282,7 @@ The sentinel file written by every install run. Shape:
 {
   "install_version": "006b",
   "last_installed_at": "2026-04-14T12:00:00Z",
-  "settings_prompted_at": null,
+  "settings_offered_at": null,
   "settings_destination": null
 }
 ```
@@ -291,12 +291,12 @@ Field reference:
 
 - `install_version` — Orca install version that last touched this project. Fresh / Upgrade / Migrate all write `"006b"` today; each future PRD that changes install behavior bumps this. Used to gate one-time migrations.
 - `last_installed_at` — ISO 8601 UTC timestamp of this install run.
-- `settings_prompted_at` — ISO 8601 UTC timestamp of the first settings-prompt offer, or `null` if never offered. If non-null, Step 4 is skipped.
+- `settings_offered_at` — ISO 8601 UTC timestamp of the first settings-prompt offer, or `null` if never offered. If non-null, Step 4 is skipped.
 - `settings_destination` — `"project"`, `"user"`, `"skipped"`, or `null`. Populated by task 007.
 
 **Backward-compatible reads.**
 
-- **Sentinel absent entirely** (pre-006a state, should only happen on first Migrate or an install that predates the sentinel): treat every field as its default — `install_version = null`, `settings_prompted_at = null`, `settings_destination = null`. Upgrade will then re-offer the settings prompt, which is correct for an install that never saw it.
+- **Sentinel absent entirely** (pre-006a state, should only happen on first Migrate or an install that predates the sentinel): treat every field as its default — `install_version = null`, `settings_offered_at = null`, `settings_destination = null`. Upgrade will then re-offer the settings prompt, which is correct for an install that never saw it.
 - **Sentinel present but sparse** (written by an earlier release that had fewer fields, e.g., a 006a-era sentinel): tolerate any missing field with the same defaults above. Preserve every key you don't recognize — later releases may have added keys this version doesn't know, and consumers must tolerate unknowns.
 - When writing, only set the fields you own this step. Don't delete or zero out keys you didn't touch.
 
