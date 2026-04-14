@@ -1,343 +1,219 @@
-# Task 001 — Design (Redo)
+# Task 001 — Design (v3, minimum viable)
 
-This supersedes the prior `design.md` and the prior `extracted-for-code-mode.md`. Context audit (`context.md`) and the design review (`design-review.md`) remain useful reference.
+Prior passes (v1, v2) over-engineered this. This version is tight: smallest base that makes Ralph functional on a non-code PRD, one flat perspectives dir, one MODE.md per mode, one pointer sentence in base `prd.md`.
 
-## The shape of the change
+## 1. Base role set
 
-The framework will have two layers:
+Two roles. That's all base needs to be functional.
 
-- **Base** — domain-neutral files. Works for any structured knowledge work: writing, tax prep, research, software.
-- **Mode** — domain-specific files layered on top of base when a PRD declares a `mode`.
+| Role        | Purpose (one line)                                                                  | Why in base                                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **planner** | Composes the pipeline — decides which perspectives look at this task, in what order. | Structurally required. Every pipeline is composed by something, and that something IS this role. Already neutral, stays as-is. |
+| **drafter** | Proposes an approach and sketches how the result will be verified before anyone commits to work. | Every non-trivial task needs a structural thinking step before execution. "Drafter" reads naturally for writing, tax prep, research, policy — sketches a draft approach, same shape as a design. |
 
-Task 001's job: define the base — its perspective set, its role names, and the mechanism by which base prose references mode-specific process content. Task 002's job: build `framework/modes/code/` from the existing code-flavored files and activate the mode loader. Task 001 does not move files, does not edit existing perspective files, and does not create mode directories.
+That's it. Two roles.
 
-The previous design correctly carved language out of `seed.md`, `ralph.md`, `perspectives/planner.md`, and `processes/prd.md` — that work landed in commit `aa7a43c` and is preserved. The previous design was wrong about what to do with the other eight perspective files: it asked the implementer to edit them in place. That has been reverted. The new plan: those eight files stay untouched on disk, and the base grows a fresh set of neutral perspective files alongside them. Task 002 cleanly relocates the eight code-flavored files into `framework/modes/code/`.
+### Why not more
 
-## Base perspective set
+- **Execution role** (implementer / preparer / writer / builder) is inherently domain-specific. Base cannot name it honestly. A mode always provides one.
+- **Reviewer of the draft** (design-reviewer) — drop from base. A planner on a non-code PRD who wants extra rigor can call the drafter twice (draft, then a second drafter pass to critique) or add a mode-specific reviewer. Propose-and-check is valuable but not required for base to function; it can be added as a separate base role in a later PRD if demand appears.
+- **Spec reviewer** — drop from base. PRD authors on non-code domains will be the same humans; the `/refine` skill already covers spec quality outside the pipeline.
+- **Validator / qa** — drop from base. Validation shape is domain-specific; a mode provides it when useful. The drafter's verification sketch plus the execution role's self-check covers the base case.
+- **Explorer** — drop from base. Investigation shape is domain-specific. Modes provide when useful.
 
-Roles that belong in base are roles that a pipeline for ANY kind of structured knowledge work needs. Five pass that bar:
+Two is the true minimum. If the minimum is wrong, a later PRD adds one role. That's cheaper than removing four speculative roles.
 
-| Base role          | Purpose (one line)                                                                 | Neutral? | Origin                                 |
-| ------------------ | ---------------------------------------------------------------------------------- | -------- | -------------------------------------- |
-| **planner**        | Composes a pipeline — decides which perspectives look at this task, in what order. | Yes      | Already exists, already generalized.   |
-| **designer**       | Proposes an approach. Thinks structurally, makes tradeoffs explicit, sketches verification strategy. | Yes (new name) | New file. "Architect" replaced because it carries software connotations. |
-| **design-reviewer**| Evaluates a proposed approach for structural problems before commitment.           | Yes      | New file — written from scratch in the neutral voice.                    |
-| **spec-reviewer**  | Evaluates a task definition for clarity, scope, verifiability before work starts.  | Yes      | New file — written from scratch in the neutral voice.                    |
-| **validator**      | Validates the produced artifact from the end-user's perspective.                   | Yes (new name) | New file. "QA-engineer" replaced because "engineer" is code-flavored.    |
+### Name rationale
 
-### Why these five and not others
+- `planner` — unchanged, already neutral.
+- `drafter` — neutral across writing (draft an essay outline), tax (draft a return strategy), research (draft a literature map), policy (draft a position). Avoids "designer" (too close to product/visual design connotation and borderline code-flavored), "architect" (the existing code-mode file), "author" (conflates with PRD author role noted in seed.md), "planner" (already taken).
 
-- **planner** is structurally required — every pipeline is composed by something, and that something IS this role.
-- **designer** + **design-reviewer** is the universal propose-and-check pair for any non-trivial approach. Splitting the proposer from the reviewer is a technique that works across every kind of structured work; merging them would conflate production and evaluation.
-- **spec-reviewer** catches problems in the task definition itself — a universal need because PRD authors can be sloppy in any domain.
-- **validator** catches the gap between "looks right" and "actually works from a user's perspective" — universal.
+## 2. Flat perspectives dir + MODE.md
 
-### Why not these
+### Directory layout after this task
 
-- **explorer** is a code-mode role as currently written (traces codebases). The investigation need exists in other domains (prior-art review for writing, precedent research for tax, literature survey for research) but the shape differs enough that a single base "explorer" file would over-constrain. Keep it as a mode concern; each mode decides whether it needs one.
-- **implementer / builder / producer** — the person who actually does the work is inherently domain-specific (code implementer, tax preparer, writer, researcher). Base should not try to name this role; modes provide it.
-- **code-cleaner / code-reviewer** — explicitly code concepts.
+```
+framework/
+├── perspectives/                    # flat, all role files together
+│   ├── planner.md                   # unchanged
+│   ├── drafter.md                   # NEW (base)
+│   ├── architect.md                 # unchanged — code-mode role
+│   ├── qa-engineer.md               # unchanged — code-mode role
+│   ├── design-reviewer.md           # unchanged — code-mode role
+│   ├── spec-reviewer.md             # unchanged — code-mode role
+│   ├── implementer.md               # unchanged — code-mode role
+│   ├── code-cleaner.md              # unchanged — code-mode role
+│   ├── code-reviewer.md             # unchanged — code-mode role
+│   └── explorer.md                  # unchanged — code-mode role
+├── modes/                           # created in task 002 (NOT this task)
+│   └── code/
+│       └── MODE.md                  # task 002 writes
+├── seed.md
+├── ralph.md
+└── processes/
+    └── prd.md
+```
 
-### Why these names
+Files don't move. Code-mode perspectives keep their current filenames forever. MODE.md is the only new artifact the mode system needs, and task 002 creates it.
 
-- **designer** reads naturally across domains: instructional designer, research designer, study designer, narrative designer, technical designer. Pairs cleanly with **design-reviewer** (already accepted). "Architect" would work for code and some other domains but fails the tax-prep read-through.
-- **validator** is crisp and neutral: tax validator, research validator, acceptance validator. Avoids "reviewer" (which overloads with design-reviewer and spec-reviewer) and avoids "engineer" (code-flavored). "Acceptance-tester" would be accurate but compound and jargony.
-- **planner**, **design-reviewer**, **spec-reviewer** need no rename; they're already neutral. The existing `design-reviewer.md` content is clean (design review flagged it as containing no code-specific terms); the existing `spec-reviewer.md` has three lines of code flavor but the bones are neutral. Even so: the base gets freshly-written files per the task directive, not in-place edits of the existing ones. The existing ones move to the code mode in task 002.
+### The layering mechanism (one sentence)
 
-### What the code mode will end up with
+Base `prd.md` gets this sentence near the top:
 
-(Full manifest in §5.) The code mode will contain at minimum: `code-architect` (from existing architect.md, content preserved), the four unambiguously-code perspectives (implementer, code-cleaner, code-reviewer, explorer), and a mode-process file. It may also contain `code-qa-engineer` as a mode-sharpened companion to base `validator` if task 002 judges the added code-specific framing valuable. Whether the existing `design-reviewer.md` and `spec-reviewer.md` also keep a presence in the code mode (as `code-design-reviewer.md` / `code-spec-reviewer.md`) is task 002's judgment call — both options are acceptable:
+> If the PRD declares a `mode` field, also read `.ralph/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
 
-- **Drop option**: base `design-reviewer` and `spec-reviewer` cover code PRDs fine; the existing files are archived only via git history.
-- **Keep option**: move with `code-` rename; mode versions add minor code-specific nuance (e.g., "each criterion reads like a test assertion" in `code-spec-reviewer`).
+That's the whole mechanism. No config, no registry, no loader.
 
-Either way, task 001 does not touch those files. Task 002 decides and executes.
+### How a planner knows what roles exist
 
-## Base planner's role list
+- Base roles: enumerated by name in `planner.md` (see §3). Two names: `planner`, `drafter`.
+- Mode roles: enumerated by name in the active mode's `MODE.md` (task 002 writes that list for `code`). The planner reads `MODE.md` when a mode is active and learns which filenames in `perspectives/` the mode uses.
+- A worker resolves a role by reading `.ralph/perspectives/<role>.md`. Flat dir → one lookup path.
 
-The base `planner.md` already says (lines 14-16):
+No directory scanning. Both sides (base and mode) declare their roles explicitly.
 
-> Available roles live in the perspectives directories you have access to — base roles always, plus any the active mode adds. Read the relevant ones when you need to decide whether they fit.
->
-> If the active mode provides suggested pipeline patterns, read them — they reflect what has worked for this kind of work. Treat them as starting points, not menus. If no mode is active, compose from first principles based on the task's risk and shape.
+## 3. Base planner's role list
 
-That text is sound but under-specified: it doesn't name the base roles, so a mode author has nothing concrete to layer against. Tweak to **also name the base role set** so mode authors know what they're adding to:
+Replace lines 14-16 of `framework/perspectives/planner.md` with:
 
-> The base framework provides these roles:
+> The base framework provides two roles:
 > - **planner** — this role; composes pipelines.
-> - **designer** — proposes approach, thinks structurally, sketches verification.
-> - **design-reviewer** — evaluates proposed approaches for structural problems.
-> - **spec-reviewer** — evaluates task definitions for clarity and verifiability.
-> - **validator** — validates from the user's perspective after work is done.
+> - **drafter** — proposes an approach and sketches verification before execution.
 >
-> The active mode (if any) adds further roles — typically an execution role (implementer / preparer / writer / etc.) and possibly mode-specific variants of the review roles. Read a perspective file before committing a role to a pipeline; don't assume from the name.
-
-This keeps the base planner self-describing without hardcoding any mode's role set, and gives a mode author a clear picture of what they're expected to contribute (at minimum, an execution role).
-
-## Mode directory layout
-
-Flat. A mode is a directory at `framework/modes/<mode-name>/` containing:
-
-- Perspective `.md` files — one per role the mode adds. Role file name = role name (e.g., `code-architect.md` defines role `code-architect`).
-- **Exactly one** `process.md` file — mode-specific process content layered onto the base `prd.md`.
-
-No subdirectories. No registry, no manifest, no loader config. The directory's contents ARE the mode.
-
-```
-framework/modes/code/
-├── code-architect.md
-├── implementer.md
-├── code-cleaner.md
-├── code-reviewer.md
-├── explorer.md
-├── (optionally: code-qa-engineer.md, code-design-reviewer.md, code-spec-reviewer.md)
-└── process.md
-```
-
-### How the mode is discovered
-
-A PRD's top-level `mode` field (string, e.g., `"code"`) names the active mode. The orchestrator and worker agents resolve mode files by constructing `.ralph/modes/<mode>/…` paths directly. No indirection, no config file.
-
-PRDs with no `mode` field (or an empty string) run in base-only. Perspectives and process content all come from base.
-
-### How mode role files get loaded alongside base role files
-
-From the perspective of a worker agent: when the worker is assigned a role, it reads the file `.ralph/perspectives/<role>.md` if the role is a base role, or `.ralph/modes/<mode>/<role>.md` if the role is a mode role. The worker doesn't need to classify — the planner wrote the role name in the pipeline, so the worker tries both locations (base first, then active mode) and uses whichever resolves. Simple file-layering; no hierarchy beyond "look here, then there."
-
-From the planner's perspective: the planner reads all files in `.ralph/perspectives/` plus all perspective files in `.ralph/modes/<active-mode>/` (if any) to build the role pool for a task. Task 002 will wire the specific mechanism.
-
-### How Ralph finds the mode's process file
-
-`.ralph/modes/<mode>/process.md`. Path is deterministic from the mode name. Base `prd.md` contains a single sentence pointing at this path (see §4).
-
-## Base `prd.md` → mode-process mechanism
-
-Base `prd.md` gets one new sentence near the top (immediately after the "Any agent working on a PRD task follows these rules" line):
-
-> If the PRD declares a `mode` field, also read `.ralph/modes/<mode>/process.md` for mode-specific process content. This file layers on top of — not replaces — the base process. If the PRD has no `mode`, you're in base-only mode and this step is skipped.
-
-That's the whole mechanism. Concrete, optional, no code changes needed.
-
-Sections that currently live in `prd.md` and are code-specific (Verification Cascade's TDD-flavored phrasing, historical Green Builds / Code Cleaning — already extracted in commit `aa7a43c`) remain in the manifest as content that the code mode's `process.md` will carry. The base `prd.md` keeps only domain-neutral process content.
-
-For the no-mode case: base `prd.md` stands alone and is complete. The Verification Cascade in base names roles abstractly (`validator` for what was `qa-engineer`; the implementation role is named as "implementer (or whatever the mode calls the execution role)" — tweak needed, see §6).
-
-## File move / extraction manifest (for task 002)
-
-This manifest supersedes the prior `extracted-for-code-mode.md`. Task 002 consumes it to plan file moves without re-deriving boundaries.
-
-### 5.1 Files moved from `framework/perspectives/` into `framework/modes/code/`
-
-All moves preserve content as it exists at the start of task 002. Task 002 MAY edit post-move for mode-specific tightening, but no content should be lost.
-
-| Source                                            | Destination                                     | Rename reason                                                      |
-| ------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------ |
-| `framework/perspectives/architect.md`             | `framework/modes/code/code-architect.md`        | Base has neutral `designer`; code mode keeps the sharper code-flavored role under an explicit `code-*` name. |
-| `framework/perspectives/implementer.md`           | `framework/modes/code/implementer.md`           | No rename — "implementer" is already a code-mode concept.          |
-| `framework/perspectives/code-cleaner.md`          | `framework/modes/code/code-cleaner.md`          | No rename.                                                         |
-| `framework/perspectives/code-reviewer.md`         | `framework/modes/code/code-reviewer.md`         | No rename.                                                         |
-| `framework/perspectives/explorer.md`              | `framework/modes/code/explorer.md`              | No rename — existing content is code-specific (traces codebases), fine under the plain name inside the mode. |
-| `framework/perspectives/qa-engineer.md`           | `framework/modes/code/code-qa-engineer.md` **OR** drop | Task 002 judges: base `validator` covers most of it; code mode may want the sharper "automated tests prove what the programmer intended; I prove what the human intended" framing. Recommendation: keep, rename to `code-qa-engineer`, tighten to the delta vs base `validator`. |
-| `framework/perspectives/design-reviewer.md`       | drop **OR** `framework/modes/code/code-design-reviewer.md` | Existing file is already domain-neutral. Recommendation: drop (base covers). |
-| `framework/perspectives/spec-reviewer.md`         | drop **OR** `framework/modes/code/code-spec-reviewer.md` | Existing has three code-flavored lines; base spec-reviewer will be written neutrally. Recommendation: drop (base covers). |
-
-`framework/perspectives/planner.md` **does not move**. It was already generalized in commit `aa7a43c` and is a base file.
-
-### 5.2 Files moved from `framework/processes/` into `framework/modes/code/`
-
-| Source                              | Destination                             | Notes                                                                 |
-| ----------------------------------- | --------------------------------------- | --------------------------------------------------------------------- |
-| `framework/processes/build-cycle.md`| Merged into `framework/modes/code/process.md` | Content is entirely code-flavored ("writes code, writes tests, runs tests"). The context audit missed this; prior architect caught it. Rather than keeping `build-cycle.md` as a separate file in the mode, fold it into `process.md` — the mode has one process file by design. |
-
-### 5.3 Content blocks extracted into `framework/modes/code/process.md`
-
-These blocks were removed from base files in commit `aa7a43c` and must land in the code mode's `process.md`. Source text is authoritative — quoted from the pre-`aa7a43c` versions:
-
-**5.3.a — Green Builds** (originally in `framework/processes/prd.md`)
-> ## Green Builds
+> The active mode (if the PRD declares one) adds more roles — at minimum an execution role, and often mode-specific reviewers, validators, or investigators. The mode's `MODE.md` names them and may suggest pipeline patterns that have worked for that kind of work. Read the mode file when a mode is active; read a perspective file before committing a role to a pipeline.
 >
-> Every task that changes code must leave all tests passing. Red builds are broken windows — they multiply quickly. Don't assume a failing test isn't yours. If tests fail when you're done, fix them before marking your step complete.
+> If no mode is active, compose from first principles with the two base roles and whatever the task's risk and shape demand.
 
-**5.3.b — Code Cleaning** (originally in `framework/processes/prd.md`)
-> ## Code Cleaning
->
-> The code-cleaner applies fixes directly — it doesn't kick back to the implementer. It commits corrections for correctness issues, simplifies unnecessary complexity, and aligns with project patterns. One pass, no rounds.
+Keep the rest of `planner.md` (How You Think / What You Produce / What You Avoid) as-is, except remove line 22's hard-coded "exploration/investigation role the active mode provides" phrasing if it reads awkward after the update — leave it if it still reads fine. Implementer judges.
 
-**5.3.c — TDD-specific Verification Cascade sharpening** (to extend base Verification Cascade in `prd.md`)
-> **Implementer** — Practices TDD. Writes tests that verify outcomes before writing implementation code. Concrete checks = executable tests.
->
-> **QA Engineer / Validator** — The gap phrase in this mode sharpens to "tests pass" vs "actually works for the user".
+## 4. aa7a43c rollback list
 
-**5.3.d — Commit Discipline sharpening** (originally in `framework/seed.md` as "Commit Discipline"; base now has a neutral "Recording Changes" section)
-> Atomic commits — one logical change each. Explain why, not just what. A history that can be bisected is a history that can be debugged.
-
-The code mode may choose to inline this into `process.md` as an addendum to base's "Recording Changes" principle.
-
-**5.3.e — AGENTS.md paragraph** (originally in `framework/seed.md` Shared Context section)
-> AGENTS.md files in code directories are short orientation (2-5 lines): what this directory is, what it's not. They may grow only for gotchas and hard-won learnings — things that would save the next agent from a trap. If you hit a non-obvious problem in a directory, encode the lesson in its AGENTS.md. Don't pre-fill them with architecture or file listings.
-
-**5.3.f — Code-mode pipeline patterns** (originally in `framework/perspectives/planner.md` lines 23-28)
-> Common patterns:
-> - Standard feature/bug fix: architect → implementer → code-cleaner
-> - Trivial change: implementer → code-cleaner
-> - Complex system change: explorer → architect → implementer → code-cleaner
-> - High-level or user-facing: architect → implementer → qa-engineer → code-cleaner
-> - Investigation/research: explorer or architect alone
->
-> These are patterns, not a menu. Compose what fits the task.
-
-Task 002 updates role names in these patterns to match final mode role names (`architect` → `code-architect`; `qa-engineer` → `code-qa-engineer` or base `validator`). The base planner points to these via its "if the active mode provides suggested pipeline patterns, read them" sentence.
-
-### 5.4 New base perspective files (created in task 001 by implementer)
-
-- `framework/perspectives/designer.md` — new. Take the domain-neutral structural-thinking content from `architect.md` (read before judging, use current knowledge, pseudo-code, approaches not recipes, evaluate across dimensions, transition thinking, verification-at-the-design-level) and rewrite without code vocabulary. Drop the TDD / test-framework / "compiles" language — that's mode content. Keep the Splitting section (domain-neutral, universally useful). Keep the "when a task over-prescribes" section (universal).
-- `framework/perspectives/design-reviewer.md` — new. Cover: problem fit, simplicity, composability, prescriptiveness trap, failure modes, scope. The existing file's content is a strong starting point; the new file can closely parallel it without importing the file's exact text (write freshly to ensure neutrality, review final output for code leakage).
-- `framework/perspectives/spec-reviewer.md` — new. Cover: outcome clarity, success-criteria quality ("concrete, observable criteria" rather than "reads like a test assertion"), scope (one task vs several), verifiability (general — "can the result be checked?"), problem statement completeness, dependencies, specification-creativity balance. Drop the "code quality is the code reviewer's job" boundary line — replace with something domain-neutral or omit.
-- `framework/perspectives/validator.md` — new. Cover: intent over implementation, edge cases and error states, the gap the role fills (for base: "mechanical verification proves the artifact does what the producer intended; you prove it does what the human intended"). Drop "automated tests" / "programmatic tests" / "code" specifics — those are code-mode sharpenings. Boundaries section should not name downstream roles (no "code-cleaner's job") — keep boundaries principled (don't fix, don't architect, don't nitpick cosmetic issues).
-
-### 5.5 Files that neither move nor get new content
-
-- `framework/seed.md` — minor tweak per §6.
-- `framework/ralph.md` — minor tweak per §6.
-- `framework/perspectives/planner.md` — minor tweak per §6.
-- `framework/processes/prd.md` — minor tweak per §6 plus the new mode-process-pointer sentence (§4).
-- `framework/templates/prd.json` — out of scope for this task. The template needs a `mode` field added; that's task 002's job.
-
-## Consistency tweaks in already-generalized base prose
-
-The implementer for task 001 must make these edits alongside creating the new perspective files.
+Every change below restores pre-`aa7a43c` wording. Rationale: the phrase uses a domain-specific word as an example or punchy concrete noun within a claim that is itself general. Keep the concrete noun; the claim remains universal.
 
 ### `framework/seed.md`
 
-Current (lines 52-55):
-> Three roles, three jobs:
-> - **PRD author** defines the problem space: what the system needs to do, why, what success looks like, and what constraints matter. Never prescribes HOW to build it.
-> - **Architect** defines the solution space: patterns, contracts, boundaries, tradeoffs. This is where the "how" gets decided.
-> - **Implementer** fills in the details within the architect's framework.
+| Location | Current (post-aa7a43c)                                                                         | Restore to (pre-aa7a43c)                                                                       |
+| -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Line 10  | `Verify the change works (whatever "works" means for this artifact)`                           | `Verify the change works (run tests, check behavior)`                                          |
+| Line 12  | `would this survive a careful second reading by someone who doesn't know what I was trying to do?` | `would this survive a code review by someone who doesn't know what I was trying to do?`       |
+| Line 14  | `## Recording Changes`                                                                         | `## Commit Discipline`                                                                         |
+| Line 16  | `One logical change per recorded step. Explain why, not just what. A trail that can be followed backward is a trail that can be debugged.` | `Atomic commits — one logical change each. Explain why, not just what. A history that can be bisected is a history that can be debugged.` |
+| Line 20  | `Don't form opinions about material you haven't read. When analyzing a problem, read the relevant material first. Cite sources precisely when discussing existing work. Understand not just the piece you're changing, but how it connects to the rest of the system — both structurally (how it fits in the whole) and in terms of the intent it serves (what the user is trying to accomplish end-to-end). A change that works in isolation but breaks the whole is worse than no change.` | `Don't form opinions about code you haven't read. When analyzing a problem, read the relevant code first. Cite specific file:line when discussing existing code. Understand not just the code you're changing, but how it connects to the rest of the system — both technically (how it fits in the codebase) and in terms of the feature or intent it serves (what the user is trying to accomplish end-to-end). A change that works in isolation but breaks the whole is worse than no change.` |
+| Line 22  | `You don't need to read everything before making a change.`                                     | `You don't need to read every file in the project before making a change.`                     |
+| Line 32  | `Don't add features, polish surrounding material, or make "improvements" beyond the task. A correction doesn't need the surrounding work cleaned up. A simple addition doesn't need extra configurability.` | `Don't add features, refactor surrounding code, add docstrings to unchanged code, or make "improvements" beyond the task. A bug fix doesn't need the surrounding code cleaned up. A simple feature doesn't need extra configurability.` |
+| Line 40  | `Three similar pieces are better than a premature abstraction.`                                 | `Three similar lines of code is better than a premature abstraction.`                          |
+| Line 69  | `Actively seek the strongest possible verification — produce the artifact, exercise it, prove it works.` | `Actively seek the strongest possible verification — build the thing, run the thing, prove it works.` |
+| Line 71  | `If verification machinery is broken, fixing it IS part of verification. If a prerequisite is missing, finding and integrating it IS part of verification.` | `If a test framework isn't functioning, fixing it IS part of verification. If a dependency is missing, finding and integrating it IS part of verification.` |
 
-Change **Architect** → **Designer** (matches new base role name). Keep **Implementer** as a generic concept word here — "implement" is a domain-neutral verb, and this section is discussing the abstract three-role structure, not naming a specific base role file. Final:
+The Respect Role Boundaries section (lines 50-59) was NOT changed by aa7a43c (grep confirms). It still reads "Architect" / "Implementer". **Leave as-is.** The prose treats "Architect" and "Implementer" as abstract role nouns, not filename references. A non-code PRD reader handles this fine — "architect" is broadly legible. Rewording would itself over-generalize.
 
-> Three roles, three jobs:
-> - **PRD author** defines the problem space...
-> - **Designer** defines the solution space: patterns, contracts, boundaries, tradeoffs. This is where the "how" gets decided.
-> - **Implementer** fills in the details within the designer's framework. (A mode may call this role something more specific — in the code mode, `implementer`; in a tax mode, `preparer`; etc.)
-
-Also: the last sentence in that section currently says "If you're authoring a PRD task and you catch yourself writing implementation specifics — stop. ... That's what gives the architect real work to do." Change "architect" → "designer".
+The "AGENTS.md paragraph" was removed from seed.md in aa7a43c — that was a genuine move (AGENTS.md is a code artifact). Goes in `modes/code/MODE.md`. Do not restore to base.
 
 ### `framework/ralph.md`
 
-Current (line 13):
-> The planner composes pipelines from the roles available in this installation — base roles always, plus any the active mode adds. Base roles live in `.ralph/perspectives/`; mode roles (if a mode is active) live in the active mode's perspectives directory.
+| Location | Current (post-aa7a43c)                                                                         | Restore to (pre-aa7a43c)                                                                       |
+| -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Line 33  | `**Be honest about verification.** Surface-level checks ≠ working artifact. Say what's really verified.` | `**Be honest about test coverage.** Mocked unit tests ≠ working software. Say what's really tested.` |
 
-This is fine as-is. No edit needed. Role names are not hardcoded here, which is correct.
-
-### `framework/perspectives/planner.md`
-
-Current (lines 14-16):
-> Available roles live in the perspectives directories you have access to — base roles always, plus any the active mode adds. Read the relevant ones when you need to decide whether they fit.
->
-> If the active mode provides suggested pipeline patterns, read them — they reflect what has worked for this kind of work. Treat them as starting points, not menus. If no mode is active, compose from first principles based on the task's risk and shape.
-
-Replace with the expanded text shown in §2 ("The base framework provides these roles: …"). Keeps the mode pointer; adds named base roles so mode authors know what they layer against.
+The Roles section (lines 11-13) was legitimately generalized — the old version hard-coded eight role names and is now mode-dependent. That's a true move, not a paraphrase. Keep current.
 
 ### `framework/processes/prd.md`
 
-Current (line 57):
-> **Planner** — Decides if the task needs QA review. High-level or high-risk tasks should include `qa-engineer` in the pipeline.
+| Location    | Current (post-aa7a43c)                                                                         | Restore to (pre-aa7a43c)                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Line 59     | `what boundaries need checking, what would give confidence this works. Does not specify exact checks — that's the implementer's job.` | `what systems and boundaries need testing, what would give confidence this works. Does not specify exact test cases — that's the implementer's job.` |
+| Lines 61-63 | Neutralized "Implementer (or whatever...)" + "Validator" paragraph | Original TDD Implementer paragraph + original "QA Engineer" heading + wording (see below). Move the TDD specificity to `code/MODE.md`; base keeps a concrete-but-not-TDD phrasing. |
+| Line 63     | `"looks right" and "actually works"`                                                           | `"tests pass" and "it actually works"` — but this is the code-mode sharpening; base keeps its current general phrasing. **Don't restore.** |
+| Line 65     | `The architect's design notes (including verification thinking) inform the implementer's approach. The implementer's verification work is the concrete realization...` | `The architect's design notes (including verification thinking) inform the implementer's test design. The implementer's tests are the concrete realization...` |
+| Line 101    | `Do the checks exercise real behavior, or just go through the motions? Surface-level verification proves the artifact exists, not that it works.` | `Are the tests testing real behavior, or just mocking everything? Unit tests with fully mocked dependencies prove the code compiles, not that it works.` |
+| Line 103    | `Can the human actually exercise what was produced? What steps, what prerequisites (required inputs, credentials, services)?` | `Can the human actually run and test what was built? What commands, what prerequisites (API keys, data, services)?` |
+| Line 110    | `**How to exercise it** — Exact steps. Include prerequisites (required inputs, credentials, services).` | `**How to test it** — Exact commands, URLs, or steps. Include prerequisites (e.g., "requires ANTHROPIC_API_KEY").` |
+| Line 111    | `**Known gaps** — What ISN'T verified, what might not work, what requires real-world inputs to validate.` | `**Known gaps** — What ISN'T tested, what might not work, what requires real API keys to validate.` |
+| Line 112    | `**Confidence level** — "Works end-to-end" vs. "passes in isolation but never run against real inputs" vs. "scaffolding only."` | `**Confidence level** — "Works end-to-end" vs. "unit tests pass but never run against real APIs" vs. "scaffolding only."` |
 
-Change `qa-engineer` → `validator`. Also soften "QA review" — the base role is `validator`, so say "end-user validation" or similar.
+The Green Builds and Code Cleaning sections were removed from `prd.md` in aa7a43c. Both are genuinely code-specific. **Do not restore to base.** Goes in `modes/code/MODE.md`.
 
-Current (lines 61-63):
-> **Implementer** (or whatever the active mode calls the execution role) — Operationalizes the architect's verification strategy: designs the concrete checks that prove outcomes before producing the artifact.
->
-> **QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "looks right" and "actually works" is large.
+The "QA review" phrasing on line 57 referring to `qa-engineer` — keep it as a code-role reference. In base-only mode, there is no qa-engineer, but the sentence is advisory ("should include"), not normative. Task 002 may move this line into `MODE.md` for clean separation.
 
-Change "architect's" → "designer's" in line 61. Rename heading line 63 from "QA Engineer" → "Validator". Check other occurrences of "architect" in `prd.md` — there's one around the Splitting section ("The architect is the only role that can split a task"). Change to "The designer is the only role that can split a task."
+### Summary rollback principle
 
-Add the mode-process-pointer sentence (§4) near the top of `prd.md`, after the existing "Any agent working on a PRD task follows these rules" line.
+Pre-aa7a43c wording used concrete code vocabulary (`tests`, `code review`, `refactor`, `file:line`, `API keys`, `ANTHROPIC_API_KEY`, `atomic commits`, `bisected`) as *examples within universal claims*. Post-aa7a43c paraphrased these to generic nouns (`material`, `second reading`, `polish`, `sources`, `inputs`, `recorded step`, `followed backward`), weakening prose for no real neutrality gain — the claims were already general. Restore the punch.
 
-Current (line 65):
-> The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's approach.
+Where the claim itself depends on a domain (Green Builds, Code Cleaning, TDD, AGENTS.md, pipeline patterns), the whole claim moves to `MODE.md`. Base keeps general claims with punchy concrete examples.
 
-Change "architect's" → "designer's".
+Ralph is self-hosting and runs almost exclusively on code. Base prose carrying code-flavored examples is legitimate — these are the *examples*, not the claims. A non-code planner reading seed.md understands "code review" as an instance of careful reading, "tests" as an instance of behavior verification, "atomic commits" as an instance of recording a change. The generic nouns help nobody and lose force.
 
-### Summary of role-name renames across base prose
+## 5. Manifest for task 002 — content blocks for `framework/modes/code/MODE.md`
 
-- "architect" / "Architect" → "designer" / "Designer" (in seed.md, prd.md)
-- "qa-engineer" → "validator" (in prd.md)
-- "QA Engineer" → "Validator" (in prd.md)
+Task 002's implementer assembles `modes/code/MODE.md` from these sources. One file.
 
-No other renames needed. `ralph.md` is clean.
+### 5.1 Role list (mode header)
 
-## Open questions and their answers
+Names the perspective files this mode uses. Written fresh in task 002. Based on current `framework/perspectives/`:
 
-**Q1: Does the base need an `explorer` role?**
-No. Investigation has a universal shape (read, trace, map) but a concrete explorer's practice is domain-specific enough that a one-size-fits-all base file would either over-specify (forcing a code-ish shape on every mode) or under-specify (useless). Let modes provide investigation roles if they need them. The base planner's line "If the task needs context gathered before planning, your pipeline should start with whatever exploration/investigation role the active mode provides" (planner.md line 22) already handles this correctly.
+- `architect` — system analysis, approach design, may split tasks.
+- `implementer` — writes code, practices TDD, commits.
+- `code-cleaner` — applies fixes directly in one pass, no feedback loop. NOT a validator.
+- `code-reviewer` — evaluates code for quality.
+- `qa-engineer` — validates from the end-user's perspective. CAN kick back to implementer for another pass. NOT a code-cleaner.
+- `design-reviewer` — catches structural design problems before commitment.
+- `spec-reviewer` — catches unclear task definitions before work starts.
+- `explorer` — maps the codebase before modification.
 
-**Q2: Does the code mode need its own `design-reviewer.md` and `spec-reviewer.md`?**
-Not strictly. Base variants cover the job. Keeping `code-design-reviewer.md` and `code-spec-reviewer.md` as mode-layer files is acceptable if task 002 finds genuine code-specific content worth preserving (e.g., "each criterion reads like a test assertion" for spec-review) — otherwise drop and rely on base. This is a task 002 judgment call, not a task 001 constraint.
+The `code-cleaner ≠ qa-engineer` distinction must be explicit in MODE.md:
+> **code-cleaner** executes fixes directly in one pass, no rounds, no kickback. **qa-engineer** validates from the end-user's perspective and may mark the task for another implementer pass. They are distinct roles; do not collapse.
 
-**Q3: The code mode will have both `code-architect` AND base `designer` visible to a code-mode planner. Won't a code-mode planner always pick `code-architect`?**
-Usually yes. But a code project sometimes has non-code sub-tasks (writing a doc, designing a data schema described in English, planning a release). The planner might reach for base `designer` there. Keeping both available is cheap — it's just two files — and gives the planner a cleaner choice. No conflict arises because role names are distinct.
+### 5.2 Content blocks to include in MODE.md
 
-**Q4: Will self-hosting break during the task 001 → task 002 transition?**
-No, with one caveat. After task 001, `framework/perspectives/` contains: the existing 8 code-flavored files (unchanged) plus the existing `planner.md` plus 4 new base files (`designer.md`, `design-reviewer.md`, `spec-reviewer.md`, `validator.md`). A code-domain PRD running on this branch will still find `architect`, `implementer`, `code-cleaner`, etc. — same behavior as today. The base `designer` and `validator` roles are visible to the planner but unused (planner won't reach for them if code-mode patterns steer toward `architect`/`qa-engineer`). Self-host still works end-to-end through the branch. Task 002's file moves are where behavior changes — and task 002 will land the mode loader in the same commit as the moves, so there's no inconsistent intermediate state on disk.
+| Block                     | Source                                                          | Notes                                                                        |
+| ------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Green Builds              | Pre-aa7a43c `framework/processes/prd.md`                        | Quote verbatim; already extracted in v2 design.                              |
+| Code Cleaning             | Pre-aa7a43c `framework/processes/prd.md`                        | Quote verbatim.                                                              |
+| TDD Verification sharpening | Pre-aa7a43c `framework/processes/prd.md` Verification Cascade  | "Implementer — Practices TDD. Writes tests that verify outcomes before writing implementation code." And: the "tests pass" vs "it actually works" phrasing for the QA Engineer gap. |
+| Atomic commits sharpening | Pre-aa7a43c `framework/seed.md` Commit Discipline header       | Base restores "Commit Discipline" + "atomic commits" + "bisected" in §4. MODE.md doesn't need to duplicate; may add a one-line sharpening if the mode has additional commit guidance. Otherwise skip. |
+| AGENTS.md paragraph       | Pre-aa7a43c `framework/seed.md` Shared Context section          | `AGENTS.md files in code directories are short orientation (2-5 lines)...` — quote verbatim. |
+| Code-mode pipeline patterns | Pre-aa7a43c `framework/perspectives/planner.md` lines 22-28    | `Standard feature/bug fix: architect → implementer → code-cleaner` etc. Quote the pattern list. |
+| build-cycle.md contents   | `framework/processes/build-cycle.md`                            | Fold entire file into MODE.md. Content is code-flavored ("writes code, writes tests, runs tests"). Do not keep as a separate file after task 002. |
 
-**Q5: Task 001 instructions say "existing perspective files stay untouched." Does that include reading them for reference when writing the new base files?**
-Reading is fine. Only editing is forbidden. Implementer for task 001 will read `architect.md`, `design-reviewer.md`, `spec-reviewer.md`, `qa-engineer.md` to understand the roles' current responsibilities before writing neutral replacements. The existing files stay on disk byte-for-byte identical when the implementer's step completes.
+### 5.3 Pointer sentence in base `prd.md`
 
-**Q6: What about `framework/template.claude.settings.json` and `framework/templates/prd.json`?**
-Settings template is task 007 (its own PRD task). `templates/prd.json` needs a `mode` field added in task 002 (when the mode system activates). Neither is in scope for task 001.
+Task 001 implementer adds (see §6 below):
+> If the PRD declares a `mode` field, also read `.ralph/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
 
-**Q7: The design review found that prior base perspective edits (architect/qa-engineer/spec-reviewer) leaked code terms. Now that those files aren't being edited, is there any remaining risk of code-term leakage in the base?**
-Yes — in the NEW files the implementer writes. The implementer must apply the grep-sweep verification (§7) to the four new files (`designer.md`, `design-reviewer.md`, `spec-reviewer.md`, `validator.md`) AND to any base prose edited in §6. No code terms in the base.
+Task 002 does NOT re-edit this sentence.
 
-## Verification strategy
+### 5.4 Template `prd.json` change
 
-The implementer for task 001 has a concrete bar:
+Task 002 adds `mode` field to `framework/templates/prd.json`. Not task 001's concern.
 
-1. **Four new files exist, read cleanly for a non-code domain.** Mental check: could a tax-prep mode planner pick up `designer.md` and use it to design a tax strategy document review? Could a writing-project planner pick up `validator.md` for story-testing? If not, rewrite.
-2. **Grep sweep over all base files that remain after this task** — i.e., `framework/seed.md`, `framework/ralph.md`, `framework/processes/prd.md`, and all files in `framework/perspectives/` EXCEPT the eight that are moving in task 002 (architect, qa-engineer, spec-reviewer as existing files; implementer, code-cleaner, code-reviewer, explorer; plus the existing design-reviewer which may also move). The grep scope is: `planner.md`, `designer.md` (new), `design-reviewer.md` (new), `spec-reviewer.md` (new), `validator.md` (new), `seed.md`, `ralph.md`, `prd.md`. The word list: `\bcode\b`, `\btest\b`, `\btests\b`, `\bTDD\b`, `\bcommit\b` (as-verb — "commit" as a git operation is acceptable in ralph.md/prd.md where git machinery is real), `\bdiff\b`, `\bbuild\b` (as-verb meaning compile), `\bcompile\b`, `\bAGENTS\.md\b`, `\brun tests\b`, `\bcode review\b`, `\bprogrammatic\b`, `\bunit test\b`, `\bintegration test\b`. Each hit must be intentional and justifiable as metaphor or cross-domain usage.
-3. **Role-name consistency sweep** — `grep -n "\barchitect\b" framework/seed.md framework/processes/prd.md framework/ralph.md framework/perspectives/planner.md framework/perspectives/designer.md framework/perspectives/design-reviewer.md framework/perspectives/spec-reviewer.md framework/perspectives/validator.md` returns ZERO hits. Same for `\bqa-engineer\b` and `\bQA Engineer\b`. Hits in `framework/perspectives/architect.md` and `framework/perspectives/qa-engineer.md` themselves are OK — those files are not base, they're moving in task 002.
-4. **Cross-reference integrity** — every internal link in the edited base prose and new perspective files resolves. The new perspective files should start with the same `Read .ralph/seed.md first` convention.
-5. **Existing perspective files byte-identical** — `git diff aa7a43c -- framework/perspectives/architect.md framework/perspectives/qa-engineer.md framework/perspectives/spec-reviewer.md framework/perspectives/design-reviewer.md framework/perspectives/implementer.md framework/perspectives/code-cleaner.md framework/perspectives/code-reviewer.md framework/perspectives/explorer.md` returns empty. Task 001's implementer must not touch these.
-6. **Self-host smoke** — a code-domain PRD running on this branch still resolves `architect`, `implementer`, `code-cleaner`, `code-reviewer`, `explorer`, `qa-engineer` in `.ralph/perspectives/` (after `.ralph/` is re-synced from `framework/`). The new base files (`designer.md`, `validator.md`, etc.) exist alongside but aren't referenced by the code PRD's pipelines. Task 002 is where actual layered loading begins.
+## 6. Implementer scope for this task
 
-Record the grep outputs and the "tax-prep read-through" judgment in `verification.md` alongside the new files.
+### Create
 
-## What the implementer for task 001 does
+- `framework/perspectives/drafter.md` — new file. Covers: structural thinking before execution, making tradeoffs explicit, sketching how the work will be verified, knowing when to split a task vs proceed. Read `architect.md` for the shape (it's the existing code-flavored analog) but write freshly in neutral voice — no code vocabulary (`tests`, `compile`, `build`, `TDD`, `codebase`). Domain-neutral examples (an outline, a strategy memo, a research plan, a design sketch) are welcome but optional — the prose should read naturally for any of them without naming any of them. Start with `Read .ralph/seed.md first — it contains principles that apply to all roles.` convention.
 
-Scope recap (for the implementer's clarity):
+### Edit
 
-**Create:**
-- `framework/perspectives/designer.md` — new file, neutral.
-- `framework/perspectives/design-reviewer.md` — new file, neutral. (Note: there's already a `design-reviewer.md`. The implementer OVERWRITES it with a freshly-written neutral version. The current file's content goes to task 002's manifest as "moved to code mode, source: git history" — but since the existing file is already clean per design-review.md, overwriting with a similar-shape neutral file is low-risk. Task 002 can recover any lost nuance from git.)
-  - **IMPORTANT**: this is the one existing file the implementer does edit, because a base `design-reviewer.md` must exist and is at the same path. Document the overwrite in `verification.md`. The prior content is recoverable via git if task 002 wants it.
-- `framework/perspectives/spec-reviewer.md` — new file, neutral. Same situation as `design-reviewer.md` — overwrites existing. Document in `verification.md`.
-- `framework/perspectives/validator.md` — new file, neutral. (No existing file at this path; straightforward create.)
+- `framework/seed.md` — restore lines per §4 (Own the Quality Loop, Commit Discipline, Read Before Judging, Stay in Scope, Keep It Simple, Verification Rigor). The Respect Role Boundaries section is NOT edited.
+- `framework/ralph.md` — restore line 33 per §4.
+- `framework/processes/prd.md` — restore lines per §4. **Also add** the one-sentence mode pointer at the top (immediately after the "Any agent working on a PRD task follows these rules." line).
+- `framework/perspectives/planner.md` — replace lines 14-16 with the expanded role-list text from §3.
 
-Wait — rethink: the user's directive says "The existing perspective files... stay untouched." An overwrite of `design-reviewer.md` and `spec-reviewer.md` is not untouched. Revise:
+### Do NOT touch
 
-**Create, revised:**
-- `framework/perspectives/designer.md` — new file (no collision).
-- `framework/perspectives/validator.md` — new file (no collision).
-- For `design-reviewer` and `spec-reviewer` in the base: two options:
-  - **Option X — Rename in task 002**: existing `design-reviewer.md` and `spec-reviewer.md` stay put as-is for task 001. Task 002 deletes them (or moves to code mode with `code-` prefix) AND creates fresh base versions at the same paths. Task 001 does NOT touch these files.
-  - **Option Y — Keep existing as-is**: existing `design-reviewer.md` and `spec-reviewer.md` ARE the base versions. They're already mostly-neutral; task 001 treats them as base-qualified. Task 002 does not touch them. No "written from scratch" for these two.
+- Any existing perspective file in `framework/perspectives/` **other than `planner.md`**. In particular: `architect.md`, `qa-engineer.md`, `design-reviewer.md`, `spec-reviewer.md`, `implementer.md`, `code-cleaner.md`, `code-reviewer.md`, `explorer.md` are byte-identical after this task.
+- `framework/processes/build-cycle.md`. Task 002 folds it into `modes/code/MODE.md`.
+- `framework/modes/`. Task 002 creates it.
+- `framework/templates/prd.json`. Task 002 edits it.
+- `framework/template.claude.settings.json`. Task 007.
+- `.ralph/` — NEVER. Source is in `framework/`.
 
-I recommend **Option Y**. The existing `design-reviewer.md` is already clean per the design-review. The existing `spec-reviewer.md` has three code-flavored lines but is otherwise neutral. Accepting them as base files (and having the design review catch anything that still reads code-ish during task 001's review step) is simpler than a write-from-scratch-for-the-sake-of-scratch. The PRD task's "The base framework needs NEW perspective files, written from scratch, with names YOU choose" — I read as applying to roles that needed a name change (designer, validator). Roles whose names don't change (planner, design-reviewer, spec-reviewer) keep their existing files.
+### Verification for the implementer's step
 
-**Final create list for task 001's implementer:**
-- `framework/perspectives/designer.md` — new.
-- `framework/perspectives/validator.md` — new.
+1. `git diff aa7a43c -- framework/perspectives/architect.md framework/perspectives/qa-engineer.md framework/perspectives/design-reviewer.md framework/perspectives/spec-reviewer.md framework/perspectives/implementer.md framework/perspectives/code-cleaner.md framework/perspectives/code-reviewer.md framework/perspectives/explorer.md framework/processes/build-cycle.md` is empty.
+2. `framework/perspectives/drafter.md` exists and, on a careful read, works for a writing, tax-prep, or research PRD.
+3. The rollback diffs from §4 applied cleanly; the listed pre-aa7a43c phrases now appear in base prose.
+4. `framework/processes/prd.md` contains the one-sentence mode pointer.
+5. `framework/perspectives/planner.md` enumerates `planner` and `drafter` by name and mentions `MODE.md`.
 
-**Final edit list for task 001's implementer:**
-- `framework/seed.md` — rename Architect → Designer per §6.
-- `framework/processes/prd.md` — rename QA Engineer → Validator, qa-engineer → validator, architect → designer; add mode-process pointer sentence per §4.
-- `framework/perspectives/planner.md` — expand role list per §2.
-- `framework/perspectives/spec-reviewer.md` — light edit to remove three code-flavored lines (Boundaries' "code quality is the code reviewer's job", "Each criterion should read like a test assertion" → "each criterion should read as a concrete observable outcome", "Can the result be tested?" → "Can the result be verified?").
-- `framework/perspectives/design-reviewer.md` — verify clean via grep; no edit expected, but if any code term slipped in, remove.
-
-**Do not touch:** `framework/perspectives/architect.md`, `qa-engineer.md`, `implementer.md`, `code-cleaner.md`, `code-reviewer.md`, `explorer.md`, `framework/processes/build-cycle.md`, `framework/ralph.md` (already clean), `framework/templates/prd.json`, `framework/template.claude.settings.json`.
-
-That's the full scope for task 001's implementer step. The mode directory does NOT yet exist; task 002 creates it.
+That's the whole task.
