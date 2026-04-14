@@ -45,7 +45,7 @@ Work until done. Don't ask for permission, confirmation, or selection between op
 
 ## Questions (when enabled)
 
-Some PRDs allow you to ask a clarifying question instead of guessing when you hit genuine ambiguity — intent, requirements, or a judgment call that really needs the human. When the dispatch prompt tells you questions are enabled, use them sparingly: only when you've actually tried to resolve the ambiguity from context and can't, and only when the cost of guessing wrong is larger than the cost of waiting. If questions aren't enabled, make the best call you can or mark the task blocked after 3 attempts. This is not a substitute for autonomy — it's a valve for real ambiguity, not a way to offload judgment.
+Some PRDs allow you to ask a clarifying question instead of guessing when you hit genuine ambiguity — intent, requirements, or a judgment call that really needs the human. When the dispatch prompt tells you questions are enabled, use them sparingly: only when you've tried to resolve the ambiguity from context and can't, and only when the cost of guessing wrong is larger than the cost of waiting. If questions aren't enabled, make the best call you can or mark the task blocked after 3 attempts.
 
 ## Proportionality
 

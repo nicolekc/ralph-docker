@@ -81,14 +81,14 @@ The most important handoff: the architect's design notes inform the implementer'
 
 ## Questions
 
-The PRD may declare `"questions": true` at the top level to enable a non-blocking question mechanism. Default is off (omitted or `false`); when off, the mechanism is invisible to agents.
+The PRD may declare `"questions": true` at the top level to enable a non-blocking question mechanism. Default is off.
 
-When enabled and you — as the working agent — hit genuine ambiguity about intent or requirements that you cannot resolve from context:
+When enabled and you hit genuine ambiguity about intent or requirements that you cannot resolve from context:
 
-- Write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index (`001`, `002`, …). One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete recommended default the human can accept with a one-word answer.
+- Write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md`, using the next free 3-digit index. One file per question. Describe what's ambiguous, what you considered, and (if useful) a concrete default the human can accept with a one-word answer.
 - Set your pipeline step's status to `needs_input`, commit, and push. Do not complete the step.
 
-Ralph parks `needs_input` steps and keeps dispatching everything else. When no other work is dispatchable, Ralph surfaces every unanswered question to the human in one batch. The human's answer is appended to the same file under a divider:
+Ralph parks the step and keeps dispatching other work. When nothing else is dispatchable, it surfaces all unanswered questions to the human in one batch and appends each answer to its file under a divider:
 
 ```markdown
 ---
@@ -98,9 +98,9 @@ Ralph parks `needs_input` steps and keeps dispatching everything else. When no o
 <human's response>
 ```
 
-A question file is "answered" iff it contains an `## Answer` section. Ralph flips answered steps back to `pending` and re-dispatches. On resume, read `questions/` in your task folder before starting — the file you wrote now has the answer below your question.
+Your step is flipped back to `pending` and re-dispatched. On resume, read `questions/` — the file you wrote now has the answer.
 
-Use this sparingly: only when you've actually tried to resolve from context, and only when the cost of guessing wrong exceeds the cost of waiting. If questions are not enabled, make your best call or mark the task blocked after 3 attempts.
+Use this sparingly: only when you've tried to resolve from context and the cost of guessing wrong exceeds the cost of waiting.
 
 ## Modifying the PRD
 

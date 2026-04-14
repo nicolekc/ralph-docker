@@ -26,13 +26,11 @@ Each worker self-orients by matching their assignment to the document chain: CLA
 
 ## Questions (when enabled)
 
-A PRD may declare `"questions": true` at the top level. When present and true, include a short paragraph in every dispatch prompt telling the subagent that if it hits genuine ambiguity it cannot resolve from context, it may write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md` (next free 3-digit index), set its pipeline step status to `needs_input`, push, and return. When the flag is absent or false, do not inject that paragraph — the agent does not learn the capability exists.
+A PRD may declare `"questions": true` at the top level. When true, include a short paragraph in every dispatch prompt telling the subagent that if it hits genuine ambiguity it cannot resolve from context, it may write a freeform markdown file at `ralph-context/tasks/<prd-name>/<task-id>/questions/NNN.md` (next free 3-digit index), set its pipeline step status to `needs_input`, push, and return. When the flag is absent or false, do not inject that paragraph.
 
-`needs_input` is a step status alongside `pending`, `in_progress`, and `complete`. It means the step is waiting on a human answer. Treat it as not-dispatchable, like `complete`, for the purpose of "is there dispatchable work?" — but unlike `blocked` it will become dispatchable again. It is a pause, not a failure: **do not count a `needs_input` step toward the 3-attempt limit.** A task cannot be marked `complete` while any of its steps are `needs_input`.
+`needs_input` is a step status (see `.ralph/processes/prd.md`). Treat it as not-dispatchable for the purpose of "is there dispatchable work?", but unlike `blocked` it will become dispatchable again. **It does not count toward the 3-attempt limit.**
 
-Surfacing: on every dispatch decision, if no step is dispatchable and at least one step somewhere is `needs_input`, read every unanswered `questions/NNN.md` file (a question is unanswered iff the file has no `## Answer` section) and present them to the human in one batch, each preceded by a `── Task <id> / <role> ──` header. Content goes through verbatim — do not summarize. Ask the human to answer inline. When the human replies, append the answer to each question file under a `---\n## Answer\n` divider (verbatim), flip the matching pipeline steps from `needs_input` back to `pending`, commit as one unit, and resume dispatching. Partial answers are fine — unanswered files stay `needs_input` for the next surfacing round.
-
-Recognize `needs_input` as a step status regardless of the flag, so stale states from a prior session or a flipped flag drain cleanly.
+When no step is dispatchable and at least one step is `needs_input`, read every unanswered `questions/NNN.md` file (unanswered = no `## Answer` section) and present them to the human in one batch, verbatim, with a header identifying task and role. When the human replies, append each answer to its file under a `---\n## Answer\n` divider, flip the matching steps from `needs_input` back to `pending`, commit, and resume. Partial answers are fine — unanswered files stay `needs_input` for the next round.
 
 ## Task Completion Assessment
 
