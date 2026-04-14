@@ -131,6 +131,39 @@ For headless execution. Install with `--bash-loop` flag, then run inside a Docke
 
 Each iteration reads `RALPH_PROMPT.md` (a thin wrapper around `.ralph/ralph.md`) and completes one pipeline step.
 
+## Running multiple sessions
+
+You can run two or more Ralph sessions against the same project in parallel — e.g. one PRD per session. Each session needs its own working tree and its own container so they don't collide on git or hijack each other's terminal.
+
+**Bind-mount mode (`ralph-start.sh`):** create a git worktree, then point the launcher at it.
+
+```bash
+# Terminal A — session on the primary working tree
+./ralph-start.sh ~/code/myproj              # container: ralph-myproj
+
+# Terminal B — second session on a worktree
+cd ~/code/myproj
+git worktree add ../myproj-prdb ralph/prd-b
+./ralph-start.sh ~/code/myproj-prdb          # container: ralph-myproj-prdb
+```
+
+The container name is derived from the folder basename, so two different worktrees give you two different containers automatically.
+
+**Volume mode (`ralph-clone.sh`):** use `--session` to get a separate clone.
+
+```bash
+./ralph-clone.sh https://github.com/me/proj.git                 # container: ralph-proj
+./ralph-clone.sh https://github.com/me/proj.git --session prdb  # container: ralph-proj-prdb
+```
+
+**Extra terminal on an existing session:** use `ralph-attach.sh` (runs `docker exec -it`). This does not start a new Ralph session — it's just another shell on the same container, handy for tailing logs.
+
+```bash
+./ralph-attach.sh ralph-myproj
+```
+
+Re-invoking `ralph-start.sh` or `ralph-clone.sh` against an already-running session also opens a new shell via `docker exec` instead of hijacking the original TTY.
+
 ## Repository Structure
 
 This repo is **self-hosting** — the framework is installed into itself for development.

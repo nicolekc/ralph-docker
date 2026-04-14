@@ -1,20 +1,61 @@
 #!/bin/bash
 # ralph-clone.sh - Start Ralph with repo cloned into Docker volume
-# Usage: ralph-clone.sh https://github.com/user/repo.git
+# Usage: ralph-clone.sh <github-repo-url> [--session <name>]
+#
+# --session <name>   Run a parallel session against the same repo.
+#                    Each session gets its own container and Docker volume
+#                    (its own clone), so two sessions can work on different
+#                    PRDs without git collisions.
 
 set -e  # Exit on any error
 
-REPO_URL="$1"
+REPO_URL=""
+SESSION=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --session|-s)
+            SESSION="$2"
+            shift 2
+            ;;
+        --session=*)
+            SESSION="${1#*=}"
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
+            exit 0
+            ;;
+        *)
+            if [ -z "$REPO_URL" ]; then
+                REPO_URL="$1"
+            else
+                echo "❌ Unexpected argument: $1"
+                echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
 if [ -z "$REPO_URL" ]; then
-    echo "Usage: ralph-clone.sh <github-repo-url>"
+    echo "Usage: ralph-clone.sh <github-repo-url> [--session <name>]"
     echo "Example: ralph-clone.sh https://github.com/user/repo.git"
+    echo "Example: ralph-clone.sh https://github.com/user/repo.git --session prdb"
     exit 1
 fi
 
 # Extract repo name from URL (handles .git suffix)
 REPO_NAME=$(basename "$REPO_URL" .git)
-CONTAINER_NAME="ralph-${REPO_NAME}"
-VOLUME_NAME="ralph-vol-${REPO_NAME}"
+
+if [ -n "$SESSION" ]; then
+    CONTAINER_NAME="ralph-${REPO_NAME}-${SESSION}"
+    VOLUME_NAME="ralph-vol-${REPO_NAME}-${SESSION}"
+else
+    CONTAINER_NAME="ralph-${REPO_NAME}"
+    VOLUME_NAME="ralph-vol-${REPO_NAME}"
+fi
 
 echo "🚀 Ralph Container: $CONTAINER_NAME"
 echo "📦 Volume: $VOLUME_NAME"
@@ -27,6 +68,12 @@ fi
 
 # Resume existing container or create new one
 if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    # If it's already running, attach a new shell via exec rather than
+    # hijacking the original TTY with `docker start -ai`.
+    if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        echo "📦 Container already running — opening a new shell (docker exec)..."
+        exec docker exec -it "$CONTAINER_NAME" bash
+    fi
     echo "📦 Resuming existing container..."
     docker start -ai "$CONTAINER_NAME"
 else

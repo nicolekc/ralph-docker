@@ -42,6 +42,12 @@ fi
 
 # Check if container already exists
 if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    # If it's already running, attach a new shell via exec instead of hijacking
+    # the original TTY with `docker start -ai`.
+    if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        echo "📦 Container already running — opening a new shell (docker exec)..."
+        exec docker exec -it "$CONTAINER_NAME" bash
+    fi
     echo "📦 Resuming existing container..."
     docker start -ai "$CONTAINER_NAME"
 else
