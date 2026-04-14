@@ -51,8 +51,13 @@
       "outcome": "Agents can ask questions that don't stall the pipeline. Questions accumulate while other work continues. The human answers in batch when Ralph has nothing else to dispatch. PRDs control whether questions are allowed.",
       "verification": "Run a PRD with questions enabled. One task asks a question. Other tasks continue to completion. Ralph surfaces the question only after exhausting other work. Answer it, task resumes. Run a PRD with questions disabled. Agent that would have asked instead makes a judgment call and continues.",
       "dependencies": [],
-      "status": "pending",
-      "pipeline": []
+      "status": "in_progress",
+      "pipeline": [
+        {"role": "plan", "status": "complete"},
+        {"role": "architect", "status": "pending"},
+        {"role": "implementer", "status": "pending"},
+        {"role": "code-cleaner", "status": "pending"}
+      ]
     },
     {
       "id": "005",
