@@ -109,11 +109,11 @@
       "outcome": "Settings template lives in a sensible location under `framework/`. Install skill offers the settings with context, user picks destination + apply/skip, outcome matches their choice.",
       "verification": "Install offers settings, user sees what they're accepting, declining leaves no trace, accepting lands them where the user chose without clobbering existing values.",
       "dependencies": ["006a"],
-      "status": "in_progress",
+      "status": "complete",
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "implementer", "status": "complete"},
-        {"role": "code-cleaner", "status": "pending"}
+        {"role": "code-cleaner", "status": "complete"}
       ]
     },
     {
