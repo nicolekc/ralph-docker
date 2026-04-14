@@ -15,153 +15,151 @@ Never read the user's `.env`, credentials, or the contents of their existing `.c
 
 Run these checks in the project root (the git toplevel) in order. **First match wins** — stop at the first bullet whose condition is true.
 
-1. `framework/seed.md` AND `framework/ralph.md` both exist at the project root → **Self-install** (this is the Orca source repo itself; the `.orca/` next to `framework/` is its own installed copy). Go to Step 3a.
-2. Both `.ralph/` and `.orca/` exist → **Conflict**. STOP.
-3. `.orca/` exists (and `.ralph/` does not) → **Upgrade** state.
-4. `.ralph/` OR `ralph-context/` OR `RALPH_PROMPT.md` exists (and `.orca/` does not) → **Migrate** state.
-5. None of the above → **Fresh** state.
+1. `framework/seed.md` AND `framework/ralph.md` both exist → **Self-install** (this is the Orca source repo itself; `.orca/` next to `framework/` is its own installed copy). This check comes first because the source repo always has `.orca/` present and would otherwise misroute to Upgrade.
+2. Both `.ralph/` and `.orca/` exist → **Conflict**.
+3. `.orca/` exists (and `.ralph/` does not) → **Upgrade**.
+4. `.ralph/` OR `ralph-context/` OR `RALPH_PROMPT.md` exists (and `.orca/` does not) → **Migrate**.
+5. None of the above → **Fresh**.
 
-The Self-install check comes first because the Orca source repo always has `.orca/` present (as its own installed copy); the `.orca/`-based checks would otherwise misroute it to Upgrade.
+Route:
 
-Route on the detected state:
-
-- **Fresh** → continue to Step 2 (Fresh).
-- **Self-install** → go to Step 3a (Self-install).
-- **Upgrade** → continue to Step 2b (Upgrade).
-- **Migrate** → continue to Step 2c (Migrate). Migrate finishes by falling through into Upgrade.
-- **Conflict** → STOP. Print exactly what's on disk and how to resolve:
+- **Fresh** → Step 2.
+- **Self-install** → Step 3a, which delegates to Step 2b with self-install adjustments.
+- **Upgrade** → Step 2b.
+- **Migrate** → Step 2c, which falls through into Step 2b.
+- **Conflict** → STOP with the message below. Do not rename, merge, or delete anything.
 
   ```
-  Both .ralph/ and .orca/ exist at <project-root>. Orca will not auto-resolve
-  this — one of them is stale and we don't know which.
+  Both .ralph/ and .orca/ exist at <project-root>. Orca will not auto-
+  resolve this — one of them is stale and we don't know which.
 
     .ralph/        (<N> files)
     .orca/         (<N> files)
     ralph-context/ (present / absent)
     orca-context/  (present / absent)
 
-  To continue, inspect the two trees (`git log -- .ralph .orca`, `ls -la`)
-  and delete whichever is not canonical, then re-run this install.
+  Inspect the two trees (e.g., `git log -- .ralph .orca`, `ls -la`) and
+  delete whichever is not canonical, then re-run this install.
   ```
 
-  Do not rename, merge, or delete anything. Stop with this message.
+  Substitute `<project-root>` with the absolute path and `<N>` with actual file counts (`find .ralph -type f | wc -l`). Leave `(present / absent)` as a literal pair with the non-matching word struck; e.g., `ralph-context/ (present)`.
 
 ## Step 2: Fresh install
 
-The user's repo has neither `.orca/` nor `.ralph/`. Proceed:
+Neither `.orca/` nor `.ralph/` exists. Proceed:
 
-1. Acquire the Orca source (Step 3b below) into a temp location you can read from.
-2. Read `framework/install/MANIFEST.md` from the Orca source — it enumerates every file this install places, classified by behavior.
+1. Acquire the Orca source (Step 3b) into a readable temp location.
+2. Read `framework/install/MANIFEST.md` from the source — it enumerates every file this install places, classified by behavior.
 3. Create `.orca/` in the project root.
-4. For each entry under **Framework files** in MANIFEST.md, copy source → target using Write. Create parent directories as needed.
-5. For each entry under **Skills**, copy source → target. Overwrite freely — these are framework-managed.
-6. For each entry under **Scaffolds**, create the directory and touch a `.gitkeep` file inside it. Do not create any other files under `orca-context/`.
-7. For each entry under **Once-only writes**:
-   - If the target file does NOT exist, copy source → target.
-   - If the target file already exists, leave it alone and record it as Unchanged.
-8. For each entry under **Git hooks**, copy source → target. Then set executable permission via `chmod +x` (through Bash). Then set the git hooks path: run `git config --get core.hooksPath` — if the output is empty or already `.git-hooks`, run `git config core.hooksPath .git-hooks`. Otherwise, warn the user that their current `core.hooksPath` is set to something else and skip the config change.
-9. For `.gitignore` entries in MANIFEST.md: ensure each entry is present in the project's `.gitignore`. Append any missing entries, preceded by a blank line and a `# Orca framework` comment, to keep merges readable. The current canonical list is empty; this is still a no-op today.
+4. **Framework files**: copy source → target (Write). Create parents as needed.
+5. **Skills**: copy source → target. Overwrite freely — framework-managed.
+6. **Scaffolds**: create each directory with a `.gitkeep`. Do not create any other files under `orca-context/`.
+7. **Once-only writes**: copy source → target only if the target does not exist. If it exists, leave it alone and record Unchanged.
+8. **Git hooks**: copy, `chmod +x`, then `git config --get core.hooksPath` — if empty or already `.git-hooks`, run `git config core.hooksPath .git-hooks`. Otherwise, warn and skip the config change.
+9. **`.gitignore` entries**: append missing entries (currently empty list — no-op today) preceded by a blank line and a `# Orca framework` comment.
 10. Write `.orca/.install-state.json` (see schema below).
 11. Go to Step 4 (Settings prompt).
 
 ### Classification semantics
 
-Per MANIFEST.md's table. Key detail for the Step 5 report: for overwrite classifications (`framework` / `skill` / `hook`), compare source vs. target bytes before writing. If they match, write nothing and report **Unchanged**. If they differ, write and report **Updated**. Never report Updated for a no-op write.
-
-Track each file as Created / Updated / Unchanged / Skipped across all operations.
+For every overwrite classification (`framework` / `skill` / `hook`), compare source vs. target bytes before writing. Identical → no write, report **Unchanged**. Different (or target missing) → write, report **Updated** or **Created**. Never report Updated for a no-op write. Track each file as Created / Updated / Unchanged / Skipped.
 
 ## Step 2b: Upgrade
 
-The project already has `.orca/`. Refresh framework-managed files and prune stale ones without touching user content.
+`.orca/` exists. Refresh framework-managed files and prune stale ones without touching user content.
 
-1. Acquire the Orca source (Step 3b below) into a temp location you can read from. In self-install mode, skip this — the current repo is the source.
-2. Read `framework/install/MANIFEST.md` from the Orca source.
-3. **Refresh framework files.** For each entry under **Framework files** in MANIFEST.md, compare source vs. target bytes. If identical, record Unchanged. If different (or target missing), Write and record Updated or Created. Create parent directories as needed.
-4. **Refresh skills.** For each entry under **Skills**, same compare-then-write logic. Record Unchanged / Updated / Created.
-5. **Refresh git hooks.** For each entry under **Git hooks**, same compare-then-write logic, then `chmod +x` the target. Leave `core.hooksPath` alone unless it's unset or already `.git-hooks` — see Step 2 substep 8 for the rule.
-6. **Do NOT touch once-only files** (`CLAUDE.md`, `.claudeignore`). Record them as Unchanged.
-7. **Do NOT touch scaffolds.** `orca-context/` already exists in an Upgrade; if any of the scaffold directories from MANIFEST.md is missing, create it with a `.gitkeep`. Do not touch any existing content inside `orca-context/`.
-8. **Ensure `.gitignore` entries.** Same append-merge rule as Step 2 substep 9.
-9. **Prune stale `.orca/` files.** See Step 2b-prune below.
-10. **Update the sentinel.** Read `.orca/.install-state.json` (tolerate missing keys; a 006a-era sentinel only has `install_version: "006a"`, `last_installed_at`, etc.). Set `install_version = "006b"`, set `last_installed_at = <now>`. Preserve all other keys, including `settings_prompted_at` and `settings_destination` — the settings prompt is NOT re-offered during Upgrade (Step 4 checks this).
-11. Go to Step 4 (Settings prompt — which will skip if `settings_prompted_at` is already non-null).
+1. Acquire the Orca source (Step 3b). In self-install mode, skip this — the current repo is the source.
+2. Read `framework/install/MANIFEST.md` from the source.
+3. **Refresh framework files**: compare-then-write per MANIFEST's Framework rows. Record Unchanged / Updated / Created.
+4. **Refresh skills**: same compare-then-write for Skills rows.
+5. **Refresh git hooks**: same compare-then-write, then `chmod +x`. `core.hooksPath` rule is the same as Step 2 substep 8 — leave it alone unless unset or already `.git-hooks`.
+6. **Do NOT touch once-only files** (`CLAUDE.md`, `.claudeignore`). Record Unchanged.
+7. **Scaffolds**: if any scaffold directory from MANIFEST is missing, create it with `.gitkeep`. Never touch existing content under `orca-context/`.
+8. **Ensure `.gitignore` entries** (same append-merge as Step 2 substep 9).
+9. **Prune stale `.orca/` files** (Step 2b-prune).
+10. **Update the sentinel**: read `.orca/.install-state.json`, set `install_version = "006b"` and `last_installed_at = <now>`, preserve all other keys (including `settings_prompted_at` and `settings_destination`). See the schema section for backward-compat read rules.
+11. Go to Step 4 (which skips if `settings_prompted_at` is already non-null — Upgrade never re-offers the prompt).
+
+In self-install mode, steps 6, 7, 8, 10, and 11 are adjusted — see Step 3a.
 
 ### Step 2b-prune: stale-file removal under `.orca/`
 
-Goal: remove `.orca/**` files that were framework-managed in an earlier Orca release but are no longer in the canonical file list.
+Remove `.orca/**` files that were framework-managed in an earlier release but are no longer in the canonical list.
 
-1. Compute the **expected set**: every target path listed under **Framework files** in MANIFEST.md.
-2. Compute the **candidate set**: every file currently under `.orca/` whose path matches one of the **Pruneable patterns** in MANIFEST.md.
-3. The **stale set** is `candidate set` minus `expected set`. Also exclude `.orca/.install-state.json` explicitly (it never matches a pruneable glob, but be defensive).
-4. **Partition the stale set** into two buckets by whether the file's immediate parent directory is framework-managed:
-   - **Confident stale**: parent directory appears in MANIFEST's framework rows (e.g., `.orca/perspectives/`, `.orca/modes/code/`, `.orca/templates/`, `.orca/processes/`, and `.orca/` itself for `seed.md` / `ralph.md`). These are framework territory — pruning here is safe.
-   - **Unexpected**: everything else (e.g., a file matching a pruneable glob but living in a subdir Orca has never shipped). These get listed and confirmed, not auto-deleted.
-5. For **Confident stale**: delete each file (`rm <path>`). Record as Deleted in the report (a sixth bucket alongside Created / Updated / Unchanged / Skipped).
-6. For **Unexpected**: print the list to the user and ask "These files match pruneable patterns but live outside known framework directories. Delete them?". Delete only on explicit confirmation. If the user declines, record as Skipped with reason "pruning declined by user".
-7. After pruning, walk the framework-managed directories under `.orca/` bottom-up and remove any now-empty directories (e.g., a `.orca/modes/<old-name>/` whose MODE.md was just pruned). Do not remove `.orca/` itself.
+1. **Expected set**: every target under **Framework files** in MANIFEST.md.
+2. **Candidate set**: every file currently under `.orca/` whose path matches a **Pruneable pattern** in MANIFEST.md.
+3. **Stale set**: candidate minus expected. Exclude `.orca/.install-state.json` defensively (it shouldn't match any glob, but skip it unconditionally).
+4. **Partition** by whether the immediate parent directory is framework-managed:
+   - **Confident stale**: parent is a framework directory Orca has shipped (`.orca/` for `seed.md` / `ralph.md`, `.orca/perspectives/`, `.orca/modes/<mode>/` or deeper, `.orca/processes/`, `.orca/templates/`). Safe to auto-delete — users are told not to edit inside `.orca/`; anything here is either a prior-release framework file (stale) or a user file in framework territory (user's error, and the install is entitled to overwrite it anyway).
+   - **Unexpected**: matches a pruneable glob but lives in a directory Orca has never shipped. List and confirm, don't auto-delete.
+5. **Confident stale**: `rm <path>`. Record as **Deleted**.
+6. **Unexpected**: print the list and ask "These files match pruneable patterns but live outside known framework directories. Delete them?". Delete on explicit confirmation only; otherwise record as **Skipped** with reason "pruning declined by user".
+7. After pruning, walk framework-managed directories bottom-up and `rmdir` any now-empty ones (e.g., a `.orca/modes/<old-name>/` whose only child was just pruned). Do not remove `.orca/` itself.
 
-Do NOT prune:
-- Any path not matching a MANIFEST pruneable glob (per 006a code-cleaner's warning, the glob list is intentionally narrow to avoid wiping user-added content).
+Never prune:
+- Paths not matching a MANIFEST pruneable glob (the glob list is intentionally narrow — see MANIFEST's note on not broadening it).
 - `.orca/.install-state.json`.
-- Anything under `orca-context/` — that's user territory, not `.orca/`.
+- Anything under `orca-context/` — that's user territory.
 
 ## Step 2c: Migrate
 
-The project has a pre-rename install (`.ralph/` or `ralph-context/` present, `.orca/` absent). Migrate renames paths in-place with a single git commit, then falls through into Upgrade.
+Pre-rename install (`.ralph/` / `ralph-context/` / `RALPH_PROMPT.md` present, `.orca/` absent). Rename paths in-place with a single commit, then fall through into Upgrade.
 
-1. **Refuse on dirty tree.** Run `git status --porcelain`. If there is ANY output (staged, unstaged, or untracked changes — treat untracked as dirty too, since a later `git mv` commit will surprise the user if they had unrelated edits in flight):
-   - Stop with this message: `Migration requires a clean git working tree. You have uncommitted changes. Please commit or stash them, then re-run the install.`
-   - Do not proceed. Do not stash automatically.
-2. **Rename directories with `git mv`.** Run each of these via Bash, but only if the source exists:
+1. **Refuse on dirty tree.** Run `git status --porcelain`. Any output at all — staged, unstaged, or untracked — means dirty. Stop with:
+   ```
+   Migration requires a clean git working tree. You have uncommitted
+   changes. Please commit or stash them, then re-run the install.
+   ```
+   Do not stash automatically.
+2. **Rename with `git mv`** (skip any whose source is absent):
    - `git mv .ralph .orca`
    - `git mv ralph-context orca-context`
-3. **Delete the `.ralph-tasks/` ghost.** If `.ralph-tasks/` exists at the project root, run `git rm -rf .ralph-tasks` (or plain `rm -rf` if the directory isn't tracked). Do not migrate its contents — per task 005's design it's a ghost directory nothing writes to.
-4. **Delete bash-loop artifacts if present.** The installer does not ship bash-loop files (per design §4). If any of these exist at the project root, remove them with `git rm` (or `rm` if untracked): `RALPH_PROMPT.md`, `ralph-loop.sh`, `ralph-once.sh`, `ralph-start.sh`, `ralph-reset.sh`, `ralph-clone.sh`, `ralph-attach.sh`, `ralph-logs/`. If the user wants to keep bash-loop locally, they can restore these from git history after install — mention this in the report.
-5. **Rewrite in-file path references.** Scope is limited to user-editable files at known paths. Do NOT grep/rewrite inside `.orca/` — the Upgrade pass that follows will overwrite those from the canonical source anyway.
+3. **Delete the `.ralph-tasks/` ghost**: `git rm -rf .ralph-tasks` (or `rm -rf` if untracked). Don't migrate contents — per task 005 it's a ghost.
+4. **Delete bash-loop artifacts if present.** The installer never ships these. If any exist at the project root, `git rm` them (or `rm` if untracked): `RALPH_PROMPT.md`, `ralph-loop.sh`, `ralph-once.sh`, `ralph-start.sh`, `ralph-reset.sh`, `ralph-clone.sh`, `ralph-attach.sh`, `ralph-logs/`. Mention in the report that the user can restore from git history if they still want bash-loop locally.
+5. **Rewrite in-file path references.** Scope is user-editable files at known paths. Do NOT grep/rewrite inside `.orca/` — Upgrade will overwrite those.
 
    Files to rewrite (skip any that don't exist):
    - `CLAUDE.md` (project root)
-   - `.claude/settings.json` — **project-level only**. Never touch `~/.claude/settings.json`; user-level settings may be shared across projects and aren't this install's business.
-   - Every `*.md` file under `orca-context/` (after the `git mv` in step 2 renamed the directory).
+   - `.claude/settings.json` — **project-level only**. Never touch `~/.claude/settings.json`.
+   - Every `*.md` file under `orca-context/` (after the step-2 rename).
 
-   For each file, do two literal substitutions:
+   For each file, do exactly these two literal substitutions with Edit's `replace_all`:
    - `.ralph/` → `.orca/`
    - `ralph-context/` → `orca-context/`
 
-   Use Edit's `replace_all`. Do not rewrite substrings that don't end in `/` (e.g., prose "the ralph loop" or a `/ralph` skill path must not be touched).
-6. **Single commit.** Stage everything: `git add -A`. Commit with message exactly `Migrate ralph-* paths to orca-*`. If the commit ends up empty (nothing to rename or rewrite), skip the commit — don't create empty history.
-7. **Fall through into Upgrade.** Continue at Step 2b substep 1. The newly-renamed `.orca/` is now treated as a normal Upgrade target, which will refresh framework files from canonical source and bump the sentinel's `install_version` to `"006b"`.
-
-Report the migration actions (renamed files, deleted files, rewritten files, commit SHA) in the final report alongside the Upgrade's refresh/prune results.
+   The trailing `/` is load-bearing. Anything else stays untouched — in particular: prose mentions ("the ralph loop", "ralph framework"), the `/ralph` skill path, the `ralph.md` filename, git URLs containing "ralph", and any other substring that doesn't end in `/`. Do not add regex substitutions; the two literal strings above are the full set.
+6. **Single commit.** `git add -A`, then commit with message exactly `Migrate ralph-* paths to orca-*`. If the result would be empty, skip the commit.
+7. **Fall through into Upgrade** at Step 2b substep 1. Report migration actions (renamed, deleted, rewritten, commit SHA) alongside Upgrade's refresh/prune results.
 
 ## Step 3: Orca source of truth
 
 ### Step 3a: Self-install mode
 
-If you detected that the current repo IS the Orca source (Step 1 saw `framework/seed.md` + `framework/ralph.md` locally), the install is a `framework/` → `.orca/` sync inside this same repo. No remote clone.
+The current repo IS the Orca source (Step 1 saw `framework/seed.md` + `framework/ralph.md` locally). The install is a `framework/` → `.orca/` sync inside this same repo. No remote clone.
 
-1. Treat the current working directory as the Orca source and `.orca/` as the install target. Skip the source-acquisition substep (Step 2 substep 1) — no clone needed.
-2. Run Step 2 substeps 2–10 (read MANIFEST through write sentinel), with these self-install adjustments:
-   - Once-only files (`CLAUDE.md`, `.claudeignore`) already exist at the repo root, so they're left untouched — correct behavior.
-   - Skills under `.claude/skills/` have identical source and target paths, so they report Unchanged.
-   - Scaffolds: `orca-context/` already exists with real content; leave it alone.
-   - Write `.orca/.install-state.json` only if missing — do not overwrite an existing sentinel, to avoid timestamp churn in git diffs.
-3. Skip the settings prompt (Step 4). Self-install must never touch the dev's own `.claude/settings.json`.
-4. Go to Step 5 (Report).
+Run Step 2b (Upgrade), treating the current working directory as the source and `.orca/` as the target, with these adjustments:
 
-The effect: `Install this project: <orca-url>` run inside this Orca repo refreshes `.orca/` from `framework/`. This is the replacement for the deleted `install.sh` dev workflow.
+- **Substep 1 (source acquisition)**: skip — current repo is the source.
+- **Skills refresh (substep 4)**: source and target paths are identical under `.claude/skills/`, so every file reports Unchanged. Still run the compare to be sure.
+- **Once-only files (substep 6)**: `CLAUDE.md` and `.claudeignore` already exist at the repo root — leave them, same as Upgrade.
+- **Scaffolds (substep 7)**: `orca-context/` already exists with real content — skip the `.gitkeep` step.
+- **Prune (substep 9)**: run it. This is the point of routing self-install through Upgrade — stale `.orca/` files get cleaned up on self-install too.
+- **Sentinel (substep 10)**: write `.orca/.install-state.json` only if missing. Do not overwrite an existing sentinel — avoids timestamp churn in git diffs on every developer sync.
+- **Settings prompt (substep 11 / Step 4)**: skip entirely. Self-install must never touch the developer's own `.claude/settings.json`.
+
+Then go to Step 5. Self-install replaces the deleted `install.sh` dev workflow: run from inside the Orca repo and it syncs `framework/` → `.orca/` plus prunes stale files.
 
 ### Step 3b: Remote source
 
-If this is a Fresh install (not self-install), acquire the Orca source:
+For a Fresh or Upgrade install on someone else's project, acquire the Orca source:
 
-1. Preferred: `gh repo clone <orca-url> /tmp/orca-source-<timestamp>` via Bash. Use a unique timestamp suffix so parallel installs don't collide.
+1. Preferred: `gh repo clone <orca-url> /tmp/orca-source-<timestamp>` (unique suffix so parallel installs don't collide).
 2. Fallback: `git clone <orca-url> /tmp/orca-source-<timestamp>`.
-3. Verify the clone succeeded and contains `framework/seed.md` and `framework/install/MANIFEST.md`. If not, stop and report that the clone failed or the URL is wrong.
-4. Use this temp clone as the Orca source for all file operations.
-5. After Step 5 reports, delete the temp clone: `rm -rf /tmp/orca-source-<timestamp>`.
+3. Verify the clone contains `framework/seed.md` and `framework/install/MANIFEST.md`. If not, stop and report.
+4. Use this clone as the Orca source for all file operations.
+5. After Step 5 reports, `rm -rf /tmp/orca-source-<timestamp>`.
 
-If the user passed a local path instead of a URL (e.g., `Install this project: .` or `Install this project: /abs/path/to/orca`), treat that path as the Orca source directly — no clone needed, no cleanup needed.
+If the user passed a local path (e.g., `Install this project: .` or `/abs/path/to/orca`), treat it as the source directly — no clone, no cleanup.
 
 ## Step 4: Settings prompt
 
@@ -236,13 +234,21 @@ Continue to Step 5.
 
 ## Step 5: Report
 
-Print a summary grouped by action:
+Print a summary grouped by action. Every file lands in exactly one bucket:
+
+- **Created** — target didn't exist before; we wrote it.
+- **Updated** — target existed and differed from source; we overwrote it.
+- **Unchanged** — target existed and already matched source (compare passed), or it's a once-only target that was already present and we left it alone.
+- **Deleted** — stale framework file pruned per MANIFEST.
+- **Migrated** — renamed during Step 2c (`.ralph` → `.orca`, etc.) or deleted during Step 2c (ghost dirs, bash-loop artifacts). Report old path and new path (or "deleted").
+- **Skipped** — action deliberately declined: `core.hooksPath` already points elsewhere, unexpected-prune rejected by user, settings destination chose Skip, etc. Always include a reason.
+
+Order within each group is alphabetical by target path.
 
 ```
 Orca install complete (state: Fresh | Self-install | Upgrade | Migrate)
 
 Created:
-  + <path>
   + <path>
 
 Updated:
@@ -258,15 +264,13 @@ Migrated:
   > <old-path> → <new-path>
 
 Skipped:
-  ? <path>   (reason)
+  ? <path>   (<reason>)
 
 Next steps:
   1. Run `/discover` in Claude Code to populate CLAUDE.md with your project's specifics.
   2. Draft a PRD at orca-context/prds/001-your-feature.json (see .orca/templates/prd.json).
   3. Run `/ralph orca-context/prds/001-your-feature.json`.
 ```
-
-Order within each group is stable: alphabetical by target path. A file appears in exactly one group.
 
 ---
 
@@ -285,12 +289,16 @@ The sentinel file written by every install run. Shape:
 
 Field reference:
 
-- `install_version` — the Orca install version that last touched this project. Fresh / Upgrade / Migrate all write `"006b"` today; each subsequent PRD that changes install behavior bumps this. Upgrade logic uses this to know which one-time migrations to run.
+- `install_version` — Orca install version that last touched this project. Fresh / Upgrade / Migrate all write `"006b"` today; each future PRD that changes install behavior bumps this. Used to gate one-time migrations.
 - `last_installed_at` — ISO 8601 UTC timestamp of this install run.
-- `settings_prompted_at` — ISO 8601 UTC timestamp of the first time the settings prompt was offered, or `null` if it hasn't been offered. Upgrade reads this; if non-null, skip Step 4.
+- `settings_prompted_at` — ISO 8601 UTC timestamp of the first settings-prompt offer, or `null` if never offered. If non-null, Step 4 is skipped.
 - `settings_destination` — `"project"`, `"user"`, `"skipped"`, or `null`. Populated by task 007.
 
-**Backward-compatible reads.** When Upgrade reads an existing sentinel, tolerate any missing field (a sentinel written by 006a may lack fields a later release added). Treat missing `settings_prompted_at` as `null` (i.e., re-prompt), missing `install_version` as "unknown but old", and preserve any unknown keys a future release may have added. Consumers must tolerate unknown keys — later tasks may extend the schema.
+**Backward-compatible reads.**
+
+- **Sentinel absent entirely** (pre-006a state, should only happen on first Migrate or an install that predates the sentinel): treat every field as its default — `install_version = null`, `settings_prompted_at = null`, `settings_destination = null`. Upgrade will then re-offer the settings prompt, which is correct for an install that never saw it.
+- **Sentinel present but sparse** (written by an earlier release that had fewer fields, e.g., a 006a-era sentinel): tolerate any missing field with the same defaults above. Preserve every key you don't recognize — later releases may have added keys this version doesn't know, and consumers must tolerate unknowns.
+- When writing, only set the fields you own this step. Don't delete or zero out keys you didn't touch.
 
 ---
 
