@@ -1,6 +1,7 @@
 {
   "name": "Pluggable Modes and Multi-Session",
   "description": "Pluggable domain modes, multi-session support, and a non-blocking question mechanism for the Ralph framework.",
+  "mode": "code",
   "signoff": "full",
   "tasks": [
     {
@@ -27,7 +28,7 @@
       "pipeline": [
         {"role": "plan", "status": "complete"},
         {"role": "architect", "status": "complete"},
-        {"role": "implementer", "status": "pending"},
+        {"role": "implementer", "status": "complete"},
         {"role": "design-reviewer", "status": "pending"}
       ]
     },
