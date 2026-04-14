@@ -2,6 +2,8 @@
 
 Any agent working on a PRD task follows these rules.
 
+If the PRD declares a `mode` field, also read `.ralph/modes/<mode>/MODE.md` — it layers mode-specific process content and names the perspective files this mode uses.
+
 ## Pipeline Model
 
 Every task has a `pipeline` — an ordered array of steps. Each step has a `role` and a `status`. The pipeline is populated by the **planner** role as the first thing that happens to any task.
@@ -56,13 +58,13 @@ Each role thinks about verification at its level of abstraction and **writes it 
 
 **Planner** — Decides if the task needs QA review. High-level or high-risk tasks should include `qa-engineer` in the pipeline.
 
-**Architect** — Includes verification strategy in the architecture: what boundaries need checking, what would give confidence this works. Does not specify exact checks — that's the implementer's job.
+**Architect** — Includes verification strategy in the architecture: what systems and boundaries need testing, what would give confidence this works. Does not specify exact test cases — that's the implementer's job.
 
 **Implementer** (or whatever the active mode calls the execution role) — Operationalizes the architect's verification strategy: designs the concrete checks that prove outcomes before producing the artifact.
 
 **QA Engineer** (when included) — Reviews from the user's perspective. Produces a verification report in the task context folder with issues, reproduction steps, and what works. Marks the task for another implementer pass if needed. Can be added by the planner for tasks that are high-level, user-facing, or where the gap between "looks right" and "actually works" is large.
 
-The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's approach. The implementer's verification work is the concrete realization of the architect's strategy.
+The key: verification thinking flows DOWN the pipeline, getting more concrete at each step. The architect's design notes (including verification thinking) inform the implementer's test design. The implementer's tests are the concrete realization of the architect's strategy.
 
 ## Durable Context
 
@@ -98,18 +100,18 @@ When a task's pipeline finishes (all steps complete), the orchestrator **assesse
 
 ### What to assess
 
-1. **Verification honesty** — Do the checks exercise real behavior, or just go through the motions? Surface-level verification proves the artifact exists, not that it works. Note the gap clearly.
+1. **Verification honesty** — Are the tests testing real behavior, or just mocking everything? Unit tests with fully mocked dependencies prove the code compiles, not that it works. Note the gap clearly.
 2. **Functionality gaps** — Does the work actually fulfill the task outcome and verification criteria? Read the task description again and compare to what was built.
-3. **Runnability** — Can the human actually exercise what was produced? What steps, what prerequisites (required inputs, credentials, services)?
+3. **Runnability** — Can the human actually run and test what was built? What commands, what prerequisites (API keys, data, services)?
 
 ### What to produce
 
 After the last pipeline step completes, the orchestrator writes a **handoff summary** to the human:
 
 - **What was built** — Brief, concrete list of what's new or changed.
-- **How to exercise it** — Exact steps. Include prerequisites (required inputs, credentials, services). If setup instructions changed, say so.
-- **Known gaps** — What ISN'T verified, what might not work, what requires real-world inputs to validate. Be honest, not optimistic.
-- **Confidence level** — "Works end-to-end" vs. "passes in isolation but never run against real inputs" vs. "scaffolding only."
+- **How to test it** — Exact commands, URLs, or steps. Include prerequisites (e.g., "requires ANTHROPIC_API_KEY"). If setup instructions changed, say so.
+- **Known gaps** — What ISN'T tested, what might not work, what requires real API keys to validate. Be honest, not optimistic.
+- **Confidence level** — "Works end-to-end" vs. "unit tests pass but never run against real APIs" vs. "scaffolding only."
 
 ### If gaps are found
 

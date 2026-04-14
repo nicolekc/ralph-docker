@@ -30,7 +30,7 @@ When a task's pipeline finishes, you assess the work before marking it done. Rea
 
 Key rules:
 - **Do not auto-fix.** If you find gaps, unset the task status and dispatch agents to address them.
-- **Be honest about verification.** Surface-level checks ≠ working artifact. Say what's really verified.
+- **Be honest about test coverage.** Mocked unit tests ≠ working software. Say what's really tested.
 - **Always give the human running instructions.** Exact commands, prerequisites, what they can verify.
 
 ## Branch and PR

@@ -11,9 +11,13 @@ Understand the nature of the work:
 * What would go wrong if the wrong perspectives looked at this?
 * What's the minimum set of perspectives that covers the risk?
 
-Available roles live in the perspectives directories you have access to — base roles always, plus any the active mode adds. Read the relevant ones when you need to decide whether they fit.
+The base framework provides two roles:
+- **planner** — this role; composes pipelines.
+- **drafter** — proposes an approach and sketches verification before execution.
 
-If the active mode provides suggested pipeline patterns, read them — they reflect what has worked for this kind of work. Treat them as starting points, not menus. If no mode is active, compose from first principles based on the task's risk and shape.
+The active mode (if the PRD declares one) adds more roles — at minimum an execution role, and often mode-specific reviewers, validators, or investigators. The mode's `MODE.md` names them and may suggest pipeline patterns that have worked for that kind of work. Read the mode file when a mode is active; read a perspective file before committing a role to a pipeline.
+
+If no mode is active, compose from first principles with the two base roles and whatever the task's risk and shape demand.
 
 ## What You Produce
 

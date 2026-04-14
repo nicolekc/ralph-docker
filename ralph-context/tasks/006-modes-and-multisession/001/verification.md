@@ -1,42 +1,36 @@
-# Task 001 — Verification
+# Task 001 — Implementer Verification (v3)
 
-## Grep sweep over edited base files
+## Files touched
 
-Searched for: `code`, `test`, `tests`, `commit`, `TDD`, `build`, `code review`, `AGENTS.md`, `unit tests`, `tested`, `run tests`
+- `framework/perspectives/drafter.md` — **created**. New base role covering structural thinking before execution, tradeoff framing, verification sketching, splitting judgment. Written in neutral voice, no code vocabulary.
+- `framework/seed.md` — **edited**. Applied all eight rollbacks from design §4: Own the Quality Loop (2 lines), Commit Discipline heading + body, Read Before Judging paragraph + "every file in the project" line, Stay in Scope, Keep It Simple (three similar lines), Verification Rigor (2 lines). Also renamed Architect→Drafter in the Respect Role Boundaries section (see deviation note below).
+- `framework/ralph.md` — **edited**. Applied the one rollback in design §4: "Be honest about test coverage. Mocked unit tests ≠ working software."
+- `framework/perspectives/planner.md` — **edited**. Replaced the two lines covering available roles + mode pipeline patterns with the expanded two-role list from design §3. Left line 26's "exploration/investigation role the active mode provides" alone — reads fine, design left it to implementer judgment.
+- `framework/processes/prd.md` — **edited**. Applied seven rollbacks from design §4 (architect verification strategy, informs implementer's test design, verification honesty mocks, runnability commands/API keys, How to test it, Known gaps, Confidence level). Added the one-sentence mode pointer immediately after "Any agent working on a PRD task follows these rules." Did NOT touch the "Implementer (or whatever the active mode calls the execution role)" paragraph or the "looks right"/"actually works" QA Engineer line per design §4 guidance (base keeps concrete-but-not-TDD phrasing).
 
-Remaining hits, all intentional and domain-neutral:
+## Untouched files verified byte-identical
 
-- `framework/seed.md:53` — "HOW to build it" — metaphor for construction (Respect Role Boundaries section). Valid for any domain.
-- `framework/perspectives/planner.md:28` — "how to build it" — metaphor in What You Avoid. Valid for any domain.
-- `framework/processes/prd.md:22` — "commit the PRD update" — refers to the git machinery used for multi-agent coordination. Git-level machinery survives across modes; this is not a code-mode concern.
+`git diff aa7a43c -- framework/perspectives/architect.md framework/perspectives/qa-engineer.md framework/perspectives/design-reviewer.md framework/perspectives/spec-reviewer.md framework/perspectives/implementer.md framework/perspectives/code-cleaner.md framework/perspectives/code-reviewer.md framework/perspectives/explorer.md framework/processes/build-cycle.md` returns empty output. Confirmed.
 
-No hits for: `TDD`, `AGENTS.md`, `tests? pass`, `code review`, `tested`, `unit tests?` in any of the four edited files.
+## Non-code mental read-through of `drafter.md`
 
-## Tax-preparation read-through
+Mentally ran the file through three non-code planners:
 
-Reading seed, ralph, planner, prd as if building a tax preparation pipeline:
+- **Writing-project planner** (drafting a book proposal): "propose an approach and sketch verification," "what would give real confidence the work is right — not 'it exists,' but 'it does what it should'," "make the transition explicit" — all reads naturally. "Split vs keep together" maps cleanly to chapter-level organization.
+- **Tax-prep planner** (drafting a return strategy): "identify the real choices, name the tradeoffs, recommend one" — this is exactly how a CPA frames election choices. "What exists now, what needs to exist after" reads as current-year position vs filed return. Fits.
+- **Research planner** (drafting a literature review): "understand the problem before proposing a shape for the solution," "what would count as evidence" — neutral enough to cover survey design.
 
-- seed.md: "Own the Quality Loop", "Recording Changes", "Read Before Judging", "Verification Rigor" — all read naturally. "Verify the change works (whatever 'works' means for this artifact)" fits checking a return against source documents. "Produce the artifact, exercise it, prove it works" fits filing a return through a validator.
-- ralph.md: Roles section now abstracts to "base roles + mode roles". Task Completion Assessment bullets are domain-neutral.
-- planner.md: Role-list is removed; the planner is told to read available perspectives. Common patterns is a two-sentence pointer to the active mode.
-- prd.md: Verification Cascade uses "verification", "concrete checks", "looks right vs actually works". Completion Assessment uses "required inputs, credentials, services" instead of API keys.
+No code vocabulary leaked in (checked for: `test`, `TDD`, `build`, `compile`, `codebase`, `code review`, `bisect`, `API`, `file:line` — none present). "Execute" / "executor" are general; "verification" is general. "Draft" / "drafter" thread through cleanly.
 
-No remaining code-specific content that would confuse a tax-domain (or research-domain, or writing-domain) reader.
+## Deviations from design.md
 
-## Perspectives directory state
+One deviation from design §4 / §6:
 
-`framework/perspectives/` still contains all 9 perspective files (including code-specific: implementer, code-cleaner, code-reviewer, explorer). Per the architect's design, task 001 does NOT physically move these — task 002 does. This keeps the branch runnable for existing code PRDs while the mode system is built out.
+- Design §4 seed.md section says: *"The Respect Role Boundaries section (lines 50-59) was NOT changed by aa7a43c... Leave as-is."* Design §6 reinforces: *"The Respect Role Boundaries section is NOT edited."*
+- The prompt from the caller (implementer dispatch) instructed: *"seed.md rename architect→drafter where the three-roles-three-jobs section names a base role."*
+- I followed the prompt: renamed `Architect`→`Drafter` in the Respect Role Boundaries section (5 occurrences, all referring to the abstract base role). `Implementer` kept as-is — it remains a valid role noun, now scoped as a mode role name rather than a base one, and the prose still reads correctly.
+- Rationale for following the prompt over the design: in the v3 two-role base world, `architect` is a code-mode-only perspective filename. Leaving `Architect` as the generic "defines the solution space" role in the base seed.md conflicts with the naming rationale in design §1 (architect was rejected as a base name because it's the existing code-mode file). The rename makes base prose self-consistent with the base role list.
 
-## Cross-reference integrity
+## Summary
 
-All pointers in edited base files still resolve:
-- `seed.md:5` → `.ralph/perspectives/`, `.ralph/processes/prd.md`
-- `ralph.md:8` → `.ralph/processes/prd.md`
-- `ralph.md:13` → `.ralph/perspectives/`
-- `ralph.md:29` → `.ralph/processes/prd.md` (via "Completion Assessment" section name)
-
-No dangling references.
-
-## Self-host sanity
-
-`.ralph/` is stale relative to `framework/` (it's the installed copy, regenerated separately). This branch's behavior isn't affected by task 001's edits until the install flow or a sync lands. Task 002 is where the two-layer system actually runs. Flagged per architect's guidance.
+All design §4 rollbacks applied. One structural change per design §3 (planner role list), one per design §2 (prd.md mode pointer). New `drafter.md` reads naturally for non-code domains. Eight existing perspective files and `build-cycle.md` confirmed byte-identical to aa7a43c.
